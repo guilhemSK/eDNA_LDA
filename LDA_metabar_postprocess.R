@@ -156,7 +156,7 @@ select_real = 1
 # Selected_real must start at 1
 #Selected_real = c(seq(1,10,1),seq(91,100,1))
 #Selected_real = seq(1,100,1)
-Selected_real = seq(1,5,1)
+Selected_real = seq(1,1,1)
 #Selected_real = 1
 
 # only useful for Gibbs sampling
@@ -172,10 +172,14 @@ var_tol = 10^-8
 dominance_calculation = 0
 # Calculating the proportion of the total read number taken by each topic (useful for ordering the topics as an alternative to normalized abundance)
 topic_read_proportion_comput = 0
+
 # Comparing topics to chemistery and lidar data (for data_pp only), as well as comparing topics to each other within the best real:
-abiotic_variables = 0
+abiotic_variables = 1
 # Number of randomizations for lidar data, required for abiotic_variables = 1
+# Randomizations not implemented yet for data_gs
 nb_abiotic_rndzations = 100000
+# Perform a PCA over the abiotic variables before computing the correlation to the assemblages (only useful for abiotic_variables = 1) :
+pca_abiotic = 0
 
 # Comparing realizations to each other
 realization_comparison = 0
@@ -192,7 +196,7 @@ nb_rndzations = 1000
 # kriging for the spatial distribution of topics in the best realization
 kriging = 1
 # required if kriging = 1, only the kriged_real are kriged (all kriged realizations must be included in Selected_real)
-kriged_real = seq(1,5,1)
+kriged_real = seq(1,1,1)
 
 # color2D.matplot colors
 col_values = as.list(as.data.frame(t(col2rgb(terrain.colors(255)))))
@@ -316,7 +320,7 @@ if (barcode_gh) {
   barcode_insert = "Anoures_IUCN_forest"
   short_barcode_insert = "IUCN_forest"
 }
-  
+
 if (blei) {
   filename_insert = "Blei_LDA"
 } else if (Rtopicmodels_Gibbs) {
@@ -859,14 +863,13 @@ if (mpar)
     {  
       command = paste("cp ",cluster_subdirname,filename," ",local_subdirname,filename,sep="")
       system(command, intern=TRUE)
-      load(filename)
+      load("Loading from cluster",filename)
     }
     
     if (existingresult)
-    {
       load(filename)
-    }
-    cat(filename,"\n")
+    
+    cat("Loading",filename,"\n")
   } 
 }
 
@@ -1084,33 +1087,33 @@ for (par_index in 1:mpar_range)
       
       Result = topicmodels::LDA(x=t(data2m),k=nb_topics,method = "VEM",control=control_LDA_VEM,model=NULL)
       
-#       ##########################
-#       library(topicmodels)
-#       nb_real = 5
-#       SEED = vector(length=nb_real,mode="integer")
-#       for (j in 1:nb_real)
-#         SEED[j] = as.integer(Sys.time()) - j*10^7
-#       alpha = 0.1
-#       nb_topics = 2
-#       em_tol = 10^-7
-#       var_tol = 10^-8
-#       #data2m = t(matrix(nrow=3,ncol=3,data=c(c(3,2,1),c(4,0,3),c(1,3,0))))
-#       data2m = t(matrix(nrow=3,ncol=3,data=c(c(4,2,0),c(1,2,3),c(0,1,3))))
-#       control_LDA_VEM = list(estimate.alpha=TRUE, alpha=alpha, estimate.beta=TRUE,
-#                              verbose = 1, prefix = tempfile(), save = 0, keep = 1,
-#                              seed = SEED, nstart = nb_real, best = 0,
-#                              var = list(iter.max = 500, tol = var_tol),
-#                              em = list(iter.max = 1000, tol = em_tol),
-#                              initialize = "random")
-#       illustrative_result = topicmodels::LDA(x=t(data2m),k=nb_topics,method = "VEM",control=control_LDA_VEM,model=NULL)
-#       LLH_final_real1 = vector(length=nb_real,mode="numeric")
-#       for (j in 1:nb_real)
-#         LLH_final_real1[j] = sum(illustrative_result[[j]]@loglikelihood)
-#       Ordered_realizations = sort.int(LLH_final_real1,decreasing=T,index.return=T)
-#       illustrative_documents = illustrative_result[[Ordered_realizations$ix[1]]]@gamma
-#       illustrative_beta = exp(illustrative_result[[Ordered_realizations$ix[1]]]@beta) 
-#       illustrative_alpha = illustrative_result[[Ordered_realizations$ix[1]]]@alpha
-#       #########################
+      #       ##########################
+      #       library(topicmodels)
+      #       nb_real = 5
+      #       SEED = vector(length=nb_real,mode="integer")
+      #       for (j in 1:nb_real)
+      #         SEED[j] = as.integer(Sys.time()) - j*10^7
+      #       alpha = 0.1
+      #       nb_topics = 2
+      #       em_tol = 10^-7
+      #       var_tol = 10^-8
+      #       #data2m = t(matrix(nrow=3,ncol=3,data=c(c(3,2,1),c(4,0,3),c(1,3,0))))
+      #       data2m = t(matrix(nrow=3,ncol=3,data=c(c(4,2,0),c(1,2,3),c(0,1,3))))
+      #       control_LDA_VEM = list(estimate.alpha=TRUE, alpha=alpha, estimate.beta=TRUE,
+      #                              verbose = 1, prefix = tempfile(), save = 0, keep = 1,
+      #                              seed = SEED, nstart = nb_real, best = 0,
+      #                              var = list(iter.max = 500, tol = var_tol),
+      #                              em = list(iter.max = 1000, tol = em_tol),
+      #                              initialize = "random")
+      #       illustrative_result = topicmodels::LDA(x=t(data2m),k=nb_topics,method = "VEM",control=control_LDA_VEM,model=NULL)
+      #       LLH_final_real1 = vector(length=nb_real,mode="numeric")
+      #       for (j in 1:nb_real)
+      #         LLH_final_real1[j] = sum(illustrative_result[[j]]@loglikelihood)
+      #       Ordered_realizations = sort.int(LLH_final_real1,decreasing=T,index.return=T)
+      #       illustrative_documents = illustrative_result[[Ordered_realizations$ix[1]]]@gamma
+      #       illustrative_beta = exp(illustrative_result[[Ordered_realizations$ix[1]]]@beta) 
+      #       illustrative_alpha = illustrative_result[[Ordered_realizations$ix[1]]]@alpha
+      #       #########################
       
       if (!best)
       {
@@ -1157,7 +1160,7 @@ for (par_index in 1:mpar_range)
           }
         }
       }
-
+      
       if (mpar)
       {
         if (par_index == 1)
@@ -1458,14 +1461,14 @@ if (!mpar)
     #       ocean@data$id = rownames(ocean@data)
     #       oceanPoints = fortify(ocean, region="id")
     #       oceanGgplot = merge(oceanPoints, ocean@data, by="id")  
-#     Americas = oceanGgplot[which(oceanGgplot$piece==2),]
-     
+    #     Americas = oceanGgplot[which(oceanGgplot$piece==2),]
+    
     land = readOGR(dsn=paste0(local_prefix,data_insert,"/ne_10m_land"), layer="ne_10m_land")
     #land_shape = readShapePoly(paste0(local_prefix,data_insert,"/ne_10m_land/ne_10m_land"))
-
-#     land@data$id = rownames(land@data)
-#     landPoints = fortify(land, region="id")
-#     landGgplot = merge(landPoints, land@data, by="id") 
+    
+    #     land@data$id = rownames(land@data)
+    #     landPoints = fortify(land, region="id")
+    #     landGgplot = merge(landPoints, land@data, by="id") 
   }
   
   ########################
@@ -1789,7 +1792,7 @@ if (!mpar)
                                                  KL.plugin(KL_documents_allreal[[j_select]][,k1],KL_documents_allreal[[j_real]][,k]))
             else if (MOTUwise)
               KL_topic_comparison[k,k1] = 1/2*(KL.plugin(KL_topic_compo_allreal[[j_real]][,k],KL_topic_compo_allreal[[j_select]][,k1]) +
-                                                             KL.plugin(KL_topic_compo_allreal[[j_select]][,k1],KL_topic_compo_allreal[[j_real]][,k]))         
+                                                 KL.plugin(KL_topic_compo_allreal[[j_select]][,k1],KL_topic_compo_allreal[[j_real]][,k]))         
           }
         }
         
@@ -1996,7 +1999,7 @@ if (!mpar)
             p_value_allRealPairs_byTopic[[k]][j_real,j_select] = nb_non_significant_rndzations/nb_rndzations
             Var_KL_topic_comparison_randomized_allRealPairs_byTopic[[k]][j_real,j_select] = Var_KL_topic_comparison_randomized
             SES_allRealPairs_byTopic[[k]][j_real,j_select] = (Mean_KL_topic_comparison_randomized[k] - KL_topic_comparison[k,Topic_correspondence[k]])/
-                                                            sqrt(Var_KL_topic_comparison_randomized - Mean_KL_topic_comparison_randomized[k]^2)
+              sqrt(Var_KL_topic_comparison_randomized - Mean_KL_topic_comparison_randomized[k]^2)
             Var_KL_topic_comparison_randomized_allRealPairs[j_real,j_select] = Var_KL_topic_comparison_randomized/nb_topics + 
               Var_KL_topic_comparison_randomized_allRealPairs[j_real,j_select]
             p_value = nb_non_significant_rndzations/nb_rndzations/nb_topics + p_value
@@ -2012,7 +2015,7 @@ if (!mpar)
             for (rndzation in 1:nb_rndzations) 
             {
               KL_topic_comparison_randomized = 1/2*(KL.plugin(KL_documents_allreal[[j_real]][,k],KL_documents_jselect_randomized[[rndzation]][,k1]) +
-                                                                 KL.plugin(KL_documents_jselect_randomized[[rndzation]][,k1],KL_documents_allreal[[j_real]][,k]))
+                                                      KL.plugin(KL_documents_jselect_randomized[[rndzation]][,k1],KL_documents_allreal[[j_real]][,k]))
               if (KL_topic_comparison[k,k1] > KL_topic_comparison_randomized)
                 nb_non_significant_rndzations = nb_non_significant_rndzations + 1
               Mean_KL_topic_comparison_randomized[i] = 1/nb_rndzations*KL_topic_comparison_randomized +
@@ -2025,7 +2028,7 @@ if (!mpar)
             p_value_allRealPairs_byTopic[[i]][j_real,j_select] = nb_non_significant_rndzations/nb_rndzations
             Var_KL_topic_comparison_randomized_allRealPairs_byTopic[[i]][j_real,j_select] = Var_KL_topic_comparison_randomized
             SES_allRealPairs_byTopic[[i]][j_real,j_select] = (Mean_KL_topic_comparison_randomized[i] - KL_topic_comparison[k,k1])/
-                                                sqrt(Var_KL_topic_comparison_randomized - Mean_KL_topic_comparison_randomized[i]^2)
+              sqrt(Var_KL_topic_comparison_randomized - Mean_KL_topic_comparison_randomized[i]^2)
             Var_KL_topic_comparison_randomized_allRealPairs[j_real,j_select] = Var_KL_topic_comparison_randomized/nb_topics + 
               Var_KL_topic_comparison_randomized_allRealPairs[j_real,j_select]
             p_value = nb_non_significant_rndzations/nb_rndzations/nb_topics + p_value
@@ -2089,8 +2092,8 @@ if (!mpar)
             
             SES_allRealPairs[j_real,j_select] = SES_allRealPairs_byTopic[[k]][j_real,j_select]/nb_topics + SES_allRealPairs[j_real,j_select]
             
-#             SES_samplewise_allRealPairs_byTopic[[k]][j_real,j_select] = 
-#               DKL100_samplewise_allRealPairs_byTopic[[k]][j_real,j_select]/sqrt(Var_KL_samplewise_topic_comparison_randomized[k] - Mean_KL_samplewise_topic_comparison_randomized[k]^2)
+            #             SES_samplewise_allRealPairs_byTopic[[k]][j_real,j_select] = 
+            #               DKL100_samplewise_allRealPairs_byTopic[[k]][j_real,j_select]/sqrt(Var_KL_samplewise_topic_comparison_randomized[k] - Mean_KL_samplewise_topic_comparison_randomized[k]^2)
             
             #Correlation_MOTUwise_allRealPairs[j_real,j_select] = cor(documents_allreal[[j_real]],documents[,Topic_correspondence_MOTUwise])[k,k]
             
@@ -2185,329 +2188,337 @@ if (!mpar)
       #################
       
       if (data_pp && !testdata)
+        case_list = c("lidar","chemi")
+      else if (data_gs)
+        case_list = "climate"
+      
+      for (case in case_list)
       {
         
-      
-      setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Chemistery/",sep=""))
-      # produces a dataframe with columns as vectors instead of factors (otherwise one cannot direclty apply "as.numeric" to the values)
-      data_chemi = read.table("chemistry_pred_CRIJ.txt",sep=" ",colClasses="vector")
-      
-      data_chemi_wrongindexing = data_chemi
-      for (i in 1:29)
-      {
-        for (j in 1:39)
+        if (case == "chemi")
         {
-          data_chemi[(j-1)*29+i,] = data_chemi_wrongindexing[(i-1)*39+j,]   
-        }
-      }
-      
-      if (filled && !filled_with_gaps)
-      {
-        # converts the dataframe of character values to a list of numeric values
-        data_chemi_num = apply(data_chemi,2,as.numeric)
-        
-        # PCA on standardized ("normed") data, ie centered and divided by std. dev. for each column 
-        chemi_PCA = dudi.pca(as.data.frame(data_chemi_num), row.w = rep(1, nrow(data_chemi_num))/nrow(data_chemi_num), 
-                             col.w = rep(1, ncol(data_chemi_num)), center = TRUE, scale = TRUE, 
-                             scannf = F, nf = ncol(data_chemi_num))
-      } else
-      {
-        # Removing missing samples
-        data_chemi_minusMissingSamples = data_chemi[-which(Missing_positions_indices==1),]
-        # converts the dataframe of character values to a list of numeric values
-        data_chemi_minusMissingSamples_num = apply(data_chemi_minusMissingSamples,2,as.numeric)
-      }
-      
-      # remembering the element names for the plots
-      element_names = colnames(data_chemi)
-      
-      if (filled && !filled_with_gaps)
-      {
-        #Correlation_chemi = cor(documents[,rev(sort_normal_topic$ix)],data_chemi_minusMissingSamples_num)
-        Correlation_chemi = vector("list",4)
-        Correlation_chemi[[1]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-        Correlation_chemi[[2]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-        Correlation_chemi[[3]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-        Correlation_chemi[[4]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-      } else
-      {
-        Correlation_chemi = vector("list",2)
-        Correlation_chemi[[1]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-        Correlation_chemi[[2]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-      }
-      for (k in 1:nb_topics)
-      {
-        for (j in 1:ncol(data_chemi))
+          setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Chemistery/",sep=""))
+          # produces a dataframe with columns as vectors instead of factors (otherwise one cannot direclty apply "as.numeric" to the values)
+          data_abiotic = read.table("chemistry_pred_CRIJ.txt",sep=" ",colClasses="vector")
+          data_abiotic = apply(data_abiotic,2,as.numeric)
+        } else if (case == "lidar")
         {
-          if (filled && !filled_with_gaps)
-          {
-            Cor_test = cor.test(documents[,k],data_chemi_num[,j])
-            Correlation_chemi[[1]][k,j] = Cor_test$estimate
-            Correlation_chemi[[2]][k,j] = Cor_test$p.value
-            Cor_test = cor.test(documents[,k],chemi_PCA$li[,j])
-            Correlation_chemi[[3]][k,j] = Cor_test$estimate
-            Correlation_chemi[[4]][k,j] = Cor_test$p.value
-          }
-          else
-          {
-            Cor_test = cor.test(documents[,k],data_chemi_minusMissingSamples_num[,j])
-            Correlation_chemi[[1]][k,j] = Cor_test$estimate
-            Correlation_chemi[[2]][k,j] = Cor_test$p.value
-          }
-        }
-      }
-      ##############################
-      
-      # Lidar data
-      setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/",sep=""))
-      data_lidar = read.table("Lidar_locsites_E20_origin_mean_10_extended.csv",colClasses="vector",sep=";")
-      data_lidarm = matrix(nrow=length(data_lidar$V5[-1]),ncol=11)
-      colnames(data_lidarm) = c("Topography","Canopy height","Light","Wetness","Slope","Canopy height difference 2008-2012","Tree density","Number of tree deaths 2008-2012","Loss of above-ground biomass 2008-2012","Slope standard deviation","Slope (log)")
-      
-      # Removing from data_lidar: canop08, which is already contained in dif_can, tree_density2008, AGBloss_mort2008, ndeath2008 
-      data_lidarm[,1] = as.vector(data_lidar$V5[-1])
-      data_lidarm[,2] = as.vector(data_lidar$V4[-1])
-      data_lidarm[,3] = as.vector(data_lidar$V6[-1])
-      data_lidarm[,4] = as.vector(data_lidar$V7[-1])
-      data_lidarm[,5] = as.vector(data_lidar$V8[-1])
-      data_lidarm[,6] = as.vector(data_lidar$V10[-1])
-      data_lidarm[,7] = as.vector(data_lidar$V11[-1])
-      data_lidarm[,8] = as.vector(data_lidar$V12[-1])
-      data_lidarm[,9] = as.vector(data_lidar$V13[-1])
-      data_lidarm[,10] = as.vector(data_lidar$V17[-1])
-      # log of slope
-      data_lidarm[,11] = data_lidarm[,5]
-      
-      # Switching from indexing row by row (first the 39 elements of the first row, then the 39 elements of the second row, etc.)
-      # to indexing column by column (first the 29 elements of the first column, then the 29 elements of the second column, etc.)
-      data_lidarm_wrongindexing = data_lidarm
-      for (i in 1:29)
-      {
-        for (j in 1:39)
-        {
-          data_lidarm[(j-1)*29+i,] = data_lidarm_wrongindexing[(i-1)*39+j,]   
-        }
-      }
-      
-      if (filled && !filled_with_gaps)
-      {
-        data_lidarm_num = apply(data_lidarm,2,as.numeric)
-        data_lidarm_num[,10] = sqrt(data_lidarm_num[,10])
-        data_lidarm_num[,11] = log(data_lidarm_num[,11])
-        colnames(data_lidarm_num) = colnames(data_lidarm)
-        ncol0 = ncol(data_lidarm_num)
-        
-        if (nb_topics == 3)
-        {
-          data_lidarm_num1 = matrix(nrow = ncol(data2m), ncol = 14)
-          data_lidarm_num1[,1:11] = data_lidarm_num
+          # Lidar data
+          setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/",sep=""))
+          data_abiotic_data.frame = read.table("Lidar_locsites_E20_origin_mean_10_extended.csv",colClasses="vector",sep=";")
+          data_abiotic = matrix(nrow=length(data_abiotic_data.frame$V5[-1]),ncol=11)
+          colnames(data_abiotic) = c("Topography","Canopy height","Light","Wetness","Slope","Canopy height difference 2008-2012","Tree density","Number of tree deaths 2008-2012","Loss of above-ground biomass 2008-2012","Slope standard deviation","Slope (log)")
           
-          setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert))
-          documents_bacteria = readRDS("documents_bacteria_PP_3topics_best_real.rds")
-          setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/"))
-          data_lidarm_num1[,12:14] = documents_bacteria
-          colnames(data_lidarm_num1) = c(colnames(data_lidarm),"Terra firme","Hydromorphic","Exposed rock")
-          ncol1 = ncol(data_lidarm_num1)
-        }
-
-        # PCA on standardized ("normed") data, ie centered and divided by std. dev. for each column 
-        lidar_PCA = dudi.pca(as.data.frame(data_lidarm_num), row.w = rep(1, nrow(data_lidarm_num))/nrow(data_lidarm_num), 
-                             col.w = rep(1, ncol(data_lidarm_num)), center = TRUE, scale = TRUE, 
-                             scannf = F, nf = ncol(data_lidarm_num)) 
-      } else
-      {
-        data_lidarm_minusMissingSamples = data_lidarm[-which(Missing_positions_indices==1),]
-        #     data_lidarm_minusMissingSamples = data_lidarm
-        #     for (j in 1:ncol(data_lidarm))
-        #     {
-        #       if (Missing_positions_indices[j]==1)
-        #       {
-        #         data_lidarm_minusMissingSamples = data_lidarm_minusMissingSamples[,-j]
-        #         test_var = test_var +1
-        #       }
-        #     }
-        data_lidarm_minusMissingSamples_num = apply(data_lidarm_minusMissingSamples,2,as.numeric)
-        data_lidarm_minusMissingSamples_num[,10] = sqrt(data_lidarm_minusMissingSamples_num[,10])
-        data_lidarm_minusMissingSamples_num[,11] = log(data_lidarm_minusMissingSamples_num[,11])
-        colnames(data_lidarm_minusMissingSamples_num) = colnames(data_lidarm)
-        ncol0 = ncol(data_lidarm_minusMissingSamples_num)
-        
-        if (nb_topics == 3)
-        {
-          data_lidarm_minusMissingSamples_num1 = matrix(nrow = ncol(data2m), ncol = 14)
-          data_lidarm_minusMissingSamples_num1[,1:11] =  data_lidarm_minusMissingSamples_num
+          # Removing from data_lidar: canop08, which is already contained in dif_can, tree_density2008, AGBloss_mort2008, ndeath2008 
+          data_abiotic[,1] = as.vector(data_abiotic_data.frame$V5[-1])
+          data_abiotic[,2] = as.vector(data_abiotic_data.frame$V4[-1])
+          data_abiotic[,3] = as.vector(data_abiotic_data.frame$V6[-1])
+          data_abiotic[,4] = as.vector(data_abiotic_data.frame$V7[-1])
+          data_abiotic[,5] = as.vector(data_abiotic_data.frame$V8[-1])
+          data_abiotic[,6] = as.vector(data_abiotic_data.frame$V10[-1])
+          data_abiotic[,7] = as.vector(data_abiotic_data.frame$V11[-1])
+          data_abiotic[,8] = as.vector(data_abiotic_data.frame$V12[-1])
+          data_abiotic[,9] = as.vector(data_abiotic_data.frame$V13[-1])
+          data_abiotic[,10] = as.vector(data_abiotic_data.frame$V17[-1])
+          # log of slope
+          data_abiotic[,11] = data_abiotic[,5]
           
-          setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert))
-          documents_bacteria = readRDS("documents_bacteria_PP_3topics_best_real.rds")
-          setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/"))
-          data_lidarm_minusMissingSamples_num1[,12:14] = documents_bacteria[-which(Missing_positions_indices==1),]
-          colnames(data_lidarm_minusMissingSamples_num1) = c(colnames(data_lidarm_minusMissingSamples_num),"Terra firme","Hydromorphic","Exposed rock")
-          ncol1 = ncol(data_lidarm_minusMissingSamples_num1)
-        }
-      }
-      
-      Correlation_lidar = list()
-      if (nb_topics == 3)
-      {
-        Correlation_lidar[[1]] = matrix(nrow = nb_topics, ncol = ncol1)
-        Correlation_lidar[[2]] = matrix(nrow = nb_topics, ncol = ncol1)
-      } else
-      {
-        Correlation_lidar[[1]] = matrix(nrow = nb_topics, ncol = ncol0)
-        Correlation_lidar[[2]] = matrix(nrow = nb_topics, ncol = ncol0)
-      }
-      if (filled && !filled_with_gaps)
-      {
-        Correlation_lidar[[3]] = matrix(nrow = nb_topics, ncol = ncol0)
-        Correlation_lidar[[4]] = matrix(nrow = nb_topics, ncol = ncol0)
-      }
-      
-      if (nb_topics == 3)
-      {
-        Mean_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol1,data=0)
-        Var_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol1,data=0)
-        p_value_abiotic = matrix(nrow=nb_topics,ncol=ncol1,data=0)
-        j_abiotic_range = ncol1
-      } else
-      {
-        Mean_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol0,data=0)
-        Var_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol0,data=0)
-        p_value_abiotic = matrix(nrow=nb_topics,ncol=ncol0,data=0)
-        j_abiotic_range = ncol0
-      }
-      
-      for (j_abiotic in 1:j_abiotic_range)
-      {
-        if (j_abiotic == 1)
+          data_abiotic = apply(data_abiotic,2,as.numeric)
+          data_abiotic[,10] = sqrt(data_abiotic[,10])
+          data_abiotic[,11] = log(data_abiotic[,11])
+        } else if (case == "climate")
         {
-          if (filled && !filled_with_gaps)
-          { 
-            documents_randomized = vector(length=nb_abiotic_rndzations,mode="list")
-            for (rndzation in 1:nb_abiotic_rndzations)
+          # Lidar data
+          setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Climate/",sep=""))
+          #data_abiotic = GDALinfo("Isothermality.grd")
+          isothermality = as.data.frame(raster("Isothermality.grd"), row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)
+          data_abiotic = matrix(nrow = nrow(isothermality), ncol = 5, data=0)
+          data_abiotic[,1] = isothermality$bio3
+          coordGS1 = data.frame(x=isothermality$x*10,y=isothermality$y*10)
+          data_abiotic[,2] = as.data.frame(raster("Max_Temperature_of_Warmest_Month.grd"), row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)$bio5
+          data_abiotic[,3] = as.data.frame(raster("Min_Temperature_of_Coldest_Month.grd"), row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)$bio6
+          data_abiotic[,4] = as.data.frame(raster("Precipitation_of_Driest_Quarter.grd"), row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)$bio17
+          data_abiotic[,5] = as.data.frame(raster("Precipitation_of_Wettest_Quarter.grd"), row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)$bio16
+          data_abiotic = apply(data_abiotic,2,as.numeric)          
+          
+          colnames_abiotic = c("Isothermality","Max. temperature of warmest month","Min. temperature of coldest month","Precipitation of driest quarter","Precipitation of wettest quarter")
+          colnames(data_abiotic) = colnames_abiotic
+          
+#           pdf("Climate_rasters.pdf")
+#           plot(raster("Isothermality.grd"))
+#           title("Isothermality")
+#           plot(raster("Max_Temperature_of_Warmest_Month.grd"))
+#           title("Max. temperature of warmest month")
+#           plot(raster("Min_Temperature_of_Coldest_Month.grd"))
+#           title("Min. temperature of coldest month")
+#           plot(raster("Precipitation_of_Driest_Quarter.grd"))
+#           title("Precipitation of driest quarter")
+#           plot(raster("Precipitation_of_Wettest_Quarter.grd"))
+#           title("Precipitation of wettest quarter")
+#           dev.off()
+          
+          # The following replaces "data_abiotic = data_abiotic[-which(Missing_positions_indices==1),]" for data_gs:
+          sites_to_remove = rep(1,nrow(coordGS1)) 
+          for (i in 1:nrow(coordGS1))
+          {
+            for (j in 1:nrow(coordGS))
             {
-              documents_randomized[[rndzation]] = matrix(nrow=ncol(data2m),ncol=nb_topics,data=0)
-              # Performing spatial randomizations
+              if ((coordGS1[i,1] == coordGS[j,1]) && (coordGS1[i,2] == coordGS[j,2]))
+                sites_to_remove[i] = 0
+            }
+          }
+          data_abiotic = data_abiotic[-which(sites_to_remove==1),]
+          
+          if (nrow(data_abiotic)!=nrow(coordGS))   
+            stop("Error: Abiotic and biotic data do not match")      
+        }
+        
+        #         if (case == "chemi")
+        #           browser()
+        
+        ncol0 = ncol(data_abiotic)
+        
+        if (data_pp)
+        {
+          # Switching from indexing row by row (first the 39 elements of the first row, then the 39 elements of the second row, etc.)
+          # to indexing column by column (first the 29 elements of the first column, then the 29 elements of the second column, etc.)
+          data_abiotic_wrongindexing = data_abiotic
+          for (i in 1:29)
+          {
+            for (j in 1:39)
+            {
+              data_abiotic[(j-1)*29+i,] = data_abiotic_wrongindexing[(i-1)*39+j,]   
+            }
+          }
+        }
+        
+        #         if (case == "chemi")
+        #           browser()
+        
+        if ((!filled || filled_with_gaps) && !data_gs)
+        {
+          data_abiotic = data_abiotic[-which(Missing_positions_indices==1),]
+        }
+        
+        if (nb_topics == 3 && data_pp)
+        {
+          data_abiotic1 = matrix(nrow = ncol(data2m), ncol = ncol0+3)
+          data_abiotic1[,1:ncol0] = data_abiotic
+          
+          setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert))
+          documents_bacteria = readRDS("documents_bacteria_PP_3topics_best_real.rds")
+          if (case == "lidar") {
+            setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/"))
+          } else if (case == "chemi")
+            setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Chemistery/",sep=""))
+          data_abiotic1[,(ncol0+1):(ncol0+3)] = documents_bacteria
+          colnames(data_abiotic1) = c(colnames(data_abiotic),"Terra firme","Hydromorphic","Exposed rock")
+          colnames_abiotic = colnames(data_abiotic1)
+          ncol1 = ncol(data_abiotic1)
+          data_abiotic = data_abiotic1
+        }
+        
+        #         if (case == "chemi")
+        #           browser()
+        
+        if (pca_abiotic)
+        {
+          # PCA on standardized ("normed") data, ie centered and divided by std. dev. for each column 
+          abiotic_PCA = dudi.pca(as.data.frame(data_abiotic), row.w = rep(1, nrow(data_abiotic))/nrow(data_abiotic), 
+                                 col.w = rep(1, ncol(data_abiotic)), center = TRUE, scale = TRUE, 
+                                 scannf = F, nf = ncol(data_abiotic)) 
+        }
+        
+        Correlation_abiotic = list()
+        if (nb_topics == 3 && data_pp)
+        {
+          Correlation_abiotic[[1]] = matrix(nrow = nb_topics, ncol = ncol1)
+          Correlation_abiotic[[2]] = matrix(nrow = nb_topics, ncol = ncol1)
+        } else
+        {
+          Correlation_abiotic[[1]] = matrix(nrow = nb_topics, ncol = ncol0)
+          Correlation_abiotic[[2]] = matrix(nrow = nb_topics, ncol = ncol0)
+        }
+        if (pca_abiotic)
+        {
+          Correlation_abiotic[[3]] = matrix(nrow = nb_topics, ncol = ncol0)
+          Correlation_abiotic[[4]] = matrix(nrow = nb_topics, ncol = ncol0)
+        }
+        
+        if (nb_topics == 3 && data_pp)
+        {
+          Mean_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol1,data=0)
+          Var_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol1,data=0)
+          p_value_abiotic = matrix(nrow=nb_topics,ncol=ncol1,data=0)
+          j_abiotic_range = ncol1
+        } else
+        {
+          Mean_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol0,data=0)
+          Var_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol0,data=0)
+          p_value_abiotic = matrix(nrow=nb_topics,ncol=ncol0,data=0)
+          j_abiotic_range = ncol0
+        }
+        
+        #         if (case == "chemi")
+        #           browser()
+        
+        for (j_abiotic in 1:j_abiotic_range)
+        {
+          if ((j_abiotic == 1) && data_pp)
+          {
+            if (filled && !filled_with_gaps)
+            { 
+              documents_randomized = vector(length=nb_abiotic_rndzations,mode="list")
+              for (rndzation in 1:nb_abiotic_rndzations)
+              {
+                documents_randomized[[rndzation]] = matrix(nrow=ncol(data2m),ncol=nb_topics,data=0)
+                # Performing spatial randomizations
+                for (k in 1:nb_topics)
+                {
+                  Spatial_documents = matrix(documents[,k],ncol=39)
+                  a=29
+                  b=39
+                  while ((a==29) && (b==39))
+                  {
+                    a=sample(1:29,1)
+                    b=sample(1:39,1)
+                  }  
+                  if ((a!=29) && (b!=39))
+                    Spatial_documents_randomized = Spatial_documents[c((a+1):29,1:a),c((b+1):39,1:b)] 
+                  else if (b==39)
+                    Spatial_documents_randomized = Spatial_documents[c((a+1):29,1:a),]
+                  else if (a==29)
+                    Spatial_documents_randomized = Spatial_documents[,c((b+1):39,1:b)] 
+                  documents_randomized[[rndzation]][,k] = as.vector(Spatial_documents_randomized)
+                }
+              }
+            } else if (!filled || filled_with_gaps)
+            { 
+              Spatial_documents = vector(length=nb_topics,mode="list")
               for (k in 1:nb_topics)
               {
-                Spatial_documents = matrix(documents[,k],ncol=39)
-                a=29
-                b=39
-                while ((a==29) && (b==39))
+                Spatial_documents[[k]] = matrix(nrow=29,ncol=39,data=0)
+                position_shift = 0
+                for (j in 1:39)
                 {
-                  a=sample(1:29,1)
-                  b=sample(1:39,1)
-                }  
-                if ((a!=29) && (b!=39))
-                  Spatial_documents_randomized = Spatial_documents[c((a+1):29,1:a),c((b+1):39,1:b)] 
-                else if (b==39)
-                  Spatial_documents_randomized = Spatial_documents[c((a+1):29,1:a),]
-                else if (a==29)
-                  Spatial_documents_randomized = Spatial_documents[,c((b+1):39,1:b)] 
-                documents_randomized[[rndzation]][,k] = as.vector(Spatial_documents_randomized)
-              }
-            }
-          } else if (!filled || filled_with_gaps)
-          { 
-            Spatial_documents = vector(length=nb_topics,mode="list")
-            for (k in 1:nb_topics)
-            {
-              Spatial_documents[[k]] = matrix(nrow=29,ncol=39,data=0)
-              position_shift = 0
-              for (j in 1:39)
-              {
-                for (i in 1:29)
-                {
-                  if (Missing_positions_indices[(j-1)*29+i]==0)
-                    Spatial_documents[[k]][i,j] = documents[(j-1)*29+i-position_shift,k]    
-                  else if (Missing_positions_indices[(j-1)*29+i]==1)
+                  for (i in 1:29)
                   {
-                    Spatial_documents[[k]][i,j] = NA
-                    position_shift = position_shift+1
+                    if (Missing_positions_indices[(j-1)*29+i]==0)
+                      Spatial_documents[[k]][i,j] = documents[(j-1)*29+i-position_shift,k]    
+                    else if (Missing_positions_indices[(j-1)*29+i]==1)
+                    {
+                      Spatial_documents[[k]][i,j] = NA
+                      position_shift = position_shift+1
+                    }
                   }
                 }
               }
-            }
-            documents_randomized = vector(length=nb_abiotic_rndzations,mode="list")
-            for (rndzation in 1:nb_abiotic_rndzations)
-            {
-              documents_randomized[[rndzation]] = matrix(nrow=ncol(data2m),ncol=nb_topics,data=0)
-              # Performing spatial randomizations
-              for (k in 1:nb_topics)
+              documents_randomized = vector(length=nb_abiotic_rndzations,mode="list")
+              for (rndzation in 1:nb_abiotic_rndzations)
               {
-                a=29
-                b=39
-                while ((a==29) && (b==39))
+                documents_randomized[[rndzation]] = matrix(nrow=ncol(data2m),ncol=nb_topics,data=0)
+                # Performing spatial randomizations
+                for (k in 1:nb_topics)
                 {
-                  a=sample(1:29,1)
-                  b=sample(1:39,1)
-                }  
-                if ((a!=29) && (b!=39))
-                  Spatial_documents_randomized = Spatial_documents[[k]][c((a+1):29,1:a),c((b+1):39,1:b)] 
-                else if (b==39)
-                  Spatial_documents_randomized = Spatial_documents[[k]][c((a+1):29,1:a),]
-                else if (a==29)
-                  Spatial_documents_randomized = Spatial_documents[[k]][,c((b+1):39,1:b)] 
-                documents_randomized[[rndzation]][,k] = as.vector(Spatial_documents_randomized[!is.na(Spatial_documents_randomized)])
+                  a=29
+                  b=39
+                  while ((a==29) && (b==39))
+                  {
+                    a=sample(1:29,1)
+                    b=sample(1:39,1)
+                  }  
+                  if ((a!=29) && (b!=39))
+                    Spatial_documents_randomized = Spatial_documents[[k]][c((a+1):29,1:a),c((b+1):39,1:b)] 
+                  else if (b==39)
+                    Spatial_documents_randomized = Spatial_documents[[k]][c((a+1):29,1:a),]
+                  else if (a==29)
+                    Spatial_documents_randomized = Spatial_documents[[k]][,c((b+1):39,1:b)] 
+                  documents_randomized[[rndzation]][,k] = as.vector(Spatial_documents_randomized[!is.na(Spatial_documents_randomized)])
+                }
               }
             }
           }
+          
+          for (k in 1:nb_topics)
+          {
+            Cor_test = cor.test(documents[,k],data_abiotic[,j_abiotic])
+            Correlation_abiotic[[1]][k,j_abiotic] = Cor_test$estimate
+            Correlation_abiotic[[2]][k,j_abiotic] = Cor_test$p.value
+            
+            if (pca_abiotic && (j_abiotic < ncol0+1))
+            {
+              Cor_test = cor.test(documents[,k],abiotic_PCA$li[,j_abiotic])
+              Correlation_abiotic[[3]][k,j_abiotic] = Cor_test$estimate
+              Correlation_abiotic[[4]][k,j_abiotic] = Cor_test$p.value
+            }
+            
+            if (data_pp)
+            {
+              nb_non_significant_rndzations = 0
+              #nb_non_significant_rndzations_PCA = 0
+              for (rndzation in 1:nb_rndzations) 
+              {
+                cor_abiotic_comparison_randomized = cor(documents_randomized[[rndzation]][,k],data_abiotic[,j_abiotic])
+                
+                #               cor_abiotic_comparison_randomized_PCA = cor.test(documents_randomized[[rndzation]][,rev(sort_normal_topic$ix)[k]],lidar_PCA$li[,j])
+                #               if (Correlation_lidar[[3]][k,j] < cor_abiotic_comparison_randomized_PCA)
+                #                 nb_non_significant_rndzations_PCA = nb_non_significant_rndzations_PCA + 1
+                
+                
+                if (Correlation_abiotic[[1]][k,j_abiotic] < cor_abiotic_comparison_randomized)
+                  nb_non_significant_rndzations = nb_non_significant_rndzations + 1
+                
+                Mean_cor_abiotic_comparison_randomized[k,j_abiotic] = 1/nb_rndzations*cor_abiotic_comparison_randomized +
+                  Mean_cor_abiotic_comparison_randomized[k,j_abiotic]
+                Var_cor_abiotic_comparison_randomized[k,j_abiotic] = cor_abiotic_comparison_randomized^2/nb_rndzations + 
+                  Var_cor_abiotic_comparison_randomized[k,j_abiotic]
+              }
+              
+              if (Correlation_abiotic[[1]][k,j_abiotic] > 0)
+                p_value_abiotic[k,j_abiotic] = nb_non_significant_rndzations/nb_rndzations
+              else if (Correlation_abiotic[[1]][k,j_abiotic] < 0)
+                p_value_abiotic[k,j_abiotic] = 1 - nb_non_significant_rndzations/nb_rndzations 
+            }
+          }
+          # End loop over j_abiotic  :
         }
         
-        for (k in 1:nb_topics)
+        #         if (case == "chemi")
+        #           browser()
+        
+        if (case == "lidar")
         {
-          if (filled && !filled_with_gaps)
-          {
-            Cor_test = cor.test(documents[,k],data_lidarm_num1[,j_abiotic])
-            Correlation_lidar[[1]][k,j_abiotic] = Cor_test$estimate
-            Correlation_lidar[[2]][k,j_abiotic] = Cor_test$p.value
-          }
-          else if (!filled || filled_with_gaps)
-          {
-            Cor_test = cor.test(documents[,k],data_lidarm_minusMissingSamples_num1[,j_abiotic])
-            Correlation_lidar[[1]][k,j_abiotic] = Cor_test$estimate
-            Correlation_lidar[[2]][k,j_abiotic] = Cor_test$p.value
-          }
-          
-          if (filled && !filled_with_gaps && (j_abiotic < ncol0+1))
-          {
-            Cor_test = cor.test(documents[,k],lidar_PCA$li[,j_abiotic])
-            Correlation_lidar[[3]][k,j_abiotic] = Cor_test$estimate
-            Correlation_lidar[[4]][k,j_abiotic] = Cor_test$p.value
-          }
-          
-          nb_non_significant_rndzations = 0
-          #nb_non_significant_rndzations_PCA = 0
-          for (rndzation in 1:nb_rndzations) 
-          {
-            if (filled && !filled_with_gaps)
-              cor_abiotic_comparison_randomized = cor(documents_randomized[[rndzation]][,k],data_lidarm_num1[,j_abiotic])
-            else if (!filled || filled_with_gaps)
-              cor_abiotic_comparison_randomized = cor(documents_randomized[[rndzation]][,k],data_lidarm_minusMissingSamples_num1[,j_abiotic])
-            
-            #               cor_abiotic_comparison_randomized_PCA = cor.test(documents_randomized[[rndzation]][,rev(sort_normal_topic$ix)[k]],lidar_PCA$li[,j])
-            #               if (Correlation_lidar[[3]][k,j] < cor_abiotic_comparison_randomized_PCA)
-            #                 nb_non_significant_rndzations_PCA = nb_non_significant_rndzations_PCA + 1
-            
-
-            if (Correlation_lidar[[1]][k,j_abiotic] < cor_abiotic_comparison_randomized)
-              nb_non_significant_rndzations = nb_non_significant_rndzations + 1
-              
-            Mean_cor_abiotic_comparison_randomized[k,j_abiotic] = 1/nb_rndzations*cor_abiotic_comparison_randomized +
-              Mean_cor_abiotic_comparison_randomized[k,j_abiotic]
-            Var_cor_abiotic_comparison_randomized[k,j_abiotic] = cor_abiotic_comparison_randomized^2/nb_rndzations + 
-              Var_cor_abiotic_comparison_randomized[k,j_abiotic]
-          }
-          
-          if (Correlation_lidar[[1]][k,j_abiotic] > 0)
-            p_value_abiotic[k,j_abiotic] = nb_non_significant_rndzations/nb_rndzations
-          else if (Correlation_lidar[[1]][k,j_abiotic] < 0)
-            p_value_abiotic[k,j_abiotic] = 1 - nb_non_significant_rndzations/nb_rndzations 
+          Correlation_lidar = Correlation_abiotic
+          ncol_lidar = ncol0
+          Mean_cor_lidar_comparison_randomized = Mean_cor_abiotic_comparison_randomized 
+          Var_cor_lidar_comparison_randomized = Var_cor_abiotic_comparison_randomized
+          p_value_lidar = p_value_abiotic 
+          colnames_lidar = colnames_abiotic
+        } else if (case == "chemi")
+        {
+          Correlation_chemi = Correlation_abiotic
+          ncol_chemi = ncol0
+          Mean_cor_chemi_comparison_randomized = Mean_cor_abiotic_comparison_randomized 
+          Var_cor_chemi_comparison_randomized = Var_cor_abiotic_comparison_randomized
+          p_value_chemi = p_value_abiotic 
+          colnames_chemi = colnames_abiotic
+        } else if (case == "climate")
+        {
+          Correlation_climate = Correlation_abiotic
+          ncol_climate = ncol0
+          #           Mean_cor_climate_comparison_randomized = Mean_cor_abiotic_comparison_randomized 
+          #           Var_cor_climate_comparison_randomized = Var_cor_abiotic_comparison_randomized
+          #           p_value_climate = p_value_abiotic 
+          colnames_climate = colnames_abiotic
         }
+        
+        # End loop over case list :
       }
       
       ################################################
       # Topic comparison within the best realization #
       ################################################
+      setwd(local_subdirname)
       
       KL_topic_comparison_samplewise = matrix(nrow=nb_topics,ncol=nb_topics,data=NA)
       KL_topic_comparison_MOTUwise = matrix(nrow=nb_topics,ncol=nb_topics,data=NA)
@@ -2521,14 +2532,20 @@ if (!mpar)
           KL_topic_comparison_MOTUwise[k,k1] = 1/2*(KL.plugin(KL_topic_compo_notaxo[,k],KL_topic_compo_notaxo[,k1]) + KL.plugin(KL_topic_compo_notaxo[,k1],KL_topic_compo_notaxo[,k]))     
         }
       }
+      
       colnames_vect = vector(length=3,mode="character")
-      for (k in 1:nb_topics)
+      if (data_pp)
       {
-        k0 = rev(sort_normal_topic$ix)[k]
-        sorted_correlations_to_bacteria = sort.int(Correlation_lidar[[1]][k0,12:14],index=T,decreasing=T)
-        j0 = sorted_correlations_to_bacteria$ix[1]
-        colnames_vect[k] = c("Terra firme","Hydromorphic","Exposed rock")[j0]
-      }
+        for (k in 1:nb_topics)
+        {
+          k0 = rev(sort_normal_topic$ix)[k]
+          sorted_correlations_to_bacteria = sort.int(Correlation_lidar[[1]][k0,12:14],index=T,decreasing=T)
+          j0 = sorted_correlations_to_bacteria$ix[1]
+          colnames_vect[k] = c("Terra firme","Hydromorphic","Exposed rock")[j0]
+        }
+      } else
+        colnames_vect = seq(1,nb_topics,1)
+      
       colnames(KL_topic_comparison_samplewise) = colnames_vect
       colnames(KL_topic_comparison_MOTUwise) = colnames_vect
       rownames(KL_topic_comparison_samplewise) = colnames_vect
@@ -2550,145 +2567,7 @@ if (!mpar)
       diversity[nb_topics+1] = nrow(data2m)
       diversity = data.frame(Assemblage = c(colnames_vect,"Total diversity"),Diversity = diversity)
       
-      setwd(local_subdirname)
       save(KL_topic_comparison_samplewise, KL_topic_comparison_MOTUwise, Corr_topic_comparison_samplewise, Corr_topic_comparison_MOTUwise, diversity, file = "Topic_comparison_inBestReal.Rdata")
-      setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/",sep=""))
-      
-      #     Correlation_lidar = matrix(nrow=nb_topics,ncol=9,data=0)
-      #     for (k in 1:nb_topics)
-      #     {
-      #       for (k_lidar in 1:9)
-      #       {
-      #         for (j in 1:nb_doc)
-      #         {
-      #           Correlation_lidar[k,k_lidar] = documents[j,rev(sort_normal_topic$ix)[k]]*data_lidarm_minusMissingSamples_num[k_lidar,j]/nb_doc
-      #           + Correlation_lidar[k,k_lidar]
-      #         }
-      #         mean_topic = sum(documents[,rev(sort_normal_topic$ix)[k]])/nb_doc
-      #         mean_lidar = sum(data_lidarm_minusMissingSamples_num[k_lidar,])/nb_doc
-      #         Correlation_lidar[k,k_lidar] = Correlation_lidar[k,k_lidar] - mean_topic*mean_lidar
-      #         dif_topic = sum(documents[,rev(sort_normal_topic$ix)[k]]^2)/nb_doc - mean_topic^2
-      #         dif_lidar = sum(data_lidarm_minusMissingSamples_num[k_lidar,]^2)/nb_doc - mean_lidar^2
-      #         denomin_lidar = 0 
-      #         denomin_topic = 0
-      #         if ((dif_topic > 0) && (dif_lidar > 0))
-      #         {
-      #           denomin_topic = sqrt(dif_topic)
-      #           denomin_lidar = sqrt(dif_lidar)
-      #         }
-      #         if ((denomin_topic != 0) && (denomin_lidar != 0))  
-      #         {
-      #           Correlation_lidar[k,k_lidar] = Correlation_lidar[k,k_lidar]/denomin_topic/denomin_lidar  
-      #         } else
-      #           Correlation_lidar[k,k_lidar] = NA
-      #       }
-      #     }
-      
-      #################################################################
-      # Chemistery data                                               #
-      #################################################################
-      setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Chemistery/",sep=""))
-      # produces a dataframe with columns as vectors instead of factors (otherwise one cannot direclty apply "as.numeric" to the values)
-      data_chemi = read.table("chemistry_pred_CRIJ.txt",sep=" ",colClasses="vector")
-      
-      data_chemi_wrongindexing = data_chemi
-      for (i in 1:29)
-      {
-        for (j in 1:39)
-        {
-          data_chemi[(j-1)*29+i,] = data_chemi_wrongindexing[(i-1)*39+j,]   
-        }
-      }
-      
-      if (filled && !filled_with_gaps)
-      {
-        # converts the dataframe of character values to a list of numeric values
-        data_chemi_num = apply(data_chemi,2,as.numeric)
-        
-        # PCA on standardized ("normed") data, ie centered and divided by std. dev. for each column 
-        chemi_PCA = dudi.pca(as.data.frame(data_chemi_num), row.w = rep(1, nrow(data_chemi_num))/nrow(data_chemi_num), 
-                             col.w = rep(1, ncol(data_chemi_num)), center = TRUE, scale = TRUE, 
-                             scannf = F, nf = ncol(data_chemi_num))
-      } else
-      {
-        # Removing missing samples
-        data_chemi_minusMissingSamples = data_chemi[-which(Missing_positions_indices==1),]
-        # converts the dataframe of character values to a list of numeric values
-        data_chemi_minusMissingSamples_num = apply(data_chemi_minusMissingSamples,2,as.numeric)
-      }
-      
-      # remembering the element names for the plots
-      element_names = colnames(data_chemi)
-      
-      if (filled && !filled_with_gaps)
-      {
-        #Correlation_chemi = cor(documents[,rev(sort_normal_topic$ix)],data_chemi_minusMissingSamples_num)
-        Correlation_chemi = vector("list",4)
-        Correlation_chemi[[1]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-        Correlation_chemi[[2]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-        Correlation_chemi[[3]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-        Correlation_chemi[[4]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-      } else
-      {
-        Correlation_chemi = vector("list",2)
-        Correlation_chemi[[1]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-        Correlation_chemi[[2]] = matrix(nrow = nb_topics, ncol = ncol(data_chemi))
-      }
-      for (k in 1:nb_topics)
-      {
-        for (j in 1:ncol(data_chemi))
-        {
-          if (filled && !filled_with_gaps)
-          {
-            Cor_test = cor.test(documents[,k],data_chemi_num[,j])
-            Correlation_chemi[[1]][k,j] = Cor_test$estimate
-            Correlation_chemi[[2]][k,j] = Cor_test$p.value
-            Cor_test = cor.test(documents[,k],chemi_PCA$li[,j])
-            Correlation_chemi[[3]][k,j] = Cor_test$estimate
-            Correlation_chemi[[4]][k,j] = Cor_test$p.value
-          }
-          else
-          {
-            Cor_test = cor.test(documents[,k],data_chemi_minusMissingSamples_num[,j])
-            Correlation_chemi[[1]][k,j] = Cor_test$estimate
-            Correlation_chemi[[2]][k,j] = Cor_test$p.value
-          }
-        }
-      }
-      #chemi_PCA$li[(i-1)*39+j,j]
-      #spatial_topicmix[i,j] = documents[(j-1)*29+i
-      
-      #     Correlation_chemi = matrix(nrow=nb_topics,ncol=ncol(data_chemi),data=0)
-      #     for (k in 1:nb_topics)
-      #     {
-      #       for (k_chemi in 1:ncol(data_chemi))
-      #       {
-      #         for (j in 1:nb_doc)
-      #         {
-      #           Correlation_chemi[k,k_chemi] = documents[j,rev(sort_normal_topic$ix)[k]]*data_chemi_minusMissingSamples_num[[k_chemi]][j]/nb_doc
-      #           + Correlation_chemi[k,k_chemi]
-      #         }
-      #         mean_topic = sum(documents[,rev(sort_normal_topic$ix)[k]])/nb_doc
-      #         mean_chemi = sum(data_chemi_minusMissingSamples_num[[k_chemi]][j])/nb_doc
-      #         Correlation_chemi[k,k_chemi] = Correlation_chemi[k,k_chemi] - mean_topic*mean_chemi
-      #         dif_topic = sum(documents[,rev(sort_normal_topic$ix)[k]]^2)/nb_doc - mean_topic^2
-      #         dif_chemi = sum(data_chemi_minusMissingSamples_num[[k_chemi]][j]^2)/nb_doc - mean_chemi^2
-      #         denomin_topic = 0
-      #         denomin_chemi = 0
-      #         if ((dif_topic > 0) && (dif_chemi > 0))
-      #         {
-      #           denomin_topic = sqrt(dif_topic)
-      #           denomin_chemi = sqrt(dif_chemi)
-      #         }
-      #         if ((denomin_topic != 0) && (denomin_chemi != 0))  
-      #         {
-      #           Correlation_chemi[k,k_chemi] = Correlation_chemi[k,k_chemi]/denomin_topic/denomin_chemi  
-      #         } else
-      #           Correlation_chemi[k,k_chemi] = NA
-      #       }
-      #     }
-      
-      }
     }
     
     #if (local)
@@ -2993,7 +2872,7 @@ if (!mpar)
           {
             if (samplewise)
               KL_topic_comparison_true_documents_randomized = 1/2*(KL.plugin(KL_documents_jselect_randomized[[rndzation]][,k],true_KL_documents[,True_topic_correspondence[k]]) +
-                                                                   KL.plugin(true_KL_documents[,True_topic_correspondence[k]],KL_documents_jselect_randomized[[rndzation]][,k]))
+                                                                     KL.plugin(true_KL_documents[,True_topic_correspondence[k]],KL_documents_jselect_randomized[[rndzation]][,k]))
             else if (MOTUwise)
               KL_topic_comparison_true_documents_randomized = 1/2*(KL.plugin(KL_topic_compo_jselect_randomized[[rndzation]][,k],true_KL_topic_compo[,True_topic_correspondence[k]]) +
                                                                      KL.plugin(true_KL_topic_compo[,True_topic_correspondence[k]],KL_topic_compo_jselect_randomized[[rndzation]][,k]))
@@ -3011,271 +2890,165 @@ if (!mpar)
       # Comparison with abiotic variables: plots #
       ############################################
       
-      if (best_keep && (j_select == 1) && data_pp && !testdata && abiotic_variables)
+      if (best_keep && (j_select == 1) && ((data_pp && !testdata) || data_gs) && abiotic_variables)
       {
-        abiotic_variables_dirname = paste0(local_subdirname,"/Abiotic_variables")
+        abiotic_variables_dirname = paste0(local_subdirname,"Abiotic_variables")
         if (!(file.exists(abiotic_variables_dirname)))
           dir.create(abiotic_variables_dirname)
         setwd(abiotic_variables_dirname)
         
         #######################
-        # saving the lidar and chemistery correlation values and associated p-values
-        save(Correlation_lidar,Mean_cor_abiotic_comparison_randomized,Var_cor_abiotic_comparison_randomized,p_value_abiotic,file="Correlation_between_lidar_data_and_topics_for_best_real.Rdata")
-        save(Correlation_chemi,file="Correlation_between_soil_chemistery_data_and_topics_for_best_real.Rdata")
+        if (data_pp)
+        {
+          # saving the lidar and chemistery correlation values and associated p-values
+          save(Correlation_lidar,Mean_cor_lidar_comparison_randomized,Var_cor_lidar_comparison_randomized,p_value_lidar,file="Correlation_between_lidar_data_and_topics_for_best_real.Rdata")
+          save(Correlation_chemi,Mean_cor_chemi_comparison_randomized,Var_cor_chemi_comparison_randomized,p_value_chemi,file="Correlation_between_soil_chemistery_data_and_topics_for_best_real.Rdata")
+        } else if (data_gs)
+          save(Correlation_climate,file="Correlation_between_climate_data_and_topics_for_best_real.Rdata")
         #######################
         
-        Abiotic_file = "Abiotic_comparison.txt"
-        write(paste(barcode_insert,"-",nb_topics,"topics\n%%%%%%%%%%%%%\n"),file=Abiotic_file,append=F)
-        for (k in 1:nb_topics)
+        if (data_pp)
+          case0_range = c("lidar","chemi")
+        else if (data_gs)
+          case0_range = "climate"
+        
+        for (case0 in case0_range)
         {
-          if (nb_topics == 3)
+          if (case0 == "lidar")
+          {
+            Correlation_abiotic = Correlation_lidar
+            Mean_cor_abiotic_comparison_randomized = Mean_cor_lidar_comparison_randomized
+            Var_cor_abiotic_comparison_randomized = Var_cor_lidar_comparison_randomized
+            p_value_abiotic = p_value_lidar
+            ncol0 = ncol_lidar
+            colnames_abiotic = colnames_lidar
+          } else if (case0 == "chemi")
+          {
+            Correlation_abiotic = Correlation_chemi
+            Mean_cor_abiotic_comparison_randomized = Mean_cor_chemi_comparison_randomized
+            Var_cor_abiotic_comparison_randomized = Var_cor_chemi_comparison_randomized
+            p_value_abiotic = p_value_chemi
+            ncol0 = ncol_chemi
+            colnames_abiotic = colnames_chemi
+          } else if (case0 == "climate")
+          {
+            Correlation_climate = Correlation_climate
+            #             Mean_cor_abiotic_comparison_randomized = Mean_cor_climate_comparison_randomized
+            #             Var_cor_abiotic_comparison_randomized = Var_cor_climate_comparison_randomized
+            #             p_value_abiotic = p_value_climate
+            ncol0 = ncol_climate
+            colnames_abiotic = colnames_climate
+          }
+          
+          # Abiotic file does not report the comparison to PCA axes in the case pca_abiotic = 1
+          Abiotic_file = paste0(case0,"_comparison.txt")
+          write(paste(barcode_insert,"-",nb_topics,"topics\n%%%%%%%%%%%%%\n"),file=Abiotic_file,append=F)
+          for (k in 1:nb_topics)
           {
             k0 = rev(sort_normal_topic$ix)[k]
-            if (filled && !filled_with_gaps)
-              colnames_range = colnames(data_lidarm_num1)
-            else
-              colnames_range = colnames(data_lidarm_minusMissingSamples_num1)
-            sorted_correlations_to_bacteria = sort.int(Correlation_lidar[[1]][k0,12:14],index=T,decreasing=T)
-            j0 = 11+sorted_correlations_to_bacteria$ix[1]
-            write(paste0("\n%%%%%%%%%%%%%\nFor topic ",k," - ",colnames_range[j0],
-                         " assemblage (rho = ",Correlation_lidar[[1]][k0,j0],", p = ",p_value_abiotic[k0,j0],"):\n%%%%%%%%%%%%%"),file=Abiotic_file,append=T)
-          } else
-          {
-            if (filled && !filled_with_gaps)
-              colnames_range = colnames(data_lidarm_num)
-            else
-              colnames_range = colnames(data_lidarm_minusMissingSamples_num)
-            write(paste0("\n%%%%%%%%%%%%%\nFor topic ",k,":\n%%%%%%%%%%%%%"),file=Abiotic_file,append=T)
+            if (nb_topics == 3 && data_pp)
+            {
+              sorted_correlations_to_bacteria = sort.int(Correlation_abiotic[[1]][k0,ncol0+(1:3)],index=T,decreasing=T)
+              j0 = ncol0+sorted_correlations_to_bacteria$ix[1]
+              write(paste0("\n%%%%%%%%%%%%%\nFor topic ",k," - ",colnames_abiotic[j0],
+                           " assemblage (rho = ",Correlation_abiotic[[1]][k0,j0],", p = ",p_value_abiotic[k0,j0],"):\n%%%%%%%%%%%%%"),file=Abiotic_file,append=T)
+            } else
+              write(paste0("\n%%%%%%%%%%%%%\nFor topic ",k,":\n%%%%%%%%%%%%%"),file=Abiotic_file,append=T)
+            for (j in 1:length(colnames_abiotic))
+            {
+              write(paste0("\n",colnames_abiotic[j],"\n%%%%%%%%%%%%%"),file=Abiotic_file,append=T)
+              write(paste("Correlation =",Correlation_abiotic[[1]][k0,j]),file=Abiotic_file,append=T)
+              if (!data_gs)
+              {
+                write(paste("Effect size with spatial randomizations =",Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j]),file=Abiotic_file,append=T)
+                write(paste("Standardized effect size with spatial randomizations =",
+                            (Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j])/sqrt(Var_cor_abiotic_comparison_randomized[k0,j]-Mean_cor_abiotic_comparison_randomized[k0,j]^2)),file=Abiotic_file,append=T)
+                write(paste("p-value for spatial randomizations =",p_value_abiotic[k0,j]),file=Abiotic_file,append=T)
+              }
+              write(paste("p-value for Student's t-test =",Correlation_abiotic[[2]][k0,j]),file=Abiotic_file,append=T)
+            }
           }
-          for (j in 1:length(colnames_range))
+          
+          if (pca_abiotic)
+            case1_range = c(1,3)
+          else 
+            case1_range = 1
+          
+          case2_range = c("_Bonferroni","")
+          
+          for (case1 in case1_range)
           {
-            write(paste0("\n",colnames_range[j],"\n%%%%%%%%%%%%%"),file=Abiotic_file,append=T)
-            write(paste("Correlation =",Correlation_lidar[[1]][k0,j]),file=Abiotic_file,append=T)
-            write(paste("Effect size with spatial randomizations =",Correlation_lidar[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j]),file=Abiotic_file,append=T)
-            write(paste("Standardized effect size with spatial randomizations =",
-                        (Correlation_lidar[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j])/sqrt(Var_cor_abiotic_comparison_randomized[k0,j]-Mean_cor_abiotic_comparison_randomized[k0,j]^2)),file=Abiotic_file,append=T)
-            write(paste("p-value for spatial randomizations =",p_value_abiotic[k0,j]),file=Abiotic_file,append=T)
-            write(paste("p-value for Student's t-test =",Correlation_lidar[[2]][k0,j]),file=Abiotic_file,append=T)
+            for (case2 in case2_range)
+            {
+              ######################
+              if (case1 == 1)
+                pdf(paste0("Correlation_between_",case0,"_data_and_topics_for_best_real",case2,".pdf"))
+              else if (case1 == 3)
+                pdf(paste0("Correlation_between_",case0,"_data_and_topics_for_best_real_pca",case2,".pdf"))
+              par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
+              #par(mar=c(5.1,4.1,4.1,2.1)
+              #bottom left top right
+              par(mar=c(15.1,10.1,4.1,4.1))
+              for (k in 1:nb_topics)
+              {            
+                k0 = rev(sort_normal_topic$ix)[k]
+                plot(Correlation_abiotic[[case1]][k0,],type="p",ann=F,yaxt="n",xaxt="n")
+                for (j in 1:ncol0)
+                {
+                  if (case2 == "")
+                  {
+                    if (Correlation_abiotic[[case1+1]][k0,j]>0.05)
+                      lines(j,Correlation_abiotic[[case1]][k0,j],col="red",type="p")
+                  } else if (case2 == "_Bonferroni")
+                  {
+                    if (Correlation_abiotic[[case1+1]][k0,j]>0.05/ncol0)
+                      lines(j,Correlation_abiotic[[case1]][k0,j],col="red",type="p")
+                  }
+                }
+                
+                axis(2, ylim=range(Correlation_abiotic[[case1]][k0,]), col='black')
+                if (ncol0 < 15)
+                {
+                  axis(1, at=1:ncol0, labels = F)
+                  labels = vector(length=ncol0,mode="character")
+                  for (i in 1:ncol0)
+                  {
+                    if (case1 == 3)
+                      labels[i] = paste(i,"th PCA axis",sep="")
+                    else if (case1 == 1)
+                      labels[i] = colnames_abiotic[i]
+                  }
+                } else 
+                {
+                  if (case1 == 1)
+                  {
+                    axis(1, at=1:ncol0, labels = F)
+                    text(1:ncol0, par("usr")[3], srt = 90, pos=1, offset=1.5, labels = colnames_abiotic[1:ncol0], xpd = T, cex=0.6)
+                  }
+                  else if (case1 == 3)
+                  {
+                    axis(1, at=1:ncol0, labels = T)
+                    xlab("PCA axes")
+                  } 
+                }
+                
+                text(1:ncol0, par("usr")[3], srt = 45, adj = c(1.05,1.75), labels = labels, xpd = TRUE, cex=1.1)
+                title(ylab="Correlation value \nbetween spatial distributions")
+                if (k==1)
+                  title(paste0("Correlation between ",case0," data and \nthe 1st most abundant assemblage"))
+                else if (k==2)
+                  title(paste0("Correlation between ",case0," data and \nthe 2nd most abundant assemblage"))
+                else if (k==3)
+                  title(paste0("Correlation between ",case0," data and \nthe 3rd most abundant assemblage"))
+                else 
+                  title(paste0("Correlation between ",case0," data and the",k,"th most abundant assemblage",sep=""))
+              }
+              dev.off()
+              ######################
+            }
           }
+          
         }
-        
-        if (filled && !filled_with_gaps)
-          case_range = c(1,3)
-        else if (!filled || filled_with_gaps)
-          case_range = 1
-        
-        for (case in case_range)
-        {
-          ######################
-          if (case == 1)
-            pdf("Correlation_between_lidar_data_and_topics_for_best_real.pdf")
-          else if (case == 3)
-            pdf("Correlation_between_lidar_data_and_topics_for_best_real_pca.pdf")
-          par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-          #par(mar=c(5.1,4.1,4.1,2.1)
-          #bottom left top right
-          par(mar=c(15.1,10.1,4.1,4.1))
-          for (k in 1:nb_topics)
-          {
-            k0 = rev(sort_normal_topic$ix)[k]
-            plot(Correlation_lidar[[case]][k0,],type="p",ann=F,yaxt="n",xaxt="n")
-            for (j in 1:11)
-            {
-              if (Correlation_lidar[[case+1]][k0,j]>0.05)
-                lines(j,Correlation_lidar[[case]][k0,j],col="red",type="p")
-            }
-            axis(2, ylim=range(Correlation_lidar[[case]][k0,]), col='black')
-            axis(1, at=1:11, labels = F)
-            labels = vector(length=ncol(data_lidarm),mode="character")
-            for (i in 1:ncol(data_lidarm))
-            {
-              if (case == 3)
-                labels[i] = paste(i,"th PCA axis",sep="")
-              else if (case == 1)
-                labels[i] = colnames(data_lidarm)[i]
-            }
-            text(1:11, par("usr")[3], srt = 45, adj = c(1.05,1.75), labels = labels, xpd = TRUE, cex=1.1)
-            title(ylab="Correlation value \nbetween spatial distributions")
-            if (k==1)
-              title("Correlation between lidar data and \nthe 1st most abundant class")
-            else if (k==2)
-              title("Correlation between lidar data and \nthe 2nd most abundant class")
-            else if (k==3)
-              title("Correlation between lidar data and \nthe 3rd most abundant class")
-            else 
-              title(paste("Correlation between lidar data and the",k,"th most abundant class",sep=""))
-          }
-          dev.off()
-          ######################
-          
-          ######################
-          if (case == 1)
-            pdf("Correlation_between_lidar_data_and_topics_for_best_real_Bonferroni.pdf")
-          else if (case == 3)
-            pdf("Correlation_between_lidar_data_and_topics_for_best_real_pca_Bonferroni.pdf")
-          par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-          #par(mar=c(5.1,4.1,4.1,2.1)
-          #bottom left top right
-          par(mar=c(15.1,10.1,4.1,4.1))
-          for (k in 1:nb_topics)
-          {
-            k0 = rev(sort_normal_topic$ix)[k]
-            plot(Correlation_lidar[[case]][k0,],type="p",ann=F,yaxt="n",xaxt="n")
-            for (j in 1:11)
-            {
-              if (Correlation_lidar[[case+1]][k0,j]>(0.05/11))
-                lines(j,Correlation_lidar[[case]][k0,j],col="red",type="p")
-            }
-            axis(2, ylim=range(Correlation_lidar[[case]][k0,]), col='black')
-            axis(1, at=1:11, labels = F)
-            labels = vector(length=ncol(data_lidarm),mode="character")
-            for (i in 1:ncol(data_lidarm))
-            {
-              if (case == 3)
-                labels[i] = paste(i,"th PCA axis",sep="")
-              else if (case == 1)
-                labels[i] = colnames(data_lidarm)[i]
-            }
-            text(1:11, par("usr")[3], srt = 45, adj = c(1.05,1.75), labels = labels, xpd = TRUE, cex=1.1)
-            title(ylab="Correlation value \nbetween spatial distributions")
-            if (k==1)
-              title("Correlation between lidar data and \nthe 1st most abundant class")
-            else if (k==2)
-              title("Correlation between lidar data and \nthe 2nd most abundant class")
-            else if (k==3)
-              title("Correlation between lidar data and \nthe 3rd most abundant class")
-            else 
-              title(paste("Correlation between lidar data and \nthe",k,"th most abundant class",sep=""))
-          }
-          dev.off()
-          ######################
-          
-          #       ######################
-          #       pdf("Correlation_between_lidar_data_and_topics_for_best_real_topicComparison.pdf")
-          #       par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-          #       #par(mar=c(5.1,4.1,4.1,2.1)
-          #       #bottom left top right
-          #       par(mar=c(15.1,10.1,4.1,4.1))
-          #       for (k_lidar in 1:9)
-          #       {
-          #         plot(Correlation_lidar[,k_lidar],type="p",ann=F,yaxt="n",xaxt="n")
-          #         axis(2, ylim=range(Correlation_lidar[,k_lidar]), col='black')
-          #         axis(1, at=1:9, labels = F)
-          #         labels = vector(length=nb_topics,mode="character")
-          #         for (i in 1:9)
-          #           labels[i]= rownames(data_lidarm)[i]
-          #         text(1:9, par("usr")[3], srt = 45, adj = c(1.05,1.75), labels = labels, xpd = TRUE, cex=1.1)
-          #         title(ylab="Correlation value \nbetween spatial distributions")
-          #         if (k==1)
-          #           title("Correlation between lidar data and the\n 1st most abundant class")
-          #         else if (k==2)
-          #           title("Correlation between lidar data and the\n 2nd most abundant class")
-          #         else 
-          #           title(paste("Correlation between lidar data and the\n",k,"th most abundant class",sep=""))
-          #       }
-          #       dev.off()
-          #       ######################
-          
-          ######################
-          if (case == 1)
-            pdf("Correlation_between_soil_chemistery_data_and_topics_for_best_real.pdf")
-          else if (case == 3)
-            pdf("Correlation_between_soil_chemistery_data_and_topics_for_best_real_pca.pdf")
-          par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-          #par(mar=c(5.1,4.1,4.1,2.1)
-          #bottom left top right
-          par(mar=c(15.1,10.1,4.1,4.1))
-          for (k in 1:nb_topics)
-          {
-            k0 = rev(sort_normal_topic$ix)[k]
-            plot(Correlation_chemi[[case]][k0,],type="p",ann=F,yaxt="n",xaxt="n")
-            for (j in 1:ncol(data_chemi))
-            {
-              if (Correlation_chemi[[case+1]][k0,j]>0.05)
-                lines(j,Correlation_chemi[[case]][k,j],col="red",type="p")
-            }
-            axis(2, ylim=range(Correlation_chemi[[case]][k0,]), col='black')
-            #           labels = vector(length=ncol(data_chemi),mode="character")
-            #           for (i in 1:ncol(data_chemi))
-            #           {
-            #             if (case == 3)
-            #               labels[i] = as.character(i)
-            #             else if (case == 1)
-            #               labels[i] = element_names[i]
-            #           }
-            #text(1:ncol(data_chemi), y=-0.5, par("usr")[3], srt = 45, adj = NULL, labels = labels, xpd = TRUE, cex=0.5)
-            if (case == 1)
-            {
-              axis(1, at=1:ncol(data_chemi), labels = F)
-              text(1:ncol(data_chemi), par("usr")[3], srt = 90, pos=1, offset=1.5, labels = element_names, xpd = T, cex=0.6)
-            }
-            else if (case == 3)
-            {
-              axis(1, at=1:ncol(data_chemi), labels = T)
-              xlab("PCA axes")
-            } 
-            title(ylab="Correlation value \nbetween spatial distributions")
-            if (k==1)
-              title("Correlation between soil chemistery data and \nthe 1st most abundant class")
-            else if (k==2)
-              title("Correlation between soil chemistery data and \nthe 2nd most abundant class")
-            else 
-              title(paste("Correlation between soil chemistery data and \nthe",k,"th most abundant class",sep=""))
-          }
-          dev.off()
-          ######################
-          
-          ######################
-          if (case == 1)
-            pdf("Correlation_between_soil_chemistery_data_and_topics_for_best_real_Bonferroni.pdf")
-          else if (case == 3)
-            pdf("Correlation_between_soil_chemistery_data_and_topics_for_best_real_Bonferroni_pca.pdf")
-          par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-          #par(mar=c(5.1,4.1,4.1,2.1)
-          #bottom left top right
-          par(mar=c(15.1,10.1,4.1,4.1))
-          for (k in 1:nb_topics)
-          {
-            k0 = rev(sort_normal_topic$ix)[k]
-            plot(Correlation_chemi[[case]][k0,],type="p",ann=F,yaxt="n",xaxt="n")
-            for (j in 1:ncol(data_chemi))
-            {
-              if (Correlation_chemi[[case+1]][k0,j]>(0.05/ncol(data_chemi)))
-                lines(j,Correlation_chemi[[case]][k,j],col="red",type="p")
-            }
-            axis(2, ylim=range(Correlation_chemi[[case]][k0,]), col='black')
-            #           axis(1, at=1:ncol(data_chemi), labels = F)
-            #           labels = vector(length=ncol(data_chemi),mode="character")
-            #           for (i in 1:ncol(data_chemi))
-            #           {
-            #             if (case == 3)
-            #               labels[i] = as.character(i)
-            #             else if (case == 1)
-            #               labels[i] = element_names[i]
-            #           }
-            #text(1:ncol(data_chemi), y=-0.5, par("usr")[3], srt = 45, adj = NULL, labels = labels, xpd = TRUE, cex=0.5)
-            if (case == 1)
-            {
-              axis(1, at=1:ncol(data_chemi), labels = F)
-              text(1:ncol(data_chemi), par("usr")[3], srt = 90, pos=1, offset=1.5, labels = element_names, xpd = T, cex=0.6)
-            }
-            else if (case == 3)
-            {
-              axis(1, at=1:ncol(data_chemi), labels = T)
-              xlab("PCA axes")
-            } 
-            title(ylab="Correlation value \nbetween spatial distributions")
-            if (k==1)
-              title("Correlation between soil chemistery data and \nthe 1st most abundant class")
-            else if (k==2)
-              title("Correlation between soil chemistery data and \nthe 2nd most abundant class")
-            else 
-              title(paste("Correlation between soil chemistery data and \nthe",k,"th most abundant class",sep=""))
-          }
-          dev.off()
-          ######################
-        }
-        
         setwd(local_subdirname)
       }
       
@@ -4199,21 +3972,21 @@ if (!mpar)
       for (i in 1:nrow(spatial_topicmix_kriged_all_topics))
         spatial_topicmix_kriged_all_topics_discrete[i,2+dominant_topic_index[i]] = 1
       
-#       spatial_topicmix_kriged_all_topics_gradient = data.frame(spatial_topicmix_kriged_all_topics[,1:2],z.pred.grad=vector(length=length(spatial_topicmix_kriged_all_topics[,1]),mode="numeric"))
-#       for (k in 1:nb_topics)
-#         spatial_topicmix_kriged_all_topics_gradient$z.pred.grad = c(0,abs(diff(spatial_topicmix_kriged_all_topics[,2+k],lag=1))) +
-#                                                                   spatial_topicmix_kriged_all_topics_gradient$z.pred.grad
-#       spatial_topicmix_kriged_all_topics_gradient$z.pred.grad[spatial_topicmix_kriged_all_topics_gradient$x == -720] = 0
+      #       spatial_topicmix_kriged_all_topics_gradient = data.frame(spatial_topicmix_kriged_all_topics[,1:2],z.pred.grad=vector(length=length(spatial_topicmix_kriged_all_topics[,1]),mode="numeric"))
+      #       for (k in 1:nb_topics)
+      #         spatial_topicmix_kriged_all_topics_gradient$z.pred.grad = c(0,abs(diff(spatial_topicmix_kriged_all_topics[,2+k],lag=1))) +
+      #                                                                   spatial_topicmix_kriged_all_topics_gradient$z.pred.grad
+      #       spatial_topicmix_kriged_all_topics_gradient$z.pred.grad[spatial_topicmix_kriged_all_topics_gradient$x == -720] = 0
       
       # Defining the color in each location based on the assemblage composition:
       spatial_topicmix_kriged_all_topics_colors = data.frame(spatial_topicmix_kriged_all_topics[,1:2],red=0,green=0,blue=0)
       coord_matrix = t(as.matrix(spatial_topicmix_kriged_all_topics[,3:(2+nb_topics)]))
       spatial_topicmix_kriged_all_topics_discrete_colors = data.frame(spatial_topicmix_kriged_all_topics[,1:2],red=0,green=0,blue=0)
       coord_matrix_discrete = t(as.matrix(spatial_topicmix_kriged_all_topics_discrete[,3:(2+nb_topics)]))
-#       if (nb_topics == 8)
-#       {
-#         col_matrix = col2rgb(color.pal(nb_topics)[c(1,5,2,6,3,7,4,8)])
-#       } else 
+      #       if (nb_topics == 8)
+      #       {
+      #         col_matrix = col2rgb(color.pal(nb_topics)[c(1,5,2,6,3,7,4,8)])
+      #       } else 
       col_matrix = col2rgb(color.pal(nb_topics))
       spatial_topicmix_kriged_all_topics_colors[,3:5] = t(col_matrix %*% coord_matrix)
       spatial_topicmix_kriged_all_topics_discrete_colors[,3:5] = t(col_matrix %*% coord_matrix_discrete)
@@ -4311,10 +4084,10 @@ if (!mpar)
         if (data_gs)
         {
           
-#           for (k in 1:nb_topics)
-#           {
-#             k0 = rev(sort_normal_topic$ix)[k]
-            
+          #           for (k in 1:nb_topics)
+          #           {
+          #             k0 = rev(sort_normal_topic$ix)[k]
+          
           df.plot = data.frame(x=spatial_topicmix_kriged[[k0]]$x/10,y=spatial_topicmix_kriged[[k0]]$y/10,z.pred=spatial_topicmix_kriged[[k0]]$z.pred)
           df.plot.raster = rasterFromXYZ(df.plot)
           df.plot.extruded = extract(df.plot.raster,land,df=T,cellnumbers=T)
@@ -4325,15 +4098,60 @@ if (!mpar)
           df.plot.extruded.data.frame = as.data.frame(df.plot.extruded.raster, row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)
           df.plot = data.frame(x=df.plot.extruded.data.frame$x,y=df.plot.extruded.data.frame$y,z.pred=df.plot.extruded.data.frame[,3])
           
-            #z.pred = rep(0,237488)
-            #tmp.plot[[k]] = ggplot(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group, alpha = 0), fill = NA) +
-            #             geom_polygon() + 
-            #               geom_path(color = "black", size=0.1) +
-            tmp.plot[[k]] = ggplot(data = bordersGgplot) +
-              #theme(legend.position = "none") +
-              geom_raster(data = df.plot, aes(x, y, fill=z.pred), inherit.aes = F) +
-              scale_fill_gradientn(colours=color.pal(7)) +
-              #geom_polygon(data = oceanGgplotNew, aes(x=long, y=lat, group=group, fill=piece)) +
+          #z.pred = rep(0,237488)
+          #tmp.plot[[k]] = ggplot(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group, alpha = 0), fill = NA) +
+          #             geom_polygon() + 
+          #               geom_path(color = "black", size=0.1) +
+          tmp.plot[[k]] = ggplot(data = bordersGgplot) +
+            #theme(legend.position = "none") +
+            geom_raster(data = df.plot, aes(x, y, fill=z.pred), inherit.aes = F) +
+            scale_fill_gradientn(colours=color.pal(7)) +
+            #geom_polygon(data = oceanGgplotNew, aes(x=long, y=lat, group=group, fill=piece)) +
+            geom_path(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group), 
+                      color = "black", size=0.1, inherit.aes = F) +
+            geom_path(data = riversGgplot, aes(x=long*10, y=lat*10, group=group), 
+                      color = "blue", size=0.4, inherit.aes = F, alpha=1) +
+            scale_y_continuous(limits=c(-110,90), expand = c(0,0)) +
+            scale_x_continuous(limits=c(-720,-470), expand = c(0,0)) +
+            geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), 
+                       aes(x,y), color="black", size=0.2, alpha=0.5, inherit.aes = F) +   
+            coord_equal() +
+            labs(fill=paste0("Assemblage ",k)) +  theme_minimal() + ggtitle(letters[k]) +
+            #           scale_x_continuous(limits=c(5,395), expand = c(0,0)) +
+            #           scale_y_continuous(limits=c(5,295), expand = c(0,0)) + 
+            theme(legend.position="bottom", legend.text=element_text(size=7), 
+                  legend.title=element_text(size=8), axis.title=element_blank(), 
+                  axis.text = element_blank(), panel.background = element_blank(),
+                  panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                  plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
+            guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
+          
+          if (k==1)
+          {
+            df.plot = data.frame(x=spatial_topicmix_kriged_all_topics_colors$x/10,y=spatial_topicmix_kriged_all_topics_colors$y/10,spatial_topicmix_kriged_all_topics_colors[,3:5])
+            df.plot.raster = rasterFromXYZ(df.plot)
+            df.plot.extruded = extract(df.plot.raster,land,df=T,cellnumbers=T)
+            df.plot.extruded.data.frame = data.frame(x=spatial_topicmix_kriged_all_topics_colors$x[df.plot.extruded$cell],
+                                                     y=spatial_topicmix_kriged_all_topics_colors$y[df.plot.extruded$cell],df.plot.extruded[,3:5])
+            df.plot.extruded.raster = rasterFromXYZ(df.plot.extruded.data.frame)
+            df.plot.extruded.raster = flip(df.plot.extruded.raster,'y')
+            df.plot.extruded.data.frame = as.data.frame(df.plot.extruded.raster, row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)
+            df.plot = data.frame(x=df.plot.extruded.data.frame$x,y=df.plot.extruded.data.frame$y,df.plot.extruded.data.frame[,3:5])
+            
+            #               land.plot = ggplot(data = landGgplot) +
+            #                 geom_path(data = landGgplot, aes(x=long*10, y=lat*10, group=group), 
+            #                          color = "black", size=0.1) 
+            #               ggsave(filename = "Test2.pdf", land.plot, width = 10)
+            
+            tmp.one.plot = ggplot(data = bordersGgplot) +
+              #geom_raster(data = spatial_topicmix_kriged_all_topics_colors, aes(x, y), fill=rgb(spatial_topicmix_kriged_all_topics_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_colors[,3:5]))), inherit.aes = F) +
+              geom_raster(data = df.plot, aes(x, y), fill=rgb(df.plot[,3:5]/max(255,max(df.plot[,3:5]))), inherit.aes = F) +
+              #geom_raster(data = test_crop_data.frame, aes(x, y), fill=rgb(test_crop_data.frame[,3:5]/max(255,max(test_crop_data.frame[,3:5]))), inherit.aes = F) +
+              #geom_raster(data = spatial_topicmix_kriged_all_topics_gradient, aes(x, y, fill=spatial_topicmix_kriged_all_topics[,3:(2+nb_topics)]), inherit.aes = F) +
+              #geom_raster(data = spatial_topicmix_kriged_all_topics_gradient, aes(x, y, fill=z.pred.grad), inherit.aes = F) +
+              #scale_fill_gradientn(colours=color.pal(7)) +
+              #                 geom_path(data = landGgplot, aes(x=long*10, y=lat*10, group=group), 
+              #                           color = "black", size=0.1, inherit.aes = F) +
               geom_path(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group), 
                         color = "black", size=0.1, inherit.aes = F) +
               geom_path(data = riversGgplot, aes(x=long*10, y=lat*10, group=group), 
@@ -4343,131 +4161,87 @@ if (!mpar)
               geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), 
                          aes(x,y), color="black", size=0.2, alpha=0.5, inherit.aes = F) +   
               coord_equal() +
-              labs(fill=paste0("Assemblage ",k)) +  theme_minimal() + ggtitle(letters[k]) +
+              theme_minimal() +
+              # labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
               #           scale_x_continuous(limits=c(5,395), expand = c(0,0)) +
               #           scale_y_continuous(limits=c(5,295), expand = c(0,0)) + 
               theme(legend.position="bottom", legend.text=element_text(size=7), 
                     legend.title=element_text(size=8), axis.title=element_blank(), 
-                    axis.text = element_blank(),
+                    axis.text = element_blank(), panel.background = element_blank(),
+                    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                     plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
               guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
             
-            if (k==1)
-            {
-              df.plot = data.frame(x=spatial_topicmix_kriged_all_topics_colors$x/10,y=spatial_topicmix_kriged_all_topics_colors$y/10,spatial_topicmix_kriged_all_topics_colors[,3:5])
-              df.plot.raster = rasterFromXYZ(df.plot)
-              df.plot.extruded = extract(df.plot.raster,land,df=T,cellnumbers=T)
-              df.plot.extruded.data.frame = data.frame(x=spatial_topicmix_kriged_all_topics_colors$x[df.plot.extruded$cell],
-                                                              y=spatial_topicmix_kriged_all_topics_colors$y[df.plot.extruded$cell],df.plot.extruded[,3:5])
-              df.plot.extruded.raster = rasterFromXYZ(df.plot.extruded.data.frame)
-              df.plot.extruded.raster = flip(df.plot.extruded.raster,'y')
-              df.plot.extruded.data.frame = as.data.frame(df.plot.extruded.raster, row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)
-              df.plot = data.frame(x=df.plot.extruded.data.frame$x,y=df.plot.extruded.data.frame$y,df.plot.extruded.data.frame[,3:5])
-              
-#               land.plot = ggplot(data = landGgplot) +
-#                 geom_path(data = landGgplot, aes(x=long*10, y=lat*10, group=group), 
-#                          color = "black", size=0.1) 
-#               ggsave(filename = "Test2.pdf", land.plot, width = 10)
-              
-              tmp.one.plot = ggplot(data = bordersGgplot) +
-                #geom_raster(data = spatial_topicmix_kriged_all_topics_colors, aes(x, y), fill=rgb(spatial_topicmix_kriged_all_topics_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_colors[,3:5]))), inherit.aes = F) +
-                geom_raster(data = df.plot, aes(x, y), fill=rgb(df.plot[,3:5]/max(255,max(df.plot[,3:5]))), inherit.aes = F) +
-                #geom_raster(data = test_crop_data.frame, aes(x, y), fill=rgb(test_crop_data.frame[,3:5]/max(255,max(test_crop_data.frame[,3:5]))), inherit.aes = F) +
-                #geom_raster(data = spatial_topicmix_kriged_all_topics_gradient, aes(x, y, fill=spatial_topicmix_kriged_all_topics[,3:(2+nb_topics)]), inherit.aes = F) +
-                #geom_raster(data = spatial_topicmix_kriged_all_topics_gradient, aes(x, y, fill=z.pred.grad), inherit.aes = F) +
-                #scale_fill_gradientn(colours=color.pal(7)) +
-#                 geom_path(data = landGgplot, aes(x=long*10, y=lat*10, group=group), 
-#                           color = "black", size=0.1, inherit.aes = F) +
-                geom_path(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group), 
-                        color = "black", size=0.1, inherit.aes = F) +
-                geom_path(data = riversGgplot, aes(x=long*10, y=lat*10, group=group), 
-                          color = "blue", size=0.4, inherit.aes = F, alpha=1) +
-                scale_y_continuous(limits=c(-110,90), expand = c(0,0)) +
-                scale_x_continuous(limits=c(-720,-470), expand = c(0,0)) +
-                geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), 
-                           aes(x,y), color="black", size=0.2, alpha=0.5, inherit.aes = F) +   
-                coord_equal() +
-                theme_minimal() +
-                # labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
-                #           scale_x_continuous(limits=c(5,395), expand = c(0,0)) +
-                #           scale_y_continuous(limits=c(5,295), expand = c(0,0)) + 
-                theme(legend.position="bottom", legend.text=element_text(size=7), 
-                      legend.title=element_text(size=8), axis.title=element_blank(), 
-                      axis.text = element_blank(), panel.background = element_blank(),
-                      panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                      plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
-                guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
-              
-             #ggsave(filename = "Test1.pdf", tmp.one.plot, width = 10) 
-              
-                df.plot = data.frame(x=spatial_topicmix_kriged_all_topics_colors$x/10,y=spatial_topicmix_kriged_all_topics_colors$y/10,spatial_topicmix_kriged_all_topics_discrete_colors[,3:5])
-                df.plot.raster = rasterFromXYZ(df.plot)
-                df.plot.extruded = extract(df.plot.raster,land,df=T,cellnumbers=T)
-                df.plot.extruded.data.frame = data.frame(x=spatial_topicmix_kriged_all_topics_colors$x[df.plot.extruded$cell],
-                                         y=spatial_topicmix_kriged_all_topics_colors$y[df.plot.extruded$cell],df.plot.extruded[,3:5])
-                df.plot.extruded.raster = rasterFromXYZ(df.plot.extruded.data.frame)
-                df.plot.extruded.raster = flip(df.plot.extruded.raster,'y')
-                df.plot.extruded.data.frame = as.data.frame(df.plot.extruded.raster, row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)
-                df.plot = data.frame(x=df.plot.extruded.data.frame$x,y=df.plot.extruded.data.frame$y,df.plot.extruded.data.frame[,3:5])
-
-              tmp.one.plot.discrete = ggplot(data = bordersGgplot) +
-                geom_raster(data = df.plot, aes(x, y), 
-                            fill=rgb(df.plot[,3:5]/max(255,max(df.plot[,3:5]))), inherit.aes = F) +
-                #geom_raster(data = spatial_topicmix_kriged_all_topics_gradient, aes(x, y, fill=spatial_topicmix_kriged_all_topics[,3:(2+nb_topics)]), inherit.aes = F) +
-                #geom_raster(data = spatial_topicmix_kriged_all_topics_gradient, aes(x, y, fill=z.pred.grad), inherit.aes = F) +
-                #scale_fill_gradientn(colours=color.pal(7)) +
-                geom_path(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group), 
-                          color = "black", size=0.1, inherit.aes = F) +
-                geom_path(data = riversGgplot, aes(x=long*10, y=lat*10, group=group), 
-                          color = "blue", size=0.4, inherit.aes = F, alpha=1) +
-                scale_y_continuous(limits=c(-110,90), expand = c(0,0)) +
-                scale_x_continuous(limits=c(-720,-470), expand = c(0,0)) +
-                geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), 
-                           aes(x,y), color="black", size=0.2, alpha=0.5, inherit.aes = F) +   
-                coord_equal() +
-                theme_minimal() +
-                # labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
-                #           scale_x_continuous(limits=c(5,395), expand = c(0,0)) +
-                #           scale_y_continuous(limits=c(5,295), expand = c(0,0)) + 
-                theme(legend.position="bottom", legend.text=element_text(size=7), 
-                      legend.title=element_text(size=8), axis.title=element_blank(), 
-                      axis.text = element_blank(), panel.background = element_blank(),
-                      panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-                      plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
-                guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
-                
-              #ggsave(filename = "Test2.pdf", tmp.one.plot.discrete, width = 10) 
-            }
-#             
-#             tmp.one.plot = tmp.one.plot +
-#               #theme(legend.position = "none") +
-#               geom_raster(data = spatial_topicmix_kriged[[k0]], aes(x, y, fill=z.pred, colour = scale_colour_gradient("white",color.pal(2)[k])), inherit.aes = F) 
-#               #scale_fill_gradientn(colours=c("white",color.pal(2)[k])) 
-#               
-#               if (k==nb_topics)
-#               {
-#                 #geom_polygon(data = oceanGgplotNew, aes(x=long, y=lat, group=group), fill = "white") +
-#                 tmp.one.plot = tmp.one.plot + geom_path(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group), 
-#                                                         color = "black", size=0.1, inherit.aes = F) +
-#                   geom_path(data = riversGgplot, aes(x=long*10, y=lat*10, group=group), 
-#                             color = "blue", size=0.4, inherit.aes = F, alpha=1) +
-#                   scale_y_continuous(limits=c(-110,90), expand = c(0,0)) +
-#                   scale_x_continuous(limits=c(-720,-470), expand = c(0,0)) +
-#                   geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), 
-#                              aes(x,y), color="black", size=0.2, alpha=0.5, inherit.aes = F) +   
-#                   coord_equal() +
-#                   labs(fill=paste0("Assemblage ",k)) +  theme_minimal() + ggtitle(letters[k]) +
-#                   #           scale_x_continuous(limits=c(5,395), expand = c(0,0)) +
-#                   #           scale_y_continuous(limits=c(5,295), expand = c(0,0)) + 
-#                   theme(legend.position="bottom", legend.text=element_text(size=7), 
-#                         legend.title=element_text(size=8), axis.title=element_blank(), 
-#                         axis.text = element_blank(),
-#                         plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
-#                   guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
-#               }
-          # }
-           # ggsave(filename = "Test.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=min(nb_topics,4))), width = 10)  
+            #ggsave(filename = "Test1.pdf", tmp.one.plot, width = 10) 
             
+            df.plot = data.frame(x=spatial_topicmix_kriged_all_topics_colors$x/10,y=spatial_topicmix_kriged_all_topics_colors$y/10,spatial_topicmix_kriged_all_topics_discrete_colors[,3:5])
+            df.plot.raster = rasterFromXYZ(df.plot)
+            df.plot.extruded = extract(df.plot.raster,land,df=T,cellnumbers=T)
+            df.plot.extruded.data.frame = data.frame(x=spatial_topicmix_kriged_all_topics_colors$x[df.plot.extruded$cell],
+                                                     y=spatial_topicmix_kriged_all_topics_colors$y[df.plot.extruded$cell],df.plot.extruded[,3:5])
+            df.plot.extruded.raster = rasterFromXYZ(df.plot.extruded.data.frame)
+            df.plot.extruded.raster = flip(df.plot.extruded.raster,'y')
+            df.plot.extruded.data.frame = as.data.frame(df.plot.extruded.raster, row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)
+            df.plot = data.frame(x=df.plot.extruded.data.frame$x,y=df.plot.extruded.data.frame$y,df.plot.extruded.data.frame[,3:5])
+            
+            tmp.one.plot.discrete = ggplot(data = bordersGgplot) +
+              geom_raster(data = df.plot, aes(x, y), 
+                          fill=rgb(df.plot[,3:5]/max(255,max(df.plot[,3:5]))), inherit.aes = F) +
+              #geom_raster(data = spatial_topicmix_kriged_all_topics_gradient, aes(x, y, fill=spatial_topicmix_kriged_all_topics[,3:(2+nb_topics)]), inherit.aes = F) +
+              #geom_raster(data = spatial_topicmix_kriged_all_topics_gradient, aes(x, y, fill=z.pred.grad), inherit.aes = F) +
+              #scale_fill_gradientn(colours=color.pal(7)) +
+              geom_path(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group), 
+                        color = "black", size=0.1, inherit.aes = F) +
+              geom_path(data = riversGgplot, aes(x=long*10, y=lat*10, group=group), 
+                        color = "blue", size=0.4, inherit.aes = F, alpha=1) +
+              scale_y_continuous(limits=c(-110,90), expand = c(0,0)) +
+              scale_x_continuous(limits=c(-720,-470), expand = c(0,0)) +
+              geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), 
+                         aes(x,y), color="black", size=0.2, alpha=0.5, inherit.aes = F) +   
+              coord_equal() +
+              theme_minimal() +
+              # labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
+              #           scale_x_continuous(limits=c(5,395), expand = c(0,0)) +
+              #           scale_y_continuous(limits=c(5,295), expand = c(0,0)) + 
+              theme(legend.position="bottom", legend.text=element_text(size=7), 
+                    legend.title=element_text(size=8), axis.title=element_blank(), 
+                    axis.text = element_blank(), panel.background = element_blank(),
+                    panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+                    plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
+              guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
+            
+            #ggsave(filename = "Test2.pdf", tmp.one.plot.discrete, width = 10) 
+          }
+          #             
+          #             tmp.one.plot = tmp.one.plot +
+          #               #theme(legend.position = "none") +
+          #               geom_raster(data = spatial_topicmix_kriged[[k0]], aes(x, y, fill=z.pred, colour = scale_colour_gradient("white",color.pal(2)[k])), inherit.aes = F) 
+          #               #scale_fill_gradientn(colours=c("white",color.pal(2)[k])) 
+          #               
+          #               if (k==nb_topics)
+          #               {
+          #                 #geom_polygon(data = oceanGgplotNew, aes(x=long, y=lat, group=group), fill = "white") +
+          #                 tmp.one.plot = tmp.one.plot + geom_path(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group), 
+          #                                                         color = "black", size=0.1, inherit.aes = F) +
+          #                   geom_path(data = riversGgplot, aes(x=long*10, y=lat*10, group=group), 
+          #                             color = "blue", size=0.4, inherit.aes = F, alpha=1) +
+          #                   scale_y_continuous(limits=c(-110,90), expand = c(0,0)) +
+          #                   scale_x_continuous(limits=c(-720,-470), expand = c(0,0)) +
+          #                   geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), 
+          #                              aes(x,y), color="black", size=0.2, alpha=0.5, inherit.aes = F) +   
+          #                   coord_equal() +
+          #                   labs(fill=paste0("Assemblage ",k)) +  theme_minimal() + ggtitle(letters[k]) +
+          #                   #           scale_x_continuous(limits=c(5,395), expand = c(0,0)) +
+          #                   #           scale_y_continuous(limits=c(5,295), expand = c(0,0)) + 
+          #                   theme(legend.position="bottom", legend.text=element_text(size=7), 
+          #                         legend.title=element_text(size=8), axis.title=element_blank(), 
+          #                         axis.text = element_blank(),
+          #                         plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
+          #                   guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
+          #               }
+          # }
+          # ggsave(filename = "Test.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=min(nb_topics,4))), width = 10)  
+          
           
         } else 
         {
@@ -4501,24 +4275,24 @@ if (!mpar)
               geom_point(data = data.frame(coordH20,z.pred=rep(0,nrow(coordH20))), aes(x,y), color="black", size=0.2, alpha=0.3)
           }
         }
-
-#         else if (data_gs)
-#         {
-#           tmp.plot[[k]] = tmp.plot[[k]] + 
-#             scale_y_continuous(limits=c(-110,90), expand = c(0,0)) +
-#             scale_x_continuous(limits=c(-720,-470), expand = c(0,0)) + 
-#             geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), aes(x,y), color="black", size=0.2, alpha=0.3)
-#             
-#             borders = readOGR(dsn=paste0(local_prefix,data_insert), layer="World_car")
-#             borders@data$id = rownames(borders@data)
-#             bordersPoints = fortify(borders, region="id")
-#             bordersGgplot = merge(bordersPoints, borders@data, by="id")
-#           #z.pred = rep(0,237488)
-#           tmp.plot[[k]] = tmp.plot[[k]] + geom_polygon(data=bordersGgplot, aes(x=long*10, y=lat*10, group=group),
-#                                                         fill=NA,color="black", size=0.1)   
-#           #tmp.plot[[k]] = tmp.plot[[k]] + geom_line(data=borders, aes(x=long*10, y=lat*10, group=group),
-#                                                       #color="black", size=0.1)     
-#         }
+        
+        #         else if (data_gs)
+        #         {
+        #           tmp.plot[[k]] = tmp.plot[[k]] + 
+        #             scale_y_continuous(limits=c(-110,90), expand = c(0,0)) +
+        #             scale_x_continuous(limits=c(-720,-470), expand = c(0,0)) + 
+        #             geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), aes(x,y), color="black", size=0.2, alpha=0.3)
+        #             
+        #             borders = readOGR(dsn=paste0(local_prefix,data_insert), layer="World_car")
+        #             borders@data$id = rownames(borders@data)
+        #             bordersPoints = fortify(borders, region="id")
+        #             bordersGgplot = merge(bordersPoints, borders@data, by="id")
+        #           #z.pred = rep(0,237488)
+        #           tmp.plot[[k]] = tmp.plot[[k]] + geom_polygon(data=bordersGgplot, aes(x=long*10, y=lat*10, group=group),
+        #                                                         fill=NA,color="black", size=0.1)   
+        #           #tmp.plot[[k]] = tmp.plot[[k]] + geom_line(data=borders, aes(x=long*10, y=lat*10, group=group),
+        #                                                       #color="black", size=0.1)     
+        #         }
         
         #sauver l'objet en pdf
         #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", tmp.plot)
@@ -4618,7 +4392,7 @@ if (!mpar)
       if (data_pp && (nb_topics == 3))
         #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=nb_topics)), height = 4, width = 10)
         ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, lidar.plot, ncol=nb_topics)), height = 10/3*4/3*2, width = 10)
-        #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, lidar.plot, ncol=nb_topics)), width = 10)
+      #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, lidar.plot, ncol=nb_topics)), width = 10)
       else
       {
         ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=min(nb_topics,4))), height = 10/min(nb_topics,4)*((nb_topics-1)%/%4 + 1)*4/3, width = 10)
