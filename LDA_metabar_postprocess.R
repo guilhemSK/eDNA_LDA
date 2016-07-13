@@ -60,15 +60,15 @@ if (local)
 }
 
 data_h20 = 0
-data_pp = 0
+data_pp = 1
 # data_gs = 1 requires filled = 1:
-data_gs = 1
+data_gs = 0
 filled = 1
 data_betadiv = 0
 data_betadiv_pooled = 0
 
 # Treating the data as occurrence data instead of abundance data
-occurrence = 0
+occurrence = 1
 
 # Number of sites an OTU must ocuppy to be ketp
 # (if nb_occupied_sites_threshold = 1, all OTUs with non-zero abundance are kept)
@@ -88,19 +88,21 @@ barcode_18smetazoa = 0
 barcode_18sannelids = 0
 barcode_18sarthropods = 0
 barcode_18snematodes = 0
-barcode_18sprotists = 0
+barcode_18sprotists = 1
 barcode_18splatyhelminthes = 0
 barcode_18splants = 0
 barcode_16sarch = 0
 barcode_itsplant = 0
 barcode_16sins = 0
 plantfungi = 0
-#frogs = 1
-frogs_poly2_all = 1
+#frogs
+frogs_iucn_all = 0
 frogs_iucn_forest = 0
 frogs_iucn_open = 0
+frogs_poly1_all = 0
 frogs_poly1_forest = 0
 frogs_poly1_open = 0
+frogs_poly2_all = 0
 frogs_poly2_forest = 0
 frogs_poly2_open = 0   
 
@@ -120,7 +122,7 @@ Rtopicmodels_VEM = 1
 hdp_faster = 0
 
 mpar = 0
-nb_topics = 8
+nb_topics = 3
 # For testdata only :
 true_nb_topics = 5
 
@@ -165,7 +167,7 @@ llh_keep = 100
 
 # only useful for VEM
 #em_tol = 5*(10^-5)
-em_tol = 10^-6
+em_tol = 10^-7
 var_tol = 10^-8
 
 # Calculation associated to topic distribution and associated plots
@@ -174,7 +176,7 @@ dominance_calculation = 0
 topic_read_proportion_comput = 0
 
 # Comparing topics to chemistery and lidar data (for data_pp only), as well as comparing topics to each other within the best real:
-abiotic_variables = 1
+abiotic_variables = 0
 # Number of randomizations for lidar data, required for abiotic_variables = 1
 # Randomizations not implemented yet for data_gs
 nb_abiotic_rndzations = 100000
@@ -303,6 +305,10 @@ if (barcode_gh) {
 {
   barcode_insert = "Anoures_poly2_open"
   short_barcode_insert = "poly2_open"
+} else if (frogs_poly1_all)
+{
+  barcode_insert = "Anoures_poly1_all"
+  short_barcode_insert = "poly1_all"
 } else if (frogs_poly1_forest)
 {
   barcode_insert = "Anoures_poly1_forest"
@@ -311,6 +317,10 @@ if (barcode_gh) {
 {
   barcode_insert = "Anoures_poly1_open"
   short_barcode_insert = "poly1_open"
+} else if (frogs_iucn_all)
+{
+  barcode_insert = "Anoures_IUCN_all"
+  short_barcode_insert = "IUCN_all"
 } else if (frogs_iucn_open)
 {
   barcode_insert = "Anoures_IUCN_open"
@@ -1680,7 +1690,7 @@ if (!mpar)
       }
     }
     sort_normal_topic = sort.int(normal_topic,index.return=T)
-    #save(sort_normal_topic,file="sort_normal_topic.Rdata")
+    save(sort_normal_topic,file="sort_normal_topic.Rdata")
     if (realization_comparison)
       sort_normal_topic_allreal[[j_select]] = sort_normal_topic
     
@@ -2244,18 +2254,18 @@ if (!mpar)
           colnames_abiotic = c("Isothermality","Max. temperature of warmest month","Min. temperature of coldest month","Precipitation of driest quarter","Precipitation of wettest quarter")
           colnames(data_abiotic) = colnames_abiotic
           
-#           pdf("Climate_rasters.pdf")
-#           plot(raster("Isothermality.grd"))
-#           title("Isothermality")
-#           plot(raster("Max_Temperature_of_Warmest_Month.grd"))
-#           title("Max. temperature of warmest month")
-#           plot(raster("Min_Temperature_of_Coldest_Month.grd"))
-#           title("Min. temperature of coldest month")
-#           plot(raster("Precipitation_of_Driest_Quarter.grd"))
-#           title("Precipitation of driest quarter")
-#           plot(raster("Precipitation_of_Wettest_Quarter.grd"))
-#           title("Precipitation of wettest quarter")
-#           dev.off()
+          #           pdf("Climate_rasters.pdf")
+          #           plot(raster("Isothermality.grd"))
+          #           title("Isothermality")
+          #           plot(raster("Max_Temperature_of_Warmest_Month.grd"))
+          #           title("Max. temperature of warmest month")
+          #           plot(raster("Min_Temperature_of_Coldest_Month.grd"))
+          #           title("Min. temperature of coldest month")
+          #           plot(raster("Precipitation_of_Driest_Quarter.grd"))
+          #           title("Precipitation of driest quarter")
+          #           plot(raster("Precipitation_of_Wettest_Quarter.grd"))
+          #           title("Precipitation of wettest quarter")
+          #           dev.off()
           
           # The following replaces "data_abiotic = data_abiotic[-which(Missing_positions_indices==1),]" for data_gs:
           sites_to_remove = rep(1,nrow(coordGS1)) 
@@ -3470,6 +3480,24 @@ if (!mpar)
   }
   dev.off()
   
+  # Writing the taxonomic composition to a .txt file
+  Taxo_compo_file = "Taxonomic_composition.txt"
+  write(paste(barcode_insert,"-",nb_topics,"topics\n%%%%%%%%%%%%%\n"),file=Taxo_compo_file,append=F)
+  for (k in 1:nb_topics)
+  {
+    k0 = rev(sort_normal_topic$ix)[k]
+    if (nb_topics == 3 && data_pp && abiotic_variables)
+    {
+      sorted_correlations_to_bacteria = sort.int(Correlation_abiotic[[1]][k0,ncol0+(1:3)],index=T,decreasing=T)
+      j0 = ncol0+sorted_correlations_to_bacteria$ix[1]
+      write(paste0("\n%%%%%%%%%%%%%\nFor topic ",k," - ",colnames_abiotic[j0],
+                   " assemblage (rho = ",Correlation_abiotic[[1]][k0,j0],", p = ",p_value_abiotic[k0,j0],"):\n%%%%%%%%%%%%%"),file=Taxo_compo_file,append=T)
+    } else
+      write(paste0("\n%%%%%%%%%%%%%\nFor topic ",k,":\n%%%%%%%%%%%%%"),file=Taxo_compo_file,append=T)
+    for (i in 1:min(50,length(which(topic_compo[[k0]][,1]>0.01))))
+      write(paste(topic_compo[[k0]][i,1],"-",topic_compo[[k0]][i,11],"-",topic_compo[[k0]][i,10]),file=Taxo_compo_file,append=T)
+  }
+  
   # KL symmetrised distance between topic's site repartition and sequence site's repartition (result from H20_GH.R)
   # -> the goal was to identify whether some topics predominantly contain one particular MOTU (which is the case for plants GH)
   #############################
@@ -3987,7 +4015,13 @@ if (!mpar)
       #       {
       #         col_matrix = col2rgb(color.pal(nb_topics)[c(1,5,2,6,3,7,4,8)])
       #       } else 
-      col_matrix = col2rgb(color.pal(nb_topics))
+      if (nb_topics == 3)
+      {
+        #col_matrix = col2rgb(color.pal(7)[c(2,4,6)])
+        col_matrix = matrix(data=c(c(0,0,255),c(0,255,0),c(255,0,0)),ncol=3)
+        rownames(col_matrix) = c("red","green","blue")
+      } else
+        col_matrix = col2rgb(color.pal(nb_topics))
       spatial_topicmix_kriged_all_topics_colors[,3:5] = t(col_matrix %*% coord_matrix)
       spatial_topicmix_kriged_all_topics_discrete_colors[,3:5] = t(col_matrix %*% coord_matrix_discrete)
     }
@@ -4083,11 +4117,7 @@ if (!mpar)
         
         if (data_gs)
         {
-          
-          #           for (k in 1:nb_topics)
-          #           {
-          #             k0 = rev(sort_normal_topic$ix)[k]
-          
+          #plotting each topic separately as a color gradient 
           df.plot = data.frame(x=spatial_topicmix_kriged[[k0]]$x/10,y=spatial_topicmix_kriged[[k0]]$y/10,z.pred=spatial_topicmix_kriged[[k0]]$z.pred)
           df.plot.raster = rasterFromXYZ(df.plot)
           df.plot.extruded = extract(df.plot.raster,land,df=T,cellnumbers=T)
@@ -4098,10 +4128,6 @@ if (!mpar)
           df.plot.extruded.data.frame = as.data.frame(df.plot.extruded.raster, row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)
           df.plot = data.frame(x=df.plot.extruded.data.frame$x,y=df.plot.extruded.data.frame$y,z.pred=df.plot.extruded.data.frame[,3])
           
-          #z.pred = rep(0,237488)
-          #tmp.plot[[k]] = ggplot(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group, alpha = 0), fill = NA) +
-          #             geom_polygon() + 
-          #               geom_path(color = "black", size=0.1) +
           tmp.plot[[k]] = ggplot(data = bordersGgplot) +
             #theme(legend.position = "none") +
             geom_raster(data = df.plot, aes(x, y, fill=z.pred), inherit.aes = F) +
@@ -4128,6 +4154,7 @@ if (!mpar)
           
           if (k==1)
           {
+            # Plotting each topic as a distinct color on a single map
             df.plot = data.frame(x=spatial_topicmix_kriged_all_topics_colors$x/10,y=spatial_topicmix_kriged_all_topics_colors$y/10,spatial_topicmix_kriged_all_topics_colors[,3:5])
             df.plot.raster = rasterFromXYZ(df.plot)
             df.plot.extruded = extract(df.plot.raster,land,df=T,cellnumbers=T)
@@ -4174,6 +4201,9 @@ if (!mpar)
             
             #ggsave(filename = "Test1.pdf", tmp.one.plot, width = 10) 
             
+            ##########################################
+            # Plotting only the dominant topic as a distinct color in each pixel
+            
             df.plot = data.frame(x=spatial_topicmix_kriged_all_topics_colors$x/10,y=spatial_topicmix_kriged_all_topics_colors$y/10,spatial_topicmix_kriged_all_topics_discrete_colors[,3:5])
             df.plot.raster = rasterFromXYZ(df.plot)
             df.plot.extruded = extract(df.plot.raster,land,df=T,cellnumbers=T)
@@ -4211,50 +4241,18 @@ if (!mpar)
               guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
             
             #ggsave(filename = "Test2.pdf", tmp.one.plot.discrete, width = 10) 
-          }
-          #             
-          #             tmp.one.plot = tmp.one.plot +
-          #               #theme(legend.position = "none") +
-          #               geom_raster(data = spatial_topicmix_kriged[[k0]], aes(x, y, fill=z.pred, colour = scale_colour_gradient("white",color.pal(2)[k])), inherit.aes = F) 
-          #               #scale_fill_gradientn(colours=c("white",color.pal(2)[k])) 
-          #               
-          #               if (k==nb_topics)
-          #               {
-          #                 #geom_polygon(data = oceanGgplotNew, aes(x=long, y=lat, group=group), fill = "white") +
-          #                 tmp.one.plot = tmp.one.plot + geom_path(data = bordersGgplot, aes(x=long*10, y=lat*10, group=group), 
-          #                                                         color = "black", size=0.1, inherit.aes = F) +
-          #                   geom_path(data = riversGgplot, aes(x=long*10, y=lat*10, group=group), 
-          #                             color = "blue", size=0.4, inherit.aes = F, alpha=1) +
-          #                   scale_y_continuous(limits=c(-110,90), expand = c(0,0)) +
-          #                   scale_x_continuous(limits=c(-720,-470), expand = c(0,0)) +
-          #                   geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), 
-          #                              aes(x,y), color="black", size=0.2, alpha=0.5, inherit.aes = F) +   
-          #                   coord_equal() +
-          #                   labs(fill=paste0("Assemblage ",k)) +  theme_minimal() + ggtitle(letters[k]) +
-          #                   #           scale_x_continuous(limits=c(5,395), expand = c(0,0)) +
-          #                   #           scale_y_continuous(limits=c(5,295), expand = c(0,0)) + 
-          #                   theme(legend.position="bottom", legend.text=element_text(size=7), 
-          #                         legend.title=element_text(size=8), axis.title=element_blank(), 
-          #                         axis.text = element_blank(),
-          #                         plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
-          #                   guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
-          #               }
-          # }
-          # ggsave(filename = "Test.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=min(nb_topics,4))), width = 10)  
-          
-          
+          }  
         } else 
         {
-          #le plot 
+          #plotting each topic separately as a color gradient
           tmp.plot[[k]] = qplot(x, y, data=spatial_topicmix_kriged[[k0]], geom="raster", fill=z.pred) +
             #tmp.plot[[k]] = qplot(x, y, spatial_topicmix_Blaise, geom="raster", fill=z.pred) +
             #tmp.plot[[k]] = qplot(x, y, data=spatial_topicmix_kriged, geom="raster", fill=z.pred) +
             #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", function(x) round(x,0))) + 
             #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", scientific_format())) +
             scale_fill_gradientn(colours=color.pal(7)) +
-            labs(fill=paste0("Assemblage ",k)) +  theme_minimal() + ggtitle(letters[k]) +
-            #           scale_x_continuous(limits=c(5,395), expand = c(0,0)) +
-            #           scale_y_continuous(limits=c(5,295), expand = c(0,0)) + 
+            coord_equal() + theme_minimal() +
+            labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
             theme(legend.position="bottom", legend.text=element_text(size=7), 
                   legend.title=element_text(size=8), axis.title=element_blank(), 
                   axis.text = element_blank(),
@@ -4274,31 +4272,59 @@ if (!mpar)
               scale_x_continuous(limits=c(5,95), expand = c(0,0)) + 
               geom_point(data = data.frame(coordH20,z.pred=rep(0,nrow(coordH20))), aes(x,y), color="black", size=0.2, alpha=0.3)
           }
+          
+          if (k==1)
+          {
+            # Plotting each topic as a distinct color on a single map
+            tmp.one.plot = ggplot(data = spatial_topicmix_kriged_all_topics_colors) +
+                           geom_raster(data = spatial_topicmix_kriged_all_topics_colors, aes(x, y), 
+                                  fill=rgb(spatial_topicmix_kriged_all_topics_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_colors[,3:5]))), inherit.aes = F) +
+                           #geom_raster() +
+                           coord_equal() + theme_minimal() +
+                           #labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
+                           theme(legend.position="bottom", legend.text=element_text(size=7), 
+                                 legend.title=element_text(size=8), axis.title=element_blank(), 
+                                 axis.text = element_blank(),
+                                 plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
+                           guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
+            
+            # Plotting only the dominant topic as a distinct color in each pixel
+            tmp.one.plot.discrete = ggplot(data = spatial_topicmix_kriged_all_topics_discrete_colors) +
+                                    geom_raster(data = spatial_topicmix_kriged_all_topics_discrete_colors, aes(x, y),
+                                                fill=rgb(spatial_topicmix_kriged_all_topics_discrete_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_discrete_colors[,3:5]))), inherit.aes = F) +
+                                    #geom_raster() +
+                                    coord_equal() + theme_minimal() +
+                                    #labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
+                                    theme(legend.position="bottom", legend.text=element_text(size=7), 
+                                          legend.title=element_text(size=8), axis.title=element_blank(), 
+                                          axis.text = element_blank(),
+                                          plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
+                                    guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
+            if (data_pp)
+            {
+              tmp.one.plot = tmp.one.plot + 
+                scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
+                scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
+                geom_point(data = data.frame(coordPP,z.pred=rep(0,nrow(coordPP))), aes(x,y), color="black", size=0.2, alpha=0.3, inherit.aes = F)
+              
+              tmp.one.plot.discrete = tmp.one.plot.discrete + 
+                scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
+                scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
+                geom_point(data = data.frame(coordPP,z.pred=rep(0,nrow(coordPP))), aes(x,y), color="black", size=0.2, alpha=0.3, inherit.aes = F)
+            } else if (data_h20)
+            {
+              tmp.one.plot = tmp.one.plot + 
+                scale_y_continuous(limits=c(5,95), expand = c(0,0)) +
+                scale_x_continuous(limits=c(5,95), expand = c(0,0)) + 
+                geom_point(data = data.frame(coordH20,z.pred=rep(0,nrow(coordH20))), aes(x,y), color="black", size=0.2, alpha=0.3)
+              
+              tmp.one.plot.discrete = tmp.one.plot.discrete + 
+                scale_y_continuous(limits=c(5,95), expand = c(0,0)) +
+                scale_x_continuous(limits=c(5,95), expand = c(0,0)) + 
+                geom_point(data = data.frame(coordH20,z.pred=rep(0,nrow(coordH20))), aes(x,y), color="black", size=0.2, alpha=0.3)
+            }
+          }
         }
-        
-        #         else if (data_gs)
-        #         {
-        #           tmp.plot[[k]] = tmp.plot[[k]] + 
-        #             scale_y_continuous(limits=c(-110,90), expand = c(0,0)) +
-        #             scale_x_continuous(limits=c(-720,-470), expand = c(0,0)) + 
-        #             geom_point(data = data.frame(coordGS,z.pred=rep(0,nrow(coordGS))), aes(x,y), color="black", size=0.2, alpha=0.3)
-        #             
-        #             borders = readOGR(dsn=paste0(local_prefix,data_insert), layer="World_car")
-        #             borders@data$id = rownames(borders@data)
-        #             bordersPoints = fortify(borders, region="id")
-        #             bordersGgplot = merge(bordersPoints, borders@data, by="id")
-        #           #z.pred = rep(0,237488)
-        #           tmp.plot[[k]] = tmp.plot[[k]] + geom_polygon(data=bordersGgplot, aes(x=long*10, y=lat*10, group=group),
-        #                                                         fill=NA,color="black", size=0.1)   
-        #           #tmp.plot[[k]] = tmp.plot[[k]] + geom_line(data=borders, aes(x=long*10, y=lat*10, group=group),
-        #                                                       #color="black", size=0.1)     
-        #         }
-        
-        #sauver l'objet en pdf
-        #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", tmp.plot)
-        
-        #Tu peux mettre plusieurs cartes (plusieurs tmp.plot) dans une liste et arranger la sortie sur plusieurs panels de la manière suivante (ici mettons que tu as 14 cartes et que tu veux les montrer sur 7 colonnes (et donc 2 lignes):
-        #         ggsave(filename = "Figchim.pdf", do.call("arrangeGrob", c(list.tmp.plot, ncol=7)), height = 8, width = 10)
       } else if ((!kriging || !any(kriged_real == j_select)) && !data_gs)
       {
         # colors Red Green Blue
@@ -4366,7 +4392,8 @@ if (!mpar)
             #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", function(x) round(x,0))) + 
             #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", scientific_format())) +
             scale_fill_gradientn(colours=color.pal(7)) +
-            labs(fill=map_labels[k]) +  theme_minimal() + ggtitle(letters[k+3]) +
+            coord_equal() + theme_minimal() +
+            labs(fill=map_labels[k]) +  ggtitle(letters[k+3]) +
             #                   scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
             #                   scale_x_continuous(limits=c(5,295), expand = c(0,0)) +
             scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
@@ -4390,10 +4417,13 @@ if (!mpar)
       }
       
       if (data_pp && (nb_topics == 3))
+      {
         #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=nb_topics)), height = 4, width = 10)
         ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, lidar.plot, ncol=nb_topics)), height = 10/3*4/3*2, width = 10)
+        ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged_oneplot.pdf",  do.call("arrangeGrob", list(tmp.one.plot, tmp.one.plot.discrete, ncol=2)), height = 10/2*4/3, width = 10)
       #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, lidar.plot, ncol=nb_topics)), width = 10)
-      else
+      #ggsave(filename = "Test1.pdf", tmp.one.plot, width=10)
+      } else
       {
         ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=min(nb_topics,4))), height = 10/min(nb_topics,4)*((nb_topics-1)%/%4 + 1)*4/3, width = 10)
         #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=min(nb_topics,4))), width = 10)
