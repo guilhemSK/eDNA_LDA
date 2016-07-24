@@ -1,3 +1,7 @@
+#!/usr/bin/env Rscript
+
+# To use command-line arguments:
+#library(optparse)
 # To use color2D.matplot function :
 library(plotrix)
 # To use errbar function :
@@ -23,7 +27,7 @@ library(rgdal)
 library(sp)
 library(rgeos)
 library(maptools)
-#
+# To use raster manipulating functions:
 library(raster)
 # To use coltorgb:
 library(grDevices)
@@ -44,6 +48,31 @@ library(grDevices)
 # ssh gsommeria@genotoul.toulouse.inra.fr
 # sshfs gsommeria@genotoul.toulouse.inra.fr:/home/gsommeria/ /Users/guilhemsommeria-klein/Desktop/Serveur_Genotoul.home/ 
 # sshfs gsommeria@genotoul.toulouse.inra.fr:/home/gsommeria/work/ /Users/guilhemsommeria-klein/Desktop/Serveur_Genotoul.work/
+
+############################
+# Parsing command-line options
+# option_list = list(
+#                   make_option(c("-f", "--file"), type="character", default=NULL, 
+#                               help="dataset file name", metavar="character"),
+#                   make_option(c("-o", "--out"), type="character", default="out.txt", 
+#                               help="output file name [default= %default]", metavar="character")
+#                   ) 
+# 
+# opt_parser = OptionParser(option_list=option_list)
+# opt = parse_args(opt_parser)
+# 
+# if (is.null(opt$file))
+# {
+#   print_help(opt_parser)
+#   stop("At least one argument must be supplied (input file).n", call.=FALSE)
+# }
+############################
+
+#####################
+#####################
+## PARAMETER PANEL ##
+#####################
+#####################
 
 # Local LDA calculation:
 local = 0
@@ -68,16 +97,18 @@ data_betadiv = 0
 data_betadiv_pooled = 0
 
 # Treating the data as occurrence data instead of abundance data
-occurrence = 1
+occurrence = 0
 
-# Number of sites an OTU must ocuppy to be ketp
+# Number of sites an OTU must ocuppy to be kept
 # (if nb_occupied_sites_threshold = 1, all OTUs with non-zero abundance are kept)
 nb_occupied_sites_threshold = 1
+# Removing OTUs with less reads than the number of sites
+no_rare = 0
 
 barcode_gh = 0
 barcode_ghassigned = 0
 barcode_itsfungi = 0
-barcode_itsasco = 0
+barcode_itsasco = 1
 barcode_itsbasidio = 0
 barcode_itsglomero = 0
 bacteriafungiarchaea = 0
@@ -88,7 +119,7 @@ barcode_18smetazoa = 0
 barcode_18sannelids = 0
 barcode_18sarthropods = 0
 barcode_18snematodes = 0
-barcode_18sprotists = 1
+barcode_18sprotists = 0
 barcode_18splatyhelminthes = 0
 barcode_18splants = 0
 barcode_16sarch = 0
@@ -196,9 +227,20 @@ bij = 1
 nb_rndzations = 1000
 
 # kriging for the spatial distribution of topics in the best realization
-kriging = 1
+kriging = 0
 # required if kriging = 1, only the kriged_real are kriged (all kriged realizations must be included in Selected_real)
 kriged_real = seq(1,1,1)
+
+#########################
+#########################
+## END PARAMETER PANEL ##
+#########################
+#########################
+
+
+##################################
+# DATA LOADING AND PREPROCESSING #
+##################################
 
 # color2D.matplot colors
 col_values = as.list(as.data.frame(t(col2rgb(terrain.colors(255)))))
@@ -358,6 +400,14 @@ if (nb_occupied_sites_threshold > 1)
 } else 
 {
   remove_single_sites_insert = ""
+}
+
+if (no_rare)
+{
+  no_rare_insert = "_noRareOTU"
+} else 
+{
+  no_rare_insert = ""
 }
 
 if (samplewise) {
@@ -656,15 +706,20 @@ if (data_pp && !filled)
 } else if (data_betadiv)
   load("Missing_positions_indices_nomobio.Rdata")
 
-if (occurrence)
-  data2m[data2m>0] = 1
-
 OTUs_to_be_removed = vector(length=nrow(data2m),mode="logical")
 Prop_OTU_removed = 0
 Prop_reads_removed = 0
 for (OTU in 1:nrow(data2m))
   # Removing all OTUs which are present in less than nb_occupied_sites_threshold
   OTUs_to_be_removed[OTU] = (length(which(data2m[OTU,]>0))<nb_occupied_sites_threshold)
+if (no_rare)
+{
+  for (OTU in 1:nrow(data2m))
+  {
+    if (OTUs_to_be_removed[OTU] == 0)
+      OTUs_to_be_removed[OTU] = !(sum(data2m[OTU,])>length(data2m[OTU,]))
+  }
+}
 if (any(OTUs_to_be_removed))
 {
   Prop_OTU_removed = length(which(OTUs_to_be_removed))/nrow(data2m)
@@ -677,6 +732,9 @@ if (any(OTUs_to_be_removed))
   count2 = rowSums(data2m)
 }
 
+if (occurrence)
+  data2m[data2m>0] = 1
+
 # Dealing with the case of split datasets where some samples are empty despite having filling them at the level of the whole dataset
 filled_with_gaps = 0
 if (filled && (length(which(colSums(data2m)==0))!=0))
@@ -684,7 +742,8 @@ if (filled && (length(which(colSums(data2m)==0))!=0))
   filled_with_gaps = 1
   Missing_positions_indices = vector(length=29*39,mode="numeric")
   Missing_positions_indices[which(colSums(data2m)==0)] = 1
-  coordGS = coordGS[-which(colSums(data2m)==0),]
+  if (data_gs)
+    coordGS = coordGS[-which(colSums(data2m)==0),]
   data2m = data2m[,-which(colSums(data2m)==0)]
 }
 
@@ -777,14 +836,14 @@ normal_ordered_seq = sorted_normal_abundances2$ix
 # end condition (!existingresult || dominance_calculation || data_betadiv || data_betadiv_pooled)
 #}
 
+######################################
+# END DATA LOADING AND PREPROCESSING #
+######################################
 
 
-
-
-
-
-
-
+#####################
+# LDA DECOMPOSITION #
+#####################
 
 LLH_final0 = matrix(nrow=2,ncol=mpar_range,data=0)
 LLH_final1 = matrix(nrow=nb_real,ncol=mpar_range,data=0)
@@ -834,14 +893,14 @@ if (mpar)
   {
     if (Rtopicmodels_Gibbs)
     {
-      local_subdirname = paste0(local_dirname,filename_insert,"_",alpha_insert,"_delta",delta,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_iter",nb_iter,"_nb_real",nb_real,occurrence_insert,remove_single_sites_insert,"/")
-      cluster_subdirname = paste0(cluster_dirname,filename_insert,"_",alpha_insert,"_delta",delta,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_iter",nb_iter,"_nb_real",nb_real,occurrence_insert,remove_single_sites_insert,"/")
-      filename = paste0(filename_insert,"_",alpha_insert,"_delta",delta,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_nb_iter",nb_iter,occurrence_insert,remove_single_sites_insert,".Rdata")  
+      local_subdirname = paste0(local_dirname,filename_insert,"_",alpha_insert,"_delta",delta,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_iter",nb_iter,"_nb_real",nb_real,occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+      cluster_subdirname = paste0(cluster_dirname,filename_insert,"_",alpha_insert,"_delta",delta,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_iter",nb_iter,"_nb_real",nb_real,occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+      filename = paste0(filename_insert,"_",alpha_insert,"_delta",delta,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_nb_iter",nb_iter,occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata")  
     } else if (Rtopicmodels_VEM)
     {
-      local_subdirname = paste0(local_dirname,filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,"/")
-      cluster_subdirname = paste0(cluster_dirname,filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,"/")
-      filename = paste0(filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,".Rdata")
+      local_subdirname = paste0(local_dirname,filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+      cluster_subdirname = paste0(cluster_dirname,filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+      filename = paste0(filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata")
     }
     
     #     if (!(file.exists(local_subdirname)))
@@ -871,21 +930,20 @@ if (mpar)
     
     if (cluster)
     {  
-      command = paste("cp ",cluster_subdirname,filename," ",local_subdirname,filename,sep="")
+      command = paste0("cp ",cluster_subdirname,filename," ",local_subdirname,filename)
       system(command, intern=TRUE)
-      load("Loading from cluster",filename)
+      cat("Loading",filename,"\n")
+      load(filename)
     }
     
     if (existingresult)
+    {
+      cat("Loading",filename,"\n")
       load(filename)
-    
-    cat("Loading",filename,"\n")
+    }
   } 
 }
 
-####################################
-# Start of the loop over parameters#
-####################################
 for (par_index in 1:mpar_range)
 {
   if (mpar)
@@ -944,12 +1002,13 @@ for (par_index in 1:mpar_range)
         {  
           command = paste("cp ",cluster_dirname,filename," ",local_dirname,filename,sep="")
           system(command, intern=TRUE)
+          cat("Loading",filename,"\n")
           load(filename)
         }
-        cat(filename,"\n")
         
         if (existingresult)
         {
+          cat("Loading",filename,"\n")
           load(filename)
         }
         
@@ -959,14 +1018,14 @@ for (par_index in 1:mpar_range)
         {
           if (Rtopicmodels_Gibbs)
           {
-            local_subdirname = paste0(local_dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best",occurrence_insert,remove_single_sites_insert,"/")
-            cluster_subdirname = paste0(cluster_dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best",occurrence_insert,remove_single_sites_insert,"/")
-            filename = paste0(filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_real",nb_real,"_nb_iter",nb_iter,"_best",occurrence_insert,remove_single_sites_insert,".Rdata")  
+            local_subdirname = paste0(local_dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+            cluster_subdirname = paste0(cluster_dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+            filename = paste0(filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_real",nb_real,"_nb_iter",nb_iter,"_best",occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata")  
           } else if (Rtopicmodels_VEM)
           {
-            local_subdirname = paste0(local_dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best",occurrence_insert,remove_single_sites_insert,"/")
-            cluster_subdirname = paste0(cluster_dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best",occurrence_insert,remove_single_sites_insert,"/")
-            filename = paste0(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best",occurrence_insert,remove_single_sites_insert,".Rdata")
+            local_subdirname = paste0(local_dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+            cluster_subdirname = paste0(cluster_dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+            filename = paste0(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best",occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata")
           }
           if (!(file.exists(local_subdirname)))
             dir.create(local_subdirname)
@@ -976,30 +1035,34 @@ for (par_index in 1:mpar_range)
           {  
             command = paste("cp ",cluster_subdirname,filename," ",local_subdirname,filename,sep="")
             system(command, intern=TRUE)
+            cat("Loading",filename,"\n")
             load(filename)
           }
           
           if (existingresult)
           {
+            cat("Loading",filename,"\n")
             load(filename)
           }
           
           directory_file = "Directory.txt"
           write(paste(local_subdirname,filename,sep=""),directory_file)
-          cat(filename,"\n")
+          
+          if (local)
+            cat(filename,"\n")
           
         } else if (best_keep)
         {
           if (Rtopicmodels_Gibbs)
           {
-            local_subdirname = paste0(local_dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best_keep",occurrence_insert,remove_single_sites_insert,"/")
-            cluster_subdirname = paste0(cluster_dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best_keep",occurrence_insert,remove_single_sites_insert,"/")
-            filename = paste0(filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_real",nb_real,"_nb_iter",nb_iter,"_best_keep",occurrence_insert,remove_single_sites_insert,".Rdata")
+            local_subdirname = paste0(local_dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+            cluster_subdirname = paste0(cluster_dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+            filename = paste0(filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_real",nb_real,"_nb_iter",nb_iter,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata")
           } else if (Rtopicmodels_VEM)
           {
-            local_subdirname = paste0(local_dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,"/")
-            cluster_subdirname = paste0(cluster_dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,"/")
-            filename = paste0(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,".Rdata")
+            local_subdirname = paste0(local_dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+            cluster_subdirname = paste0(cluster_dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
+            filename = paste0(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata")
           }
           if (!(file.exists(local_subdirname)))
             dir.create(local_subdirname)
@@ -1009,23 +1072,26 @@ for (par_index in 1:mpar_range)
           {  
             command = paste("cp ",cluster_subdirname,filename," ",local_subdirname,filename,sep="")
             system(command, intern=TRUE)
+            cat("Loading",filename,"\n")
             load(filename)
           }
           
           if (existingresult)
           {
+            cat("Loading",filename,"\n")
             load(filename)
           }
           
           directory_file = "Directory.txt"
           write(paste(local_subdirname,filename,sep=""),directory_file)
           
-          cat(filename,"\n")
+          if (local) 
+            cat(filename,"\n")
         }
       }
     } else if (hdp_faster)
     {
-      local_subdirname = paste0(local_dirname,filename_insert,"hdp-faster_alpha",alpha,"_gamma",gamma,"_eta",eta,"_maxiter",maxiter,"_norep",occurrence_insert,remove_single_sites_insert)
+      local_subdirname = paste0(local_dirname,filename_insert,"hdp-faster_alpha",alpha,"_gamma",gamma,"_eta",eta,"_maxiter",maxiter,"_norep",occurrence_insert,remove_single_sites_insert,no_rare_insert)
       if (!(file.exists(local_subdirname)))
         dir.create(local_subdirname)
       setwd(local_subdirname) 
@@ -1328,13 +1394,12 @@ for (par_index in 1:mpar_range)
 #       alpha_insert = paste("alpha",format(alpha_est0[1,],digits=3),sep="")
 #   }
 
+write(paste("Proportion of OTUs removed before LDA decomposition:",Prop_OTU_removed),file="Removed_OTUs_and_reads.txt")
+write(paste("Proportion of reads removed before LDA decomposition:",Prop_reads_removed),file="Removed_OTUs_and_reads.txt",append=T)
 
-
-
-
-
-
-
+############################
+# END OF LDA DECOMPOSITION #
+############################
 
 
 ################################################
@@ -1410,7 +1475,7 @@ if (!mpar)
     Topic_correspondence_to_best_real = list()
     Topic_correspondence_to_best_real[[1]] = seq(1,nb_topics,1)
     
-    llh_differences_allRealPairs = matrix(nrow=length_selected_real,ncol=length_selected_real,data=0)
+    llh_differences_allRealPairs = matrix(nrow=length_selected_real,ncol=length_selected_real,data=NA)
     
     #KL_sym = vector(mode="list",length=length_selected_real-1)
     documents_allreal = vector(mode="list",length=length_selected_real)
@@ -1452,9 +1517,9 @@ if (!mpar)
   #     #######################
   #   }
   
-  ####################
-  #Loading earth data#
-  ####################
+  ##########################
+  # Loading earth map data #
+  ##########################
   if (kriging && data_gs)
   {
     borders = readOGR(dsn=paste0(local_prefix,data_insert), layer="World_car")
@@ -1504,27 +1569,7 @@ if (!mpar)
         alpha_est = Result@alpha
       }
     } else if (best_keep)
-    {
-      #           if (Rtopicmodels_VEM)
-      #           {
-      #             llh = LLH_final_real1[best_real] 
-      #             llh_iterations = Result[[best_real]]@logLiks
-      #             logbeta = Result[[best_real]]@beta 
-      #             documents = Result[[best_real]]@gamma
-      #             nb_terms = Result[[best_real]]@wordassignments$ncol
-      #             nb_doc = Result[[best_real]]@wordassignments$nrow
-      #             alpha_est = Result[[best_real]]@alpha
-      #           } else if (Rtopicmodels_Gibbs)
-      #           {
-      #             llh = LLH_final_real1[best_real] 
-      #             if (llh_keep)
-      #               llh_iterations = Result[[best_real]]@fitted[[1]]@logLiks 
-      #             logbeta = Result[[best_real]]@fitted[[1]]@beta 
-      #             documents = Result[[best_real]]@fitted[[1]]@gamma
-      #             nb_terms = Result[[best_real]]@fitted[[1]]@wordassignments$ncol
-      #             nb_doc = Result[[best_real]]@fitted[[1]]@wordassignments$nrow
-      #           }
-      
+    { 
       if (select_real)
       {
         if (Rtopicmodels_VEM)
@@ -1582,12 +1627,20 @@ if (!mpar)
     KL_topic_compo_notaxo[which(topic_compo_notaxo < 1/sum(data2m))] = 1/sum(data2m)
     KL_topic_compo_notaxo = sweep(KL_topic_compo_notaxo,MARGIN=2,colSums(KL_topic_compo_notaxo),`/`)   
     
+    # setting the minimal proportion of a topic in a sample as 1/#readsInSample :
+    #     for (i in 1:nrow(documents))
+    #       documents[which(documents[i,]<1/sum(data2m[,i]))] = 1/sum(data2m[,i])
+    # setting the minimal proportion of a topic in a sample as 1/total#reads (same as for the minimal proportion of an OTU in a sample) :
+    KL_documents = documents
+    KL_documents[which(documents < 1/sum(data2m))] = 1/sum(data2m)
+    
     # documents : propotion of each topic in a site/document (sums to 1 over topics)
     # KL_documents : propotion of each site/document in a topic (sums to 1 over sites/documents)
-    KL_documents = sweep(documents,MARGIN=2,colSums(documents),`/`)
+#     KL_documents = sweep(documents,MARGIN=2,colSums(documents),`/`)
+    KL_documents = sweep(KL_documents,MARGIN=2,colSums(KL_documents),`/`)
     
-    smoothed_KL_documents = sweep(documents+1,MARGIN=2,colSums(documents)+nb_doc,`/`)
-    smoothed_documents = sweep(documents+1,MARGIN=1,rowSums(documents)+nb_topics,`/`)
+    # smoothed_KL_documents = sweep(documents+1,MARGIN=2,colSums(documents)+nb_doc,`/`)
+    # smoothed_documents = sweep(documents+1,MARGIN=1,rowSums(documents)+nb_topics,`/`)
     
     if (realization_comparison)
     {
@@ -1597,23 +1650,6 @@ if (!mpar)
       topic_compo_allreal[[j_select]] = topic_compo_notaxo
       KL_topic_compo_allreal[[j_select]] = KL_topic_compo_notaxo
     }
-    
-    #     KL_documents = matrix(nrow=nb_doc,ncol=nb_topics)
-    #     smoothed_KL_documents = matrix(nrow=nb_doc,ncol=nb_topics)
-    #     smoothed_documents = matrix(nrow=nb_doc,ncol=nb_topics)
-    #     for (j in 1:nb_topics)
-    #     {
-    #       KL2_norm_factor = 0
-    #       for (i in 1:nb_doc)
-    #       {
-    #         KL_documents[i,j] = documents[i,j]/sum(documents[,j])
-    #         smoothed_KL_documents[i,j] = (documents[i,j]+1)/(sum(documents[,j])+nb_doc)
-    #         smoothed_documents[i,j] = (documents[i,j]+1)/(sum(documents[i,])+nb_topics)
-    #         #smoothed_documents_norm_factor = smoothed_documents_norm_factor + smoothed_documents[i,j]
-    #       }
-    #       #smoothed_documents[,j]=smoothed_documents[,j]/smoothed_documents_norm_factor
-    #     }
-    #smoothed_KL_documents_allreal[[j_select]] = KL_documents
     
     # Topic dominance calculations
     ################################################################
@@ -2211,6 +2247,7 @@ if (!mpar)
           # produces a dataframe with columns as vectors instead of factors (otherwise one cannot direclty apply "as.numeric" to the values)
           data_abiotic = read.table("chemistry_pred_CRIJ.txt",sep=" ",colClasses="vector")
           data_abiotic = apply(data_abiotic,2,as.numeric)
+          colnames_abiotic = colnames(data_abiotic)
         } else if (case == "lidar")
         {
           # Lidar data
@@ -2218,6 +2255,7 @@ if (!mpar)
           data_abiotic_data.frame = read.table("Lidar_locsites_E20_origin_mean_10_extended.csv",colClasses="vector",sep=";")
           data_abiotic = matrix(nrow=length(data_abiotic_data.frame$V5[-1]),ncol=11)
           colnames(data_abiotic) = c("Topography","Canopy height","Light","Wetness","Slope","Canopy height difference 2008-2012","Tree density","Number of tree deaths 2008-2012","Loss of above-ground biomass 2008-2012","Slope standard deviation","Slope (log)")
+          colnames_abiotic = colnames(data_abiotic)
           
           # Removing from data_lidar: canop08, which is already contained in dif_can, tree_density2008, AGBloss_mort2008, ndeath2008 
           data_abiotic[,1] = as.vector(data_abiotic_data.frame$V5[-1])
@@ -2317,6 +2355,8 @@ if (!mpar)
           
           setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert))
           documents_bacteria = readRDS("documents_bacteria_PP_3topics_best_real.rds")
+          if (!filled || filled_with_gaps)
+            documents_bacteria = documents_bacteria[-which(Missing_positions_indices==1),]
           if (case == "lidar") {
             setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/"))
           } else if (case == "chemi")
@@ -2524,12 +2564,17 @@ if (!mpar)
         
         # End loop over case list :
       }
-      
-      ################################################
-      # Topic comparison within the best realization #
-      ################################################
-      setwd(local_subdirname)
-      
+    }
+    
+    # Resuming to the main subdirectory
+    setwd(local_subdirname)
+    
+    ################################################
+    # Topic comparison within the best realization #
+    ################################################
+    
+    if (j_select == 1)
+    {
       KL_topic_comparison_samplewise = matrix(nrow=nb_topics,ncol=nb_topics,data=NA)
       KL_topic_comparison_MOTUwise = matrix(nrow=nb_topics,ncol=nb_topics,data=NA)
       for (i_topic in 1:(nb_topics-1))
@@ -2543,28 +2588,40 @@ if (!mpar)
         }
       }
       
-      colnames_vect = vector(length=3,mode="character")
-      if (data_pp)
+      # assemblage_names_vect and correlations_to_bacterial_assemblages are reused to label the assemblages
+      # for realization_comparison in the (data_pp && nb_topics == 3) case
+      assemblage_names_vect = vector(length=nb_topics,mode="character")
+      correlations_to_bacterial_assemblages = vector(length=nb_topics,mode="numeric")
+      if (data_pp && (nb_topics==3))
       {
+        # Retrieving the name of the assemblage based on the correlation with the 3 bacterial assemblages:
+        setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert))
+        documents_bacteria = readRDS("documents_bacteria_PP_3topics_best_real.rds")
+        setwd(local_subdirname)
+        if (!filled || filled_with_gaps)
+          documents_bacteria = documents_bacteria[-which(Missing_positions_indices==1),]
+        colnames(documents_bacteria) = c("Terra firme","Hydromorphic","Exposed rock")
         for (k in 1:nb_topics)
         {
           k0 = rev(sort_normal_topic$ix)[k]
-          sorted_correlations_to_bacteria = sort.int(Correlation_lidar[[1]][k0,12:14],index=T,decreasing=T)
-          j0 = sorted_correlations_to_bacteria$ix[1]
-          colnames_vect[k] = c("Terra firme","Hydromorphic","Exposed rock")[j0]
+          Correlation_bacteria = cor(documents[,k0],documents_bacteria)
+          sorted_correlations_to_bacteria = sort.int(Correlation_bacteria,index=T,decreasing=T)
+          k_bact = sorted_correlations_to_bacteria$ix[1]
+          correlations_to_bacterial_assemblages[k] = Correlation_bacteria[k_bact]
+          assemblage_names_vect[k] = colnames(documents_bacteria)[k_bact]
         }
       } else
-        colnames_vect = seq(1,nb_topics,1)
+        assemblage_names_vect = seq(1,nb_topics,1)
       
-      colnames(KL_topic_comparison_samplewise) = colnames_vect
-      colnames(KL_topic_comparison_MOTUwise) = colnames_vect
-      rownames(KL_topic_comparison_samplewise) = colnames_vect
-      rownames(KL_topic_comparison_MOTUwise) = colnames_vect
+      colnames(KL_topic_comparison_samplewise) = assemblage_names_vect
+      colnames(KL_topic_comparison_MOTUwise) = assemblage_names_vect
+      rownames(KL_topic_comparison_samplewise) = assemblage_names_vect
+      rownames(KL_topic_comparison_MOTUwise) = assemblage_names_vect
       
       documents1 = documents[,rev(sort_normal_topic$ix)]
       topic_compo_notaxo1 = topic_compo_notaxo[,rev(sort_normal_topic$ix)]
-      colnames(documents1) = colnames_vect
-      colnames(topic_compo_notaxo1) = colnames_vect
+      colnames(documents1) = assemblage_names_vect
+      colnames(topic_compo_notaxo1) = assemblage_names_vect
       Corr_topic_comparison_samplewise = cor(documents1)
       Corr_topic_comparison_MOTUwise = cor(topic_compo_notaxo1)
       
@@ -2575,7 +2632,7 @@ if (!mpar)
         diversity[k] = length(which(topic_compo_notaxo[,k0] > 1/sum(data2m)))
       }
       diversity[nb_topics+1] = nrow(data2m)
-      diversity = data.frame(Assemblage = c(colnames_vect,"Total diversity"),Diversity = diversity)
+      diversity = data.frame(Assemblage = c(assemblage_names_vect,"Total diversity"),Diversity = diversity)
       
       save(KL_topic_comparison_samplewise, KL_topic_comparison_MOTUwise, Corr_topic_comparison_samplewise, Corr_topic_comparison_MOTUwise, diversity, file = "Topic_comparison_inBestReal.Rdata")
     }
@@ -2584,8 +2641,6 @@ if (!mpar)
     #cat("Saving result ...\n")  
     # Creating the save files for (!mpar)
     ##########################
-    # Resuming to the main subdirectory
-    setwd(local_subdirname)
     
     if (!best && !best_keep)
     {  
@@ -2688,7 +2743,7 @@ if (!mpar)
       
       if (best_keep && (j_select == 1) && realization_comparison)
       {
-        realization_comparison_dirname = paste0(local_subdirname,"/Realization_comparison_",MOTU_sample_insert,"_",bij_insert)
+        realization_comparison_dirname = paste0(local_subdirname,"Realization_comparison_",MOTU_sample_insert,"_",bij_insert)
         if (!(file.exists(realization_comparison_dirname)))
           dir.create(realization_comparison_dirname)
         setwd(realization_comparison_dirname)
@@ -2896,9 +2951,9 @@ if (!mpar)
         }
       }
       
-      ############################################
-      # Comparison with abiotic variables: plots #
-      ############################################
+      #############################################
+      # Comparison with abiotic variables: output #
+      #############################################
       
       if (best_keep && (j_select == 1) && ((data_pp && !testdata) || data_gs) && abiotic_variables)
       {
@@ -2916,6 +2971,10 @@ if (!mpar)
         } else if (data_gs)
           save(Correlation_climate,file="Correlation_between_climate_data_and_topics_for_best_real.Rdata")
         #######################
+        
+        ############
+        # txt file #
+        ############
         
         if (data_pp)
           case0_range = c("lidar","chemi")
@@ -2952,6 +3011,8 @@ if (!mpar)
           
           # Abiotic file does not report the comparison to PCA axes in the case pca_abiotic = 1
           Abiotic_file = paste0(case0,"_comparison.txt")
+          abiotic_data.frame = as.data.frame(matrix(ncol=length(colnames_abiotic)*2,nrow=nb_topics,data=0))
+          colnames(abiotic_data.frame) = colnames_abiotic
           write(paste(barcode_insert,"-",nb_topics,"topics\n%%%%%%%%%%%%%\n"),file=Abiotic_file,append=F)
           for (k in 1:nb_topics)
           {
@@ -2962,8 +3023,19 @@ if (!mpar)
               j0 = ncol0+sorted_correlations_to_bacteria$ix[1]
               write(paste0("\n%%%%%%%%%%%%%\nFor topic ",k," - ",colnames_abiotic[j0],
                            " assemblage (rho = ",Correlation_abiotic[[1]][k0,j0],", p = ",p_value_abiotic[k0,j0],"):\n%%%%%%%%%%%%%"),file=Abiotic_file,append=T)
+              i = 0
+              i_insert = ""
+              while (any(rownames(abiotic_data.frame)==paste(assemblage_names_vect[k],barcode_insert,i_insert)))
+              {
+                i = i+1
+                i_insert = i
+              }
+              rownames(abiotic_data.frame)[k] = paste(assemblage_names_vect[k],barcode_insert,i_insert)
             } else
+            {
               write(paste0("\n%%%%%%%%%%%%%\nFor topic ",k,":\n%%%%%%%%%%%%%"),file=Abiotic_file,append=T)
+              rownames(abiotic_data.frame)[k] = paste("Assemblage",k,barcode_insert)
+            }
             for (j in 1:length(colnames_abiotic))
             {
               write(paste0("\n",colnames_abiotic[j],"\n%%%%%%%%%%%%%"),file=Abiotic_file,append=T)
@@ -2976,8 +3048,16 @@ if (!mpar)
                 write(paste("p-value for spatial randomizations =",p_value_abiotic[k0,j]),file=Abiotic_file,append=T)
               }
               write(paste("p-value for Student's t-test =",Correlation_abiotic[[2]][k0,j]),file=Abiotic_file,append=T)
+          
+              abiotic_data.frame[k,(2*(j-1)+1):(2*(j-1)+2)] = c(Correlation_abiotic[[1]][k0,j],p_value_abiotic[k0,j])
             }
           }
+          
+          saveRDS(abiotic_data.frame,file=paste0(case0,"_data.frame.rds"))
+          
+          #########
+          # plots #
+          #########
           
           if (pca_abiotic)
             case1_range = c(1,3)
@@ -3997,8 +4077,9 @@ if (!mpar)
       #test = apply(spatial_topicmix_kriged_all_topics[,3:(2+nb_topics)],1,sort.int,index.return = T,decreasing=T)
       dominant_topic_proportion = apply(spatial_topicmix_kriged_all_topics[,3:(2+nb_topics)],1,max)
       dominant_topic_index = apply((spatial_topicmix_kriged_all_topics[,3:(2+nb_topics)] == dominant_topic_proportion),1,which)
+      # dominant_topic_index is a list if two topics have equal proportions in one site, otherwise it is a vector  
       for (i in 1:nrow(spatial_topicmix_kriged_all_topics))
-        spatial_topicmix_kriged_all_topics_discrete[i,2+dominant_topic_index[i]] = 1
+        spatial_topicmix_kriged_all_topics_discrete[i,2+dominant_topic_index[[i]]] = 1
       
       #       spatial_topicmix_kriged_all_topics_gradient = data.frame(spatial_topicmix_kriged_all_topics[,1:2],z.pred.grad=vector(length=length(spatial_topicmix_kriged_all_topics[,1]),mode="numeric"))
       #       for (k in 1:nb_topics)
@@ -4277,29 +4358,29 @@ if (!mpar)
           {
             # Plotting each topic as a distinct color on a single map
             tmp.one.plot = ggplot(data = spatial_topicmix_kriged_all_topics_colors) +
-                           geom_raster(data = spatial_topicmix_kriged_all_topics_colors, aes(x, y), 
-                                  fill=rgb(spatial_topicmix_kriged_all_topics_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_colors[,3:5]))), inherit.aes = F) +
-                           #geom_raster() +
-                           coord_equal() + theme_minimal() +
-                           #labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
-                           theme(legend.position="bottom", legend.text=element_text(size=7), 
-                                 legend.title=element_text(size=8), axis.title=element_blank(), 
-                                 axis.text = element_blank(),
-                                 plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
-                           guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
+              geom_raster(data = spatial_topicmix_kriged_all_topics_colors, aes(x, y), 
+                          fill=rgb(spatial_topicmix_kriged_all_topics_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_colors[,3:5]))), inherit.aes = F) +
+              #geom_raster() +
+              coord_equal() + theme_minimal() +
+              #labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
+              theme(legend.position="bottom", legend.text=element_text(size=7), 
+                    legend.title=element_text(size=8), axis.title=element_blank(), 
+                    axis.text = element_blank(),
+                    plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
+              guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
             
             # Plotting only the dominant topic as a distinct color in each pixel
             tmp.one.plot.discrete = ggplot(data = spatial_topicmix_kriged_all_topics_discrete_colors) +
-                                    geom_raster(data = spatial_topicmix_kriged_all_topics_discrete_colors, aes(x, y),
-                                                fill=rgb(spatial_topicmix_kriged_all_topics_discrete_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_discrete_colors[,3:5]))), inherit.aes = F) +
-                                    #geom_raster() +
-                                    coord_equal() + theme_minimal() +
-                                    #labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
-                                    theme(legend.position="bottom", legend.text=element_text(size=7), 
-                                          legend.title=element_text(size=8), axis.title=element_blank(), 
-                                          axis.text = element_blank(),
-                                          plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
-                                    guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
+              geom_raster(data = spatial_topicmix_kriged_all_topics_discrete_colors, aes(x, y),
+                          fill=rgb(spatial_topicmix_kriged_all_topics_discrete_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_discrete_colors[,3:5]))), inherit.aes = F) +
+              #geom_raster() +
+              coord_equal() + theme_minimal() +
+              #labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
+              theme(legend.position="bottom", legend.text=element_text(size=7), 
+                    legend.title=element_text(size=8), axis.title=element_blank(), 
+                    axis.text = element_blank(),
+                    plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
+              guides(fill = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
             if (data_pp)
             {
               tmp.one.plot = tmp.one.plot + 
@@ -4421,8 +4502,8 @@ if (!mpar)
         #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=nb_topics)), height = 4, width = 10)
         ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, lidar.plot, ncol=nb_topics)), height = 10/3*4/3*2, width = 10)
         ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged_oneplot.pdf",  do.call("arrangeGrob", list(tmp.one.plot, tmp.one.plot.discrete, ncol=2)), height = 10/2*4/3, width = 10)
-      #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, lidar.plot, ncol=nb_topics)), width = 10)
-      #ggsave(filename = "Test1.pdf", tmp.one.plot, width=10)
+        #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, lidar.plot, ncol=nb_topics)), width = 10)
+        #ggsave(filename = "Test1.pdf", tmp.one.plot, width=10)
       } else
       {
         ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=min(nb_topics,4))), height = 10/min(nb_topics,4)*((nb_topics-1)%/%4 + 1)*4/3, width = 10)
@@ -4439,56 +4520,57 @@ if (!mpar)
       }
       dev.off()
     }
-    
-    threshold_val = 0.1
-    if ((!kriging || !any(kriged_real == j_select)) && !data_gs)
-    {
-      if (filled && !filled_with_gaps)
-      {
-        pdf(paste("Topic_ordered_by_site-normalized_abundance_composition_maps_onebyone_thres",threshold_val,".pdf",sep=""))
-        # 2 topics :
-        #par(mfrow=c(2,1))
-        # 5 topics :
-        #par(mfrow=c(3,2))
-        # 10 topics
-        #par(mfrow=c(2,2))
-        par(cex.lab=1.5,cex.main=1.7,cex.axis=2)
-        # par(mar = c(bottom, left, top, right))
-        par(mar = c(5, 4, 4, 5) + 0.1)
-        #lattice::levelplot(abund2.pred~x+y, z2, 
-        #col.regions=topo.colors(100), aspect = "iso",contour=T,main=binomial)
-        # Loop over topics (one map per topic, the color stands for the proportion of the topic)
-        for (k in 1:nb_topics)
-        {  
-          k0 = rev(sort_normal_topic$ix)[k]
-          # colors based on colorspace::divergence_hcl(3)
-          # c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)
-          # rev(col_values$red)/255,rev(col_values$green)/255,rev(col_values$blue)/255
-          # grey to green : c(242,0)/255,c(242,166)/255,c(242,0)/255
-          # grey to blue : c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)
-          cellcol = matrix(nrow=29,ncol=39,data=0.1)
-          # Uniform grey between 0 and threshold_val, and then a grey to blue color gradient
-          cellcol[spatial_topicmix[[k0]]<threshold_val] = color.scale(spatial_topicmix[[k0]][spatial_topicmix[[k0]]<threshold_val],226/255,226/255,226/255)
-          cellcol[spatial_topicmix[[k0]]>threshold_val] = color.scale(spatial_topicmix[[k0]][spatial_topicmix[[k0]]>threshold_val],c(226/255,2/255),c(226/255,63/255),c(226/255,165/255))
-          color2D.matplot(spatial_topicmix[[k0]],
-                          extremes=NA,cellcolors=cellcol,show.legend=F,nslices=10,xlab="",
-                          ylab="",do.hex=FALSE,axes=F,show.values=FALSE,vcol="white",vcex=1,xrange=c(0,1),
-                          border=NA,na.color="white",main=paste("Topic ",k0," - #",k,sep=""))
-          axis(2, at=c(0,5,10,15,20,25,30), labels=c("","50","100","150","200","250","300"))
-          axis(1, at=c(0,5,10,15,20,25,30,35,40), labels=c("0","","100","","200","","300","","400"))
-          #       color.legend(xl=39+1.392857,yb=4.53125,xr=39+2.785714,yt=13.59375,legend=c(0,1),
-          #                    rect.col=color.scale(seq(0,1,1/255),c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)),gradient="y",cex=1.5, 
-          #                    align="rb")
-          color.legend(xl=39+1.392857,yb=4.53125,xr=39+2.785714,yt=13.59375,legend=c(0,1),
-                       rect.col=color.scale(c(rep(threshold_val,threshold_val/(1-threshold_val)*255),
-                                              seq(threshold_val,1,1/(255+threshold_val/(1-threshold_val)*255))),
-                                            c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)),gradient="y",cex=1.5, 
-                       align="rb")
-          
-        }
-        dev.off()
-      }
-    }
+
+# Plots the spatial distribution of topics while removing abundance values lower than threshold_val   
+#     threshold_val = 0.1
+#     if ((!kriging || !any(kriged_real == j_select)) && !data_gs)
+#     {
+#       if (filled && !filled_with_gaps)
+#       {
+#         pdf(paste("Topic_ordered_by_site-normalized_abundance_composition_maps_onebyone_thres",threshold_val,".pdf",sep=""))
+#         # 2 topics :
+#         #par(mfrow=c(2,1))
+#         # 5 topics :
+#         #par(mfrow=c(3,2))
+#         # 10 topics
+#         #par(mfrow=c(2,2))
+#         par(cex.lab=1.5,cex.main=1.7,cex.axis=2)
+#         # par(mar = c(bottom, left, top, right))
+#         par(mar = c(5, 4, 4, 5) + 0.1)
+#         #lattice::levelplot(abund2.pred~x+y, z2, 
+#         #col.regions=topo.colors(100), aspect = "iso",contour=T,main=binomial)
+#         # Loop over topics (one map per topic, the color stands for the proportion of the topic)
+#         for (k in 1:nb_topics)
+#         {  
+#           k0 = rev(sort_normal_topic$ix)[k]
+#           # colors based on colorspace::divergence_hcl(3)
+#           # c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)
+#           # rev(col_values$red)/255,rev(col_values$green)/255,rev(col_values$blue)/255
+#           # grey to green : c(242,0)/255,c(242,166)/255,c(242,0)/255
+#           # grey to blue : c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)
+#           cellcol = matrix(nrow=29,ncol=39,data=0.1)
+#           # Uniform grey between 0 and threshold_val, and then a grey to blue color gradient
+#           cellcol[spatial_topicmix[[k0]]<threshold_val] = color.scale(spatial_topicmix[[k0]][spatial_topicmix[[k0]]<threshold_val],226/255,226/255,226/255)
+#           cellcol[spatial_topicmix[[k0]]>threshold_val] = color.scale(spatial_topicmix[[k0]][spatial_topicmix[[k0]]>threshold_val],c(226/255,2/255),c(226/255,63/255),c(226/255,165/255))
+#           color2D.matplot(spatial_topicmix[[k0]],
+#                           extremes=NA,cellcolors=cellcol,show.legend=F,nslices=10,xlab="",
+#                           ylab="",do.hex=FALSE,axes=F,show.values=FALSE,vcol="white",vcex=1,xrange=c(0,1),
+#                           border=NA,na.color="white",main=paste("Topic ",k0," - #",k,sep=""))
+#           axis(2, at=c(0,5,10,15,20,25,30), labels=c("","50","100","150","200","250","300"))
+#           axis(1, at=c(0,5,10,15,20,25,30,35,40), labels=c("0","","100","","200","","300","","400"))
+#           #       color.legend(xl=39+1.392857,yb=4.53125,xr=39+2.785714,yt=13.59375,legend=c(0,1),
+#           #                    rect.col=color.scale(seq(0,1,1/255),c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)),gradient="y",cex=1.5, 
+#           #                    align="rb")
+#           color.legend(xl=39+1.392857,yb=4.53125,xr=39+2.785714,yt=13.59375,legend=c(0,1),
+#                        rect.col=color.scale(c(rep(threshold_val,threshold_val/(1-threshold_val)*255),
+#                                               seq(threshold_val,1,1/(255+threshold_val/(1-threshold_val)*255))),
+#                                             c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)),gradient="y",cex=1.5, 
+#                        align="rb")
+#           
+#         }
+#         dev.off()
+#       }
+#     }
     
     #     pdf("Topic_ordered_by_site-normalized_abundance_composition_maps_filled.pdf")
     #     # 2 topics :
@@ -4770,9 +4852,9 @@ if (Rtopicmodels_VEM && select_real)
   write(alpha_est_mean,mean_alpha_file)
 }
 
-#################################
-# Comparing realizations: plots #
-#################################
+##################################
+# Comparing realizations: output #
+##################################
 
 if (select_real && realization_comparison)
 {
@@ -4784,7 +4866,7 @@ if (select_real && realization_comparison)
   #     save(Correlation_MOTUwise,Correlation_samplewise,KL_samplewise,KL_MOTUwise,file="Topic_KL-correlation_between_best_real_and_following_reals.Rdata")
   #     save(Correlation_samplewise_allRealPairs,Correlation_MOTUwise_allRealPairs,KL_samplewise_allRealPairs,KL_MOTUwise_allRealPairs,file="Topic_KL-correlation_matrices_between_all_real.Rdata")
   save(Correlation,KL,DKL100,file=paste0("Topic_KL-correlation_between_best_real_and_following_reals_",MOTU_sample_insert,"_",bij_insert,".Rdata"))
-  save(Correlation_allRealPairs,KL_allRealPairs_w_rndzations,DKL100_allRealPairs,llh_differences_allRealPairs,p_value_allRealPairs,SES_allRealPairs,file=paste0("Topic_KL-correlation_matrices_between_all_real_",MOTU_sample_insert,"_",bij_insert,".Rdata"))
+  save(Correlation_allRealPairs,KL_allRealPairs_w_rndzations,KL_allRealPairs,DKL100_allRealPairs,llh_differences_allRealPairs,p_value_allRealPairs,SES_allRealPairs,file=paste0("Topic_KL-correlation_matrices_between_all_real_",MOTU_sample_insert,"_",bij_insert,".Rdata"))
   save(Correlation_allRealPairs_byTopic,Correlation_allRealPairs_byTopic,KL_allRealPairs_byTopic,KL_allRealPairs_randomized_byTopic,SES_allRealPairs_byTopic,DKL100_allRealPairs_byTopic,Var_KL_topic_comparison_randomized_allRealPairs_byTopic,
        p_value_allRealPairs_byTopic,Topic_correspondence_to_best_real,file=paste0("Topic_KL-correlation_matrices_between_all_real_by_topic_",MOTU_sample_insert,"_",bij_insert,".Rdata"))
   
@@ -4794,7 +4876,11 @@ if (select_real && realization_comparison)
   write(paste("For all topics :\n%%%%%%%%%%%%%\n"),file=Stability_file,append=T)
   write(paste("Mean correlation =",mean(Correlation_allRealPairs[which(Correlation_allRealPairs!=0)]),"\n"),file=Stability_file,append=T)
   write(paste("Mean KL distance =",mean(KL_allRealPairs[which(!is.na(KL_allRealPairs))]),"\n"),file=Stability_file,append=T)
-  write(paste("Mean randomized KL distance for",nb_rndzations,"randomizations per topic =",mean(KL_allRealPairs_w_rndzations[lower.tri(KL_allRealPairs_w_rndzations,diag=F)]),"\n"),file=Stability_file,append=T)
+  # Intercept of SKL = f(llh)
+  fitted_llh = Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real]
+  fit1 = lm(KL_allRealPairs[1,-1] ~ fitted_llh)
+  write(paste("Mean KL distance = f(llh difference) intercept =",fit1$coefficient[1],"\n"),file=Stability_file,append=T)
+  #write(paste("Mean randomized KL distance for",nb_rndzations,"randomizations per topic =",mean(KL_allRealPairs_w_rndzations[lower.tri(KL_allRealPairs_w_rndzations,diag=F)]),"\n"),file=Stability_file,append=T)
   write(paste("Mean KL distance difference (ES) for",nb_rndzations,"randomizations per topic =",mean(DKL100_allRealPairs[which(!is.na(DKL100_allRealPairs))]),"\n"),file=Stability_file,append=T)
   
   SES_denominator = sqrt(mean(Var_KL_topic_comparison_randomized_allRealPairs[which(!is.na(Var_KL_topic_comparison_randomized_allRealPairs))]) -
@@ -4806,6 +4892,25 @@ if (select_real && realization_comparison)
   write(paste("Mean standardized KL distance difference (SES) computed topic by topic for",nb_rndzations,"randomizations per topic =",SES_topicByTopic,"\n"),file=Stability_file,append=T)
   
   write(paste("Mean p-value for",nb_rndzations,"randomizations per topic =",mean(p_value_allRealPairs[which(!is.na(p_value_allRealPairs))]),"\n"),file=Stability_file,append=T)
+  # Intercept of p-value = f(llh) : 
+  fit2 = lm(p_value_allRealPairs[1,-1] ~ fitted_llh)
+  write(paste("p-value = f(llh difference) intercept =",fit2$coefficient[1],"\n"),file=Stability_file,append=T)
+  
+  if (bij)
+    stability_data.frame = as.data.frame(matrix(nrow=nb_topics+1,ncol=10,data=0))
+  else
+    stability_data.frame = as.data.frame(matrix(nrow=1,ncol=10,data=0))
+  rownames(stability_data.frame)[1] = barcode_insert
+  stability_data.frame[1,] = c(diversity$Diversity[nb_topics+1],
+                             mean(Correlation_allRealPairs[which(Correlation_allRealPairs!=0)]),
+                             mean(KL_allRealPairs[which(!is.na(KL_allRealPairs))]),
+                             fit1$coefficient[1],
+                             mean(DKL100_allRealPairs[which(!is.na(DKL100_allRealPairs))]),
+                             SES,
+                             SES_topicByTopic,
+                             mean(p_value_allRealPairs[which(!is.na(p_value_allRealPairs))]),
+                             fit2$coefficient[1],
+                             alpha_est_mean)
   
   # Computing the correspondence betwwen the topics of all realizations and the topics of the best realization
   #   if ((j_select == 1) && realization_comparison)
@@ -4861,32 +4966,58 @@ if (select_real && realization_comparison)
       mean_SES_denominator = sqrt(mean_SES_denominator - mean_KL_randomized^2)
       SES = mean_DKL100/mean_SES_denominator
       
-      if (data_pp && !testdata && nb_topics == 3)
+      # fit of SKL = f(llh) :
+      fitted_llh = Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real]
+      fit1 = lm(KL_allRealPairs_byTopic[[k0]][1,-1] ~ fitted_llh)
+      # fit of p-value = f(llh) :
+      fit2 = lm(p_value_allRealPairs_byTopic[[k0]][1,-1] ~ fitted_llh)
+      
+      if (data_pp && !testdata && (nb_topics == 3))
       {
-        # Retrieving the name of the assemblage based on the correlation with the 3 bacterial assemblages:
-        setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert))
-        documents_bacteria = readRDS("documents_bacteria_PP_3topics_best_real.rds")
-        setwd(realization_comparison_dirname)
-        if (!filled || filled_with_gaps)
-          documents_bacteria = documents_bacteria[-which(Missing_positions_indices==1),]
-        colnames(documents_bacteria) = c("Terra firme","Hydromorphic","Exposed rock")
-        Correlation_bacteria = cor(documents_allreal[[1]][,k0],documents_bacteria)
-        sorted_correlations_to_bacteria = sort.int(Correlation_bacteria,index=T,decreasing=T)
-        k_bact = sorted_correlations_to_bacteria$ix[1]
-        
-        write(paste0("For topic ",k," - ",colnames(documents_bacteria)[k_bact],
-                     " assemblage (rho = ",Correlation_bacteria[k_bact],"):\n%%%%%%%%%%%%%\n"),file=Stability_file,append=T)
+        i = 0
+        i_insert = ""
+        while (any(rownames(stability_data.frame)==paste(assemblage_names_vect[k],barcode_insert,i_insert)))
+        {
+          i = i+1
+          i_insert = i
+        }
+        rownames(stability_data.frame)[k+1] = paste(assemblage_names_vect[k],barcode_insert,i_insert) 
+        write(paste0("For topic ",k," - ",assemblage_names_vect[k],
+                     " assemblage (rho = ",correlations_to_bacterial_assemblages[k],"):\n%%%%%%%%%%%%%\n"),file=Stability_file,append=T)
       } else
+      {
         write(paste0("For topic ",k,":\n%%%%%%%%%%%%%\n"),file=Stability_file,append=T)
+        rownames(stability_data.frame)[k+1] = paste("Assemblage",k,barcode_insert)
+      }
       
       write(paste("Mean correlation =",mean_correlation,"\n"),file=Stability_file,append=T)
       write(paste("Mean KL distance =",mean_KL,"\n"),file=Stability_file,append=T)
+      write(paste("Mean KL distance = f(llh difference) intercept =",fit1$coefficient[1],"\n"),file=Stability_file,append=T)
       write(paste("Mean KL distance difference (ES) for",nb_rndzations,"randomizations per topic =",mean_DKL100,"\n"),file=Stability_file,append=T)
       write(paste("Mean standardized KL distance difference (SES) for",nb_rndzations,"randomizations per topic =",SES,"\n"),file=Stability_file,append=T)
       write(paste("Mean standardized KL distance difference (SES) computed topic by topic for",nb_rndzations,"randomizations per topic =",SES_topicByTopic,"\n"),file=Stability_file,append=T)
       write(paste("Mean p-value for",nb_rndzations,"randomizations per topic =",p_value,"\n"),file=Stability_file,append=T)
+      write(paste("p-value = f(llh difference) intercept =",fit2$coefficient[1],"\n"),file=Stability_file,append=T)
+      
+      stability_data.frame[k+1,] = c(diversity$Diversity[k],
+                                     mean_correlation,
+                                     mean_KL,
+                                     fit1$coefficient[1],
+                                     mean_DKL100,
+                                     SES,
+                                     SES_topicByTopic,
+                                     p_value,
+                                     fit2$coefficient[1],
+                                     NA)
     }
   }
+
+  colnames(stability_data.frame) = c("Diversity","Correlation","SKL","SKL=f(llh) intercept","ES","Total SES","Mean SES over assemblages","p-value","p-value=f(llh) intercept","alpha")
+  saveRDS(stability_data.frame,file="stability_data.frame.rds")
+  
+  #########
+  # Plots #
+  #########
   
   pdf(paste0("Topic_KL_distance_",MOTU_sample_insert,"_between_real_color2D.pdf"))
   # 2 topics :
@@ -5061,7 +5192,7 @@ if (select_real && realization_comparison)
   par(mar = c(5, 5, 4, 3) + 0.1)
   #     plot(seq(2,length_selected_real,1),apply(Topic_comparison,1,mean),ylim=c(0,1),type="p", main = "Averaged Hellinger similarity between\n the component communities in different realizations",
   #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")   
-  plot(llh_differences_allRealPairs[llh_differences_allRealPairs>0],KL_allRealPairs[!is.na(KL_allRealPairs)],type="p", main = "Averaged KL distance between\n pairs of realizations",
+  plot(llh_differences_allRealPairs[!is.na(llh_differences_allRealPairs)],KL_allRealPairs[!is.na(KL_allRealPairs)],type="p", main = "Averaged KL distance between\n pairs of realizations",
        xlab = "Loglikelihood difference", ylab = "KL distance")
   dev.off()
   
@@ -5071,9 +5202,9 @@ if (select_real && realization_comparison)
   par(mar = c(5, 5, 4, 3) + 0.1)
   #     plot(seq(2,length_selected_real,1),apply(Topic_comparison,1,mean),ylim=c(0,1),type="p", main = "Averaged Hellinger similarity between\n the component communities in different realizations",
   #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")  
-  if (length(which(!is.na(DKL100_allRealPairs))) != length(which(llh_differences_allRealPairs>0)))
+  if (length(which(!is.na(DKL100_allRealPairs))) != length(which(!is.na(llh_differences_allRealPairs))))
     cat("\nError in DKL100_allRealPairs values")
-  plot(llh_differences_allRealPairs[llh_differences_allRealPairs>0],DKL100_allRealPairs[!is.na(DKL100_allRealPairs)],type="p", main = "Averaged KL distance difference between\n pairs of realizations",
+  plot(llh_differences_allRealPairs[!is.na(llh_differences_allRealPairs)],DKL100_allRealPairs[!is.na(DKL100_allRealPairs)],type="p", main = "Averaged KL distance difference between\n pairs of realizations",
        xlab = "Loglikelihood difference", ylab = "Difference of KL distance")
   dev.off()
   
@@ -5207,6 +5338,14 @@ if (select_real && realization_comparison)
   par(mar = c(5, 5, 4, 3) + 0.1)
   plot(p_value_allRealPairs[1,-1],DKL100_allRealPairs[1,-1],type="p", main = "Averaged KL distance diffrence between\n the component communities in different realizations",
        xlab = "p-value", ylab = "Difference in KL distance to best realization", xlim=range(p_value_allRealPairs[1,-1]))
+  dev.off()
+  
+  pdf(paste0("p-value_",MOTU_sample_insert,"_averaged_vs_llh_difference.pdf"))  
+  par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
+  # par(mar = c(bottom, left, top, right))
+  par(mar = c(5, 5, 4, 3) + 0.1)
+  plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],p_value_allRealPairs[1,-1],type="p", main = "Averaged stability p-value between the best real. and the following",
+       xlab = "Llh difference with best realization", ylab = "p-value wrt best realization", xlim=range(p_value_allRealPairs[1,-1]))
   dev.off()
   
   pdf("Topic_KL_difference_between_real_averaged_w_randomizations_vs_rank.pdf")  

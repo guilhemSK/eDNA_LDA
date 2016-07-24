@@ -28,6 +28,8 @@ occurrence = 0
 # Number of sites an OTU must ocuppy 
 # (if nb_occupied_sites_threshold = 1, all OTUs with non-zero abundance are kept)
 nb_occupied_sites_threshold = 1
+# Removing OTUs with less reads than the number of sites
+no_rare = 0
 
 barcode_gh = 0
 barcode_ghassigned = 0
@@ -200,6 +202,14 @@ if (nb_occupied_sites_threshold > 1)
   remove_single_sites_insert = ""
 }
 
+if (no_rare)
+{
+  no_rare_insert = "_noRareOTU"
+} else 
+{
+  no_rare_insert = ""
+}
+
 ###############
 setwd(paste("/home/gsommeria/work/",data_insert,"/",barcode_insert,"/",sep=""))
 
@@ -335,15 +345,20 @@ if (plantfungi) {
 rownames(data2m) = seq(1,nrow(data2m),1)
 data2m = apply(data2m,2,as.numeric)
 
-if (occurrence)
-  data2m[data2m>0] = 1
-
 OTUs_to_be_removed = vector(length=nrow(data2m),mode="logical")
 # Prop_OTU_removed = 0
 # Prop_reads_removed = 0
 for (OTU in 1:nrow(data2m))
   # Removing all OTUs which are present in less than nb_occupied_sites_threshold
   OTUs_to_be_removed[OTU] = (length(which(data2m[OTU,]>0))<nb_occupied_sites_threshold)
+if (no_rare)
+{
+  for (OTU in 1:nrow(data2m))
+  {
+    if (OTUs_to_be_removed[OTU] == 0)
+      OTUs_to_be_removed[OTU] = !(sum(data2m[OTU,])>length(data2m[OTU,]))
+  }
+}
 if (any(OTUs_to_be_removed))
 {
 #   Prop_OTU_removed = length(which(OTUs_to_be_removed))/nrow(data2m)
@@ -352,6 +367,9 @@ if (any(OTUs_to_be_removed))
   rownames(data2m) = seq(1,nrow(data2m),1)
   count2 = rowSums(data2m)
 }
+
+if (occurrence)
+  data2m[data2m>0] = 1
 
 # Removing empty sites even after filling (this may arise when data2m results from a split of the original dataset)
 if (any(colSums(data2m)==0))  
@@ -486,10 +504,10 @@ if (!mpar)
     
     if (Rtopicmodels_Gibbs)
     {
-      filename = paste(filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_real",nb_real,"_nb_iter",nb_iter,occurrence_insert,remove_single_sites_insert,".Rdata",sep="")
+      filename = paste(filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_real",nb_real,"_nb_iter",nb_iter,occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata",sep="")
       save(Result,file=filename)
     } else if (Rtopicmodels_VEM) {
-      filename = paste(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,".Rdata",sep="")
+      filename = paste(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata",sep="")
       save(Result,file=filename)
     }
     cat(filename)
@@ -500,9 +518,9 @@ if (!mpar)
     if (best) 
     {
       if (Rtopicmodels_Gibbs) {
-        subdirname = paste(dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best",occurrence_insert,remove_single_sites_insert,"/",sep="")
+        subdirname = paste(dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/",sep="")
       } else if (Rtopicmodels_VEM) {
-        subdirname = paste(dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best",occurrence_insert,remove_single_sites_insert,"/",sep="")
+        subdirname = paste(dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/",sep="")
       }
       if (!(file.exists(subdirname)))
       {dir.create(subdirname)}
@@ -510,10 +528,10 @@ if (!mpar)
       
       if (Rtopicmodels_Gibbs)
       {
-        filename = paste(filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_real",nb_real,"_nb_iter",nb_iter,"_best",occurrence_insert,remove_single_sites_insert,".Rdata",sep="")
+        filename = paste(filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_real",nb_real,"_nb_iter",nb_iter,"_best",occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata",sep="")
         save(Result,file=filename)
       } else if (Rtopicmodels_VEM) {
-        filename = paste(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best",occurrence_insert,remove_single_sites_insert,".Rdata",sep="")
+        filename = paste(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best",occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata",sep="")
         save(Result,file=filename)
       }
       cat(filename)
@@ -521,9 +539,9 @@ if (!mpar)
       } else if (best_keep)
       {
         if (Rtopicmodels_Gibbs) {
-          subdirname = paste(dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best_keep",occurrence_insert,remove_single_sites_insert,"/",sep="")
+          subdirname = paste(dirname,filename_insert,"_alpha",alpha,"_delta",delta,"_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/",sep="")
         } else if (Rtopicmodels_VEM) {
-          subdirname = paste(dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,"/",sep="")
+          subdirname = paste(dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/",sep="")
         }
         if (!(file.exists(subdirname)))
           dir.create(subdirname)
@@ -531,11 +549,11 @@ if (!mpar)
         
         if (Rtopicmodels_Gibbs)
         {
-          filename = paste(filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_real",nb_real,"_nb_iter",nb_iter,"_best_keep",occurrence_insert,remove_single_sites_insert,".Rdata",sep="")
+          filename = paste(filename_insert,"_alpha",alpha,"_delta",delta,"_nb_topics",nb_topics,"_nb_real",nb_real,"_nb_iter",nb_iter,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata",sep="")
           save(Result,file=filename)
         } else if (Rtopicmodels_VEM)
         {
-          filename = paste(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,".Rdata",sep="")
+          filename = paste(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata",sep="")
           save(Result,file=filename)
         }
         cat(filename)
@@ -570,10 +588,10 @@ if (!mpar)
   
   if (Rtopicmodels_Gibbs)
   {
-    subdirname = paste(dirname,filename_insert,"_",alpha_insert,"_delta",delta,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_iter",nb_iter,"_nb_real",nb_real,occurrence_insert,remove_single_sites_insert,"/",sep="")
+    subdirname = paste(dirname,filename_insert,"_",alpha_insert,"_delta",delta,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_iter",nb_iter,"_nb_real",nb_real,occurrence_insert,remove_single_sites_insert,no_rare_insert,"/",sep="")
   } else if (Rtopicmodels_VEM)
   {
-    subdirname = paste(dirname,filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,occurrence_insert,remove_single_sites_insert,"/",sep="")
+    subdirname = paste(dirname,filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,"/",sep="")
   }
   if (!(file.exists(subdirname)))
     dir.create(subdirname)
@@ -584,11 +602,11 @@ if (!mpar)
     
     if (Rtopicmodels_Gibbs)
     {
-      filename = paste(filename_insert,"_",alpha_insert,"_delta",delta,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_nb_iter",nb_iter,occurrence_insert,remove_single_sites_insert,".Rdata",sep="")
+      filename = paste(filename_insert,"_",alpha_insert,"_delta",delta,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_nb_iter",nb_iter,occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata",sep="")
       save(Result_mpar,file=filename)
     } else if (Rtopicmodels_VEM)
     {
-      filename = paste(filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,occurrence_insert,remove_single_sites_insert,".Rdata",sep="")
+      filename = paste(filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata",sep="")
       save(Result_mpar,file=filename)
     }
     cat(filename)
