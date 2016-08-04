@@ -92,7 +92,7 @@ data_h20 = 0
 data_pp = 1
 # data_gs = 1 requires filled = 1:
 data_gs = 0
-filled = 1
+filled = 0
 data_betadiv = 0
 data_betadiv_pooled = 0
 
@@ -108,7 +108,7 @@ no_rare = 0
 barcode_gh = 0
 barcode_ghassigned = 0
 barcode_itsfungi = 0
-barcode_itsasco = 1
+barcode_itsasco = 0
 barcode_itsbasidio = 0
 barcode_itsglomero = 0
 bacteriafungiarchaea = 0
@@ -119,7 +119,7 @@ barcode_18smetazoa = 0
 barcode_18sannelids = 0
 barcode_18sarthropods = 0
 barcode_18snematodes = 0
-barcode_18sprotists = 0
+barcode_18sprotists = 1
 barcode_18splatyhelminthes = 0
 barcode_18splants = 0
 barcode_16sarch = 0
@@ -158,7 +158,8 @@ nb_topics = 3
 true_nb_topics = 5
 
 #nb_topics_range = c(2,3)
-nb_topics_range = c(2,3,4,5,6,7,8,9,10,11,13,15)
+nb_topics_range = c(2,3,4,5,6,7)
+#nb_topics_range = c(2,3,4,5,6,7,8,9,10,11,13,15)
 #nb_topics_range = c(2,3,4,5,7,9,11,13,15,17,19)
 #nb_topics_range = c(2,3,4,5,10,15,20,30,40,50)
 #nb_topics_range = c(2,3,4,5,7,9,11,13,15,17,19,21,23,25,27,29,31)
@@ -206,7 +207,7 @@ dominance_calculation = 0
 # Calculating the proportion of the total read number taken by each topic (useful for ordering the topics as an alternative to normalized abundance)
 topic_read_proportion_comput = 0
 
-# Comparing topics to chemistery and lidar data (for data_pp only), as well as comparing topics to each other within the best real:
+# Comparing topics to chemistery and lidar data (for data_pp only):
 abiotic_variables = 0
 # Number of randomizations for lidar data, required for abiotic_variables = 1
 # Randomizations not implemented yet for data_gs
@@ -218,8 +219,8 @@ pca_abiotic = 0
 realization_comparison = 0
 # Comparing the realizations MOTUwise or samplewise (with spatial randomizations)
 # For testdata = 1, MOTUwise = 1 would require loading true_topic_compo (not done yet)
-samplewise = 0
-MOTUwise = 1
+samplewise = 1
+MOTUwise = 0
 # How the topic correspondence between realizations is computed: in a bijective way if bij=1 or taking into account the 3 lowest SKL if bij=0 
 # (only useful if realization_comparison=1)
 bij = 1
@@ -229,7 +230,7 @@ nb_rndzations = 1000
 # kriging for the spatial distribution of topics in the best realization
 kriging = 0
 # required if kriging = 1, only the kriged_real are kriged (all kriged realizations must be included in Selected_real)
-kriged_real = seq(1,1,1)
+kriged_real = seq(1,5,1)
 
 #########################
 #########################
@@ -777,12 +778,6 @@ if (data_betadiv_pooled)
 }
 
 # sample_count2 contains the number of reads per sample, in order to normalize the number of reads per sequence
-# sample_count2 = vector(length=ncol(data2m),mode="numeric")
-# for (j in 1:ncol(data2m))
-# {
-#   for (i in 1:nrow(data2m))
-#     sample_count2[j] = as.numeric(data2m[i,j])+sample_count2[j]
-# }
 sample_count2 = colSums(data2m)
 
 # # computing the variance of the number of reads per sample
@@ -791,44 +786,11 @@ sample_count2 = colSums(data2m)
 #   var_sample_count2 = (sample_count2[i] - sum(sample_count2)/ncol(data2m))^2/ncol(data2m) + var_sample_count2
 # std_dev_sample_count2 = sqrt(var_sample_count2)/(sum(sample_count2)/ncol(data2m))
 
-# computing the read proportion per site for each sequence
-#normal_data2m = matrix(nrow=nrow(data2m),ncol=ncol(data2m),data=0)
-# computing the read proportion per sequence for each site
-# KL_normal_data2m and smoothed_KL_normal_data2m contains the proportion of the total number of reads belonging to sequence i that is found in sample j
-# smoothed_KL2_normal_data2m contains the proportion of the reads in sample j that belong to sequence i
-# KL_normal_data2m = matrix(nrow=nrow(data2m),ncol=ncol(data2m),data=0)
-# smoothed_KL_normal_data2m = matrix(nrow=nrow(data2m),ncol=ncol(data2m),data=0)
-# smoothed_KL2_normal_data2m = matrix(nrow=nrow(data2m),ncol=ncol(data2m),data=0)
 # normal_count2 contains the proportion of each sequence average over the sites
-# normal_count2 = vector(length=nrow(data2m),mode="numeric")
 normal_count2 = rowSums(data2m)/ncol(data2m)
 # nrow(data2m) = nb_seq et ncol(data2m) = nb_sites
-#   for (j in 1:ncol(data2m))
-#   {
-#     normal_data2m[,j] = data2m[,j]/sample_count2[j]
-#     normal_count2 = normal_count2 + normal_data2m[,j]/ncol(data2m)
-#   }
-normal_data2m = sweep(data2m,MARGIN=2,sample_count2,'/')
-
-# for (i in 1:nrow(data2m))
-# {
-# # # KL quantities were useful to compare the distribution of particular MOTUS to the distribution of the topics   
-#   
-# #   norm_factor_KL2 = 0
-#   for (j in 1:ncol(data2m))
-#   {
-# #     if (count2[i]!=0)  
-# #     {KL_normal_data2m[i,j] = as.numeric(data2m[i,j])/count2[i]}
-# #     else
-# #     {KL_normal_data2m[i,j] = NA}
-# #     smoothed_KL_normal_data2m[i,j] = (as.numeric(data2m[i,j]) + 1)/(count2[i] + ncol(data2m))
-# #     smoothed_KL2_normal_data2m[i,j] = (as.numeric(data2m[i,j])+1)/(sample_count2[j]+nrow(data2m))
-# #     norm_factor_KL2 = norm_factor_KL2 + smoothed_KL2_normal_data2m[i,j]
-#     normal_data2m[i,j] = as.numeric(data2m[i,j])/sample_count2[j]
-#     normal_count2[i] = normal_count2[i] + normal_data2m[i,j]/ncol(data2m)
-#   }
-#   #smoothed_KL2_normal_data2m[i,] = smoothed_KL2_normal_data2m[i,]/norm_factor_KL2
-# } 
+# computing the read proportion per site for each sequence
+normal_data2m = sweep(data2m,MARGIN=2,sample_count2,'/') 
 
 sorted_normal_abundances2 = sort.int(normal_count2,decreasing=T,index.return=T)
 normal_ordered_seq = sorted_normal_abundances2$ix
@@ -903,6 +865,7 @@ if (mpar)
       filename = paste0(filename_insert,"_",alpha_insert,"_nb_topics",nb_topics_range[1],"-",nb_topics_range[length(nb_topics_range)],"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,".Rdata")
     }
     
+    #     Not erasing the folder if it already exists:
     #     if (!(file.exists(local_subdirname)))
     #     {
     #       dir.create(local_subdirname)
@@ -921,6 +884,7 @@ if (mpar)
     #       local_subdirname = paste(local_subdirname_modified,"/",sep="")
     #     }
     #     setwd(local_subdirname)
+    
     if (!(file.exists(local_subdirname)))
       dir.create(local_subdirname)
     setwd(local_subdirname)
@@ -1256,22 +1220,19 @@ for (par_index in 1:mpar_range)
       nb_words = Result[[1]]@fitted[[1]]@n
       for (j in 1:nb_real)
       {
-        LLH_final0[1,par_index] = Result[[j]]@fitted[[1]]@loglikelihood/nb_real + LLH_final0[1,par_index]  
         LLH_final1[j,par_index] = Result[[j]]@fitted[[1]]@loglikelihood
-        LLH_final0[2,par_index] = Result[[j]]@fitted[[1]]@loglikelihood^2/nb_real + LLH_final0[2,par_index]  
-        AIC0[2,par_index] = (2*(nb_topics*(nb_terms+nb_doc) - Result[[j]]@fitted[[1]]@loglikelihood))^2/nb_real + AIC0[2,par_index]
-        AIC0[4,par_index] = (2*(nb_words - Result[[j]]@fitted[[1]]@loglikelihood))^2/nb_real + AIC0[4,par_index]
         AIC1[j,par_index] = 2*(nb_topics*(nb_terms+nb_doc) - Result[[j]]@fitted[[1]]@loglikelihood)
         AIC2[j,par_index] = 2*(nb_words - Result[[j]]@fitted[[1]]@loglikelihood)
+        AIC3[j,par_index] = 2*(nb_topics*nb_terms + 1 - Result[[j]]@fitted[[1]]@loglikelihood)
       } 
-      LLH_final0[2,par_index] = LLH_final0[2,par_index] - LLH_final0[1,par_index]^2
-      LLH_final0[2,par_index] = sqrt(LLH_final0[2,par_index])
+      LLH_final0[1,par_index] = mean(LLH_final1[,par_index])
+      LLH_final0[2,par_index] = sd(LLH_final1[,par_index])      
       AIC0[1,par_index] = 2*(nb_topics*(nb_terms+nb_doc) - LLH_final0[1,par_index])
       AIC0[3,par_index] = 2*(nb_words - LLH_final0[1,par_index])
-      AIC0[2,par_index] = AIC0[2,par_index] - AIC0[1,par_index]^2
-      AIC0[4,par_index] = AIC0[4,par_index] - AIC0[3,par_index]^2
-      AIC0[2,par_index] = sqrt(AIC0[2,par_index])
-      AIC0[4,par_index] = sqrt(AIC0[4,par_index])
+      AIC0[5,par_index] = 2*(nb_topics*nb_terms + 1 - LLH_final0[1,par_index])
+      AIC0[2,par_index] = sd(AIC1[,par_index])
+      AIC0[4,par_index] = sd(AIC2[,par_index])
+      AIC0[6,par_index] = sd(AIC3[,par_index])
     } else if (Rtopicmodels_VEM)
     {
       nb_terms = Result[[1]]@wordassignments$ncol
@@ -1279,39 +1240,33 @@ for (par_index in 1:mpar_range)
       nb_words = Result[[1]]@n
       for (j in 1:nb_real)
       {
-        LLH_final0[1,par_index] = sum(Result[[j]]@loglikelihood)/nb_real + LLH_final0[1,par_index]  
         LLH_final1[j,par_index] = sum(Result[[j]]@loglikelihood)
-        LLH_final0[2,par_index] = (sum(Result[[j]]@loglikelihood))^2/nb_real + LLH_final0[2,par_index]  
-        AIC0[2,par_index] = (2*(nb_topics*(nb_terms+nb_doc) - sum(Result[[j]]@loglikelihood)))^2/nb_real + AIC0[2,par_index]
-        AIC0[4,par_index] = (2*(nb_words - sum(Result[[j]]@loglikelihood)))^2/nb_real + AIC0[4,par_index]
-        AIC0[6,par_index] = (2*(nb_topics*nb_terms + 1 - sum(Result[[j]]@loglikelihood)))^2/nb_real + AIC0[6,par_index]
         AIC1[j,par_index] = 2*(nb_topics*(nb_terms+nb_doc) - sum(Result[[j]]@loglikelihood))
         AIC2[j,par_index] = 2*(nb_words - sum(Result[[j]]@loglikelihood))
         AIC3[j,par_index] = 2*(nb_topics*nb_terms + 1 - sum(Result[[j]]@loglikelihood))
         alpha_est1[j,par_index] = Result[[j]]@alpha
-        alpha_est0[1,par_index] = Result[[j]]@alpha/nb_real + alpha_est0[1,par_index]
-        alpha_est0[2,par_index] = Result[[j]]@alpha^2/nb_real + alpha_est0[2,par_index]
-        #cat("\n",alpha_est0[1,i],"\n")
       } 
-      LLH_final0[2,par_index] = LLH_final0[2,par_index] - LLH_final0[1,par_index]^2
-      LLH_final0[2,par_index] = sqrt(LLH_final0[2,par_index])
+      LLH_final0[1,par_index] = mean(LLH_final1[,par_index])
+      LLH_final0[2,par_index] = sd(LLH_final1[,par_index])
       AIC0[1,par_index] = 2*(nb_topics*(nb_terms+nb_doc) - LLH_final0[1,par_index])
       AIC0[3,par_index] = 2*(nb_words - LLH_final0[1,par_index])
       AIC0[5,par_index] = 2*(nb_topics*nb_terms + 1 - LLH_final0[1,par_index])
-      AIC0[2,par_index] = AIC0[2,par_index] - AIC0[1,par_index]^2
-      AIC0[4,par_index] = AIC0[4,par_index] - AIC0[3,par_index]^2
-      AIC0[6,par_index] = AIC0[6,par_index] - AIC0[5,par_index]^2
-      AIC0[2,par_index] = sqrt(AIC0[2,par_index])
-      AIC0[4,par_index] = sqrt(AIC0[4,par_index])
-      AIC0[6,par_index] = sqrt(AIC0[6,par_index])
-      alpha_est0[2,par_index] = alpha_est0[2,par_index] - alpha_est0[1,par_index]^2
-      alpha_est0[2,par_index] = sqrt(alpha_est0[2,par_index])
+      AIC0[2,par_index] = sd(AIC1[,par_index])
+      AIC0[4,par_index] = sd(AIC2[,par_index])
+      AIC0[6,par_index] = sd(AIC3[,par_index])
+      alpha_est0[1,par_index] = mean(alpha_est1[,par_index])
+      alpha_est0[2,par_index] = sd(alpha_est1[,par_index])
     }
     
-    if (Rtopicmodels_VEM)
+    if (Rtopicmodels_VEM && (par_index == length(mpar_range)))
     {
       alpha_file = "estimated_alpha.txt"
-      write(alpha_est0[1,],alpha_file)
+      write(paste("par =",mpar_range[1],"- alpha =",alpha_est0[1,1]),alpha_file,ncolumns=1)
+      if (length(mpar_range)>1)
+      {
+        for (par_index in 2:length(mpar_range))
+          write(paste("par =",mpar_range[par_index],"- alpha =",alpha_est0[1,par_index]),alpha_file,append=T)
+      }
     }
     # This (!mpar) section could be put after the the loop over mpar
   } else if (!mpar)
@@ -1356,12 +1311,14 @@ for (par_index in 1:mpar_range)
           #nb_terms1 = Result[[j]]@fitted[[1]]@wordassignments$ncol
           #nb_doc = Result[[j]]@fitted[[1]]@wordassignments$nrow
           LLH1[j,] = Result[[j]]@fitted[[1]]@logLiks
-          LLH0[1,] = Result[[j]]@fitted[[1]]@logLiks/nb_real + LLH0[1,]
-          LLH0[2,] = Result[[j]]@fitted[[1]]@logLiks^2/nb_real + LLH0[2,]
+#           LLH0[1,] = Result[[j]]@fitted[[1]]@logLiks/nb_real + LLH0[1,]
+#           LLH0[2,] = Result[[j]]@fitted[[1]]@logLiks^2/nb_real + LLH0[2,]
           #llh[j] = Result[[j]]@fitted[[1]]@loglikelihood
         }
-        LLH0[2,] = LLH0[2,] - LLH0[1,]^2
-        LLH0[2,] = sqrt(LLH0[2,])
+        LLH0[1,] = apply(LLH1,2,mean)
+        LLH0[2,] = apply(LLH1,2,sd)
+#         LLH0[2,] = LLH0[2,] - LLH0[1,]^2
+#         LLH0[2,] = sqrt(LLH0[2,])
       } else if (Rtopicmodels_VEM)
       {
         # different number of iterations for each realization
@@ -1484,38 +1441,6 @@ if (!mpar)
     KL_topic_compo_allreal = vector(mode="list",length=length_selected_real)
     sort_normal_topic_allreal = vector(mode="list",length=length_selected_real)
   }
-  
-  #   if (testdata)
-  #   {
-  #     ########################
-  #     # Basic
-  #     pdf("True_topics_composition_maps.pdf")
-  #     # 2 topics :
-  #     #par(mfrow=c(2,1))
-  #     # 5 topics :
-  #     #par(mfrow=c(3,2))
-  #     # 10 topics
-  #     par(mfrow=c(2,2))
-  #     #lattice::levelplot(abund2.pred~x+y, z2, 
-  #     #col.regions=topo.colors(100), aspect = "iso",contour=T,main=binomial)
-  #     # Loop over topics (one map per topic, the color stands for the proportion of the topic)
-  #     for (k in 1:true_nb_topics)
-  #     {  
-  #       spatial_topicmix = matrix(nrow=29,ncol=39)
-  #       for (j in 1:39)
-  #       {
-  #         for (i in 1:29)
-  #           spatial_topicmix[i,j] = true_documents[(j-1)*29+i,k]   
-  #       }
-  #       # colors Red Green Blue
-  #       color2D.matplot(spatial_topicmix,c(0,1),c(0,0),c(1,0),
-  #                       extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab="Column",
-  #                       ylab="Row",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                       border="black",na.color="white",main=paste("Topic - #",k,sep=""))
-  #     }
-  #     dev.off()
-  #     #######################
-  #   }
   
   ##########################
   # Loading earth map data #
@@ -1762,36 +1687,6 @@ if (!mpar)
           topic_compo[[k]][i,j+1]=as.character(taxo_ref[vect$ix[i]+1,j])
       }
     }
-    # topic_compo[[1,1]][1:20,]
-    # composition of first topic by total read proportion ordening :
-    # topic_compo[[1,rev(sort_prop_topic$ix)[1]]][1:10,]
-    # topic_compo[[1,rev(sort_prop_topic$ix)[2]]][1:10,]
-    # topic_compo[[1,rev(sort_prop_topic$ix)[3]]][1:10,]
-    # topic_compo[[1,rev(sort_prop_topic$ix)[4]]][1:10,]
-    # topic_compo[[1,rev(sort_prop_topic$ix)[5]]][1:10,]
-    # topic_compo[[1,rev(sort_prop_topic$ix)[6]]][1:10,]
-    # topic_compo[[1,rev(sort_prop_topic$ix)[7]]][1:10,]
-    # topic_compo[[1,rev(sort_prop_topic$ix)[8]]][1:10,]
-    # topic_compo[[1,rev(sort_prop_topic$ix)[9]]][1:10,]
-    # topic_compo[[1,rev(sort_prop_topic$ix)[10]]][1:10,]
-    # composition of first topic by site-normalized read proportion ordening :
-    # topic_compo[[1,rev(sort_normal_topic$ix)[1]]][1:20,]
-    # Ordening of topics by total read proportion :
-    # rev(sort_prop_topic$ix)
-    # Ordening of topics by site-normalized read proportion :
-    # rev(sort_normal_topic$ix)
-    
-    ## Computing the topic similarity MOTU-wise for the best realization
-    #   if (j_select == 1)
-    #   {
-    #     Topic_compo_mat = matrix(nrow=nb_terms,ncol=nb_topics,data=0)
-    #     for (k in 1:nb_topics)
-    #       Topic_compo_mat[,k] = topic_compo[[k]][,1]
-    #     
-    #     Topic_Hellinger_similarity = 1 - 1/sqrt(2)*dist(t(sqrt(Topic_compo_mat[,rev(sort_normal_topic$ix)])),
-    #                                     method = "euclidean", diag = FALSE, upper = FALSE)
-    #     save(Topic_Hellinger_similarity,file="MOTU-wise_topic_Hellinger_similarity.Rdata")
-    #   }
     
     #######################################
     # Comparing realizations: computation #
@@ -1818,11 +1713,6 @@ if (!mpar)
       #     Similarity = 1 - 1/sqrt(2)*dist(t(sqrt(cbind(KL_documents_allreal[[1]][,rev(sort_normal_topic_allreal[[1]]$ix)],KL_documents[,rev(sort_normal_topic$ix)]))),
       #                                              method = "euclidean", diag = FALSE, upper = FALSE)
       #     Hellinger[[j_select-1]] = as.matrix(Similarity)[(nb_topics+1):(2*nb_topics),1:nb_topics]
-      
-      # Computing the KL distance only between the pairwise most correlated topics between realizations
-      # Topic_compo_mat[,] contains the topic compositions of the first realization and topic_compo[[]][,1] the topic composition of the other realizations
-      #       for (k in 1:nb_topics)
-      #         KL_MOTUwise[j_select-1,k] = 1/2*(KL.plugin(topic_compo_allreal[[j_select]][,k] Topic_compo_mat[,k],topic_compo[[Topic_correspondence_cor[k]]][,1]) + KL.plugin(topic_compo[[Topic_correspondence_cor[k]]][,1],Topic_compo_mat[,k]))
       
       # Computing the mean KL distance between topics for all pairs of realizations
       for (j_real in 1:(j_select-1))
@@ -2010,19 +1900,6 @@ if (!mpar)
         {
           for (k in 1:nb_topics)
           {          
-            #           Topic_correspondence_samplewise[k] = which(Best_topic_comparison_samplewise[k] == KL_samplewise_topic_comparison[k,])
-            #           #Topic_correspondence_MOTUwise[k] = which(Best_topic_comparison_MOTUwise[k] == KL_MOTUwise_topic_comparison[k,])
-            #           if (k>1)
-            #           {
-            #             for (k0 in 1:(k-1))
-            #             {
-            #               if (Topic_correspondence_samplewise[k0] == Topic_correspondence_samplewise[k])
-            #               {
-            #                 if (Best_topic_comparison_samplewise[k0] < Best_topic_comparison_samplewise[k]
-            #               }
-            #             }
-            #           }
-            
             nb_non_significant_rndzations = 0
             Var_KL_topic_comparison_randomized = 0
             for (rndzation in 1:nb_rndzations) 
@@ -2711,36 +2588,6 @@ if (!mpar)
         }
       }
       
-      # to print the 10 most abundant MOTUs in the most abundant topic, the second most abundant topic ... :
-      # topic_compo[[1,rev(sort_normal_topic$ix)[1]]][1:10,]
-      # topic_compo[[1,rev(sort_normal_topic$ix)[2]]][1:10,]
-      
-      # Saving topic_compo in a txt file does not work for the moment :
-      # file = "Topic_composition.txt"
-      # write("test",file)
-      # for (k in 1:20)
-      # {
-      #   for (l in 1:(length(taxo_ref[1,])+1))
-      #   {
-      #     list_content = topic_compo[[1,rev(sort_normal_topic$ix)[1]]][k,l]
-      #     write(list_content,file, sep = "\t", append = TRUE)
-      #   }
-      #   write("\n",file, sep = "")
-      # }
-      # for (m in 2:nb_topics)
-      # {
-      #   write("",append = TRUE)
-      #   for (k in 1:20)
-      #   {
-      #     for (l in 1:(length(taxo_ref[1,])+1))
-      #     {
-      #       list_content = topic_compo[[1,rev(sort_normal_topic$ix)[m]]][k,l]
-      #       write(list_content,file, sep = "\t", append = TRUE)
-      #     }
-      #     write("\n",file, sep = "")
-      #   }
-      # }
-      
       if (best_keep && (j_select == 1) && realization_comparison)
       {
         realization_comparison_dirname = paste0(local_subdirname,"Realization_comparison_",MOTU_sample_insert,"_",bij_insert)
@@ -3011,8 +2858,10 @@ if (!mpar)
           
           # Abiotic file does not report the comparison to PCA axes in the case pca_abiotic = 1
           Abiotic_file = paste0(case0,"_comparison.txt")
-          abiotic_data.frame = as.data.frame(matrix(ncol=length(colnames_abiotic)*2,nrow=nb_topics,data=0))
-          colnames(abiotic_data.frame) = colnames_abiotic
+          if (!data_gs)
+            abiotic_data.frame = as.data.frame(matrix(ncol=length(colnames_abiotic)*3,nrow=nb_topics,data=0))
+          else
+            abiotic_data.frame = as.data.frame(matrix(ncol=length(colnames_abiotic)*2,nrow=nb_topics,data=0))
           write(paste(barcode_insert,"-",nb_topics,"topics\n%%%%%%%%%%%%%\n"),file=Abiotic_file,append=F)
           for (k in 1:nb_topics)
           {
@@ -3040,20 +2889,35 @@ if (!mpar)
             {
               write(paste0("\n",colnames_abiotic[j],"\n%%%%%%%%%%%%%"),file=Abiotic_file,append=T)
               write(paste("Correlation =",Correlation_abiotic[[1]][k0,j]),file=Abiotic_file,append=T)
+              # Comparison to randomizations is not implemented yet for GS data:
               if (!data_gs)
               {
                 write(paste("Effect size with spatial randomizations =",Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j]),file=Abiotic_file,append=T)
                 write(paste("Standardized effect size with spatial randomizations =",
                             (Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j])/sqrt(Var_cor_abiotic_comparison_randomized[k0,j]-Mean_cor_abiotic_comparison_randomized[k0,j]^2)),file=Abiotic_file,append=T)
+                write(paste("Normalized effect size with spatial randomizations =",
+                            (Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j])/(1-Mean_cor_abiotic_comparison_randomized[k0,j])),file=Abiotic_file,append=T)
                 write(paste("p-value for spatial randomizations =",p_value_abiotic[k0,j]),file=Abiotic_file,append=T)
+                
+                abiotic_data.frame[k,(3*(j-1)+1):(3*(j-1)+3)] = c(Correlation_abiotic[[1]][k0,j],(Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j])/(1-Mean_cor_abiotic_comparison_randomized[k0,j]),p_value_abiotic[k0,j])
+                if (k==1)
+                  colnames(abiotic_data.frame)[(3*(j-1)+1):(3*(j-1)+3)] = c(paste(colnames_abiotic[j],"corr."),paste(colnames_abiotic[j],"norm. ES"),paste(colnames_abiotic[j],"p-value"))
+              } else
+              {
+                abiotic_data.frame[k,(2*(j-1)+1):(2*(j-1)+2)] = c(Correlation_abiotic[[1]][k0,j],p_value_abiotic[k0,j])
+                if (k==1)
+                  colnames(abiotic_data.frame)[(2*(j-1)+1):(2*(j-1)+2)] = c(paste(colnames_abiotic[j],"corr."),paste(colnames_abiotic[j],"p-value"))
               }
-              write(paste("p-value for Student's t-test =",Correlation_abiotic[[2]][k0,j]),file=Abiotic_file,append=T)
-          
-              abiotic_data.frame[k,(2*(j-1)+1):(2*(j-1)+2)] = c(Correlation_abiotic[[1]][k0,j],p_value_abiotic[k0,j])
+              
+              # write(paste("p-value for Student's t-test =",Correlation_abiotic[[2]][k0,j]),file=Abiotic_file,append=T)
             }
           }
           
+          # Comparison to PCA components is not included in the output
           saveRDS(abiotic_data.frame,file=paste0(case0,"_data.frame.rds"))
+          setwd(local_subdirname)
+          write.csv(abiotic_data.frame,paste0(case0,"_comparison.csv"))
+          setwd(abiotic_variables_dirname)
           
           #########
           # plots #
@@ -3145,22 +3009,6 @@ if (!mpar)
       ########################################################
       
       col_topic=c("black","blue","red","forestgreen","gold","mediumorchid2","chocolate4","cadetblue4","maroon","tan2","mediumturquoise","lightsalmon2","hotpink","greenyellow","lavender","khaki4")
-      #     legend_topic=c("Topic 1","Topic 2","Topic 3","Topic 4","Topic 5")
-      #     col_vector_rgb=matrix(ncol=3,nrow=nb_topics+1)
-      #     col_vector_rgb[1,]=c(1,0,0)
-      #     col_vector_rgb[2,]=c(0,1,0)
-      #     col_vector_rgb[3,]=c(0,0,1)
-      #     col_vector_rgb[4,]=c(1,0,1)
-      #     col_vector_rgb[5,]=c(1,1,0)
-      #     col_vector_rgb[6,]=c(0,1,1)
-      #     # col_vector_rgb[7,]=c(0.5,0,0)
-      #     # col_vector_rgb[8,]=c(0,0.5,0)
-      #     # col_vector_rgb[9,]=c(0,0,0.5)
-      #     # col_vector_rgb[10,]=c(0.5,0,0.5)
-      #     # col_vector_rgb[11,]=c(1,1,1)
-      #     last_element=length(col_vector_rgb[,1])
-      
-      #Ordered_realizations = sort.int(LLH_final_real1,decreasing=T,index.return=T)
       
       # Creating the subdirectory specific to the realization
       if (select_real)
@@ -3333,16 +3181,6 @@ if (!mpar)
     #ylab = "Number of sites", main = "Histogramme of the number of sites\n with respect to the proportion\n of the most abundant sequence")
     dev.off()
     
-    # pdf("topic_dominance_by_sequence_hist_percent.pdf")
-    # h = hist(max_topic, breaks = nb_bins, plot=F)
-    # h$density = h$counts/sum(h$counts)
-    # plot(h, freq=F, xlab = "Proportion of the most abundant sequence",
-    #      ylab = "Proportion of the total number of topics", 
-    #      main = "Proportion of the total number of topics\n with respect to the topic's proportion\n
-    #      taken by the most abundant sequence in topic", xaxp = c(0, 1, 10))
-    # #ylab = "Number of sites", main = "Proportion of sites\n with respect to the proportion\n of the most abundant sequence")
-    # dev.off()
-    
     pdf("topic_dominance_by_sequence_hist_percent.pdf")
     par(mar=c(5.1,5.1,5.1,2.1)) 
     par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
@@ -3398,14 +3236,6 @@ if (!mpar)
          ylab = "Number of sequences", main = "Number of sequences\n with respect to the share of their total number of reads\n in the topic where they are most dominant", xaxp = c(0, 1, 10))
     dev.off()
     
-    # pdf("topic_exclusivity_hist_percent.pdf")
-    # h = hist(prop_reads_seq_main_topic, breaks = nb_bins, plot=F)
-    # h$density = h$counts/sum(h$counts)
-    # plot(h, freq=F, xlab = "Share of the sequence's total number of reads\n in the topic where the sequence is most dominant",
-    #      ylab = "Proportion of sequences", main = "Proportion of the number of sequences\n with respect to the share of their 
-    #      total number of reads\n in the topic where they are most dominant", xaxp = c(0, 1, 10))
-    # dev.off()
-    
     pdf("topic_exclusivity_hist_percent.pdf")
     par(mar=c(5.1,5.1,7.1,2.1)) 
     par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
@@ -3430,47 +3260,6 @@ if (!mpar)
     #ylab = "Number of sites", main = "Proportion of sites\n with respect to the proportion\n of the most abundant sequence")
     mtext("Community-normalized proportion of sequences\n in the community where the MOTU is most dominant",side=1,line=4,cex=1.5) 
     dev.off()
-    
-    # pdf("Prop_in_main_topic_vs_total_read_share_in_main_topic.pdf")
-    # par(mar=c(5.1,4.1,4.1,4.1))
-    # plot(prop_reads_seq_main_topic[-c(242,586,591,702)],prop_max_topic_seq[-c(242,586,591,702)],type="p", yaxt="n",
-    #      main="Proportion of a sequence in the topic where it is most dominant\n with respect to this topic's share of the sequence's total number of reads",
-    #      xlab = "Share of the sequence's total number of reads\n in the topic where the sequence is most dominant",
-    #      ylab = "Proportion of the sequence in the topic where it is most dominant")
-    # axis(2, ylim=range(prop_max_topic_seq), col='black')
-    # par(new=T)
-    # plot(prop_reads_seq_main_topic[-c(242,586,591,702)],log(prop_max_topic_seq[-c(242,586,591,702)])/log(10),type="p",ann=F,yaxt="n",xaxt="n",col="blue")
-    # axis(4, ylim=range(log(prop_max_topic_seq)/log(10)), col='blue')
-    # mtext("Proportion of the sequence in the topic where it is most dominant (log_10)",side=4,line=3,col="blue")
-    # dev.off()
-    # 
-    # # figure utilisant le classement "sorted_normal_abundances2$ix" des séquences selon leur abondance site-normalized, obtenu en sortie de H20_GH.R
-    # pdf(paste("Prop_in_main_topic_vs_total_read_share_in_main_topic_",nb_topics,"firstseq.pdf",sep=""))
-    # par(mar=c(5.1,4.1,4.1,4.1))
-    # plot(prop_reads_seq_main_topic[normal_ordered_seq[1:nb_topics]],prop_max_topic_seq[normal_ordered_seq[1:nb_topics]],type="p", yaxt="n",
-    #      main="Proportion of a sequence in the topic where it is most dominant\n with respect to this topic's share of the sequence's total number of reads",
-    #      xlab = "Share of the sequence's total number of reads\n in the topic where the sequence is most dominant",
-    #      ylab = "Proportion of the sequence in the topic where it is most dominant")
-    # axis(2, ylim=range(prop_max_topic_seq), col='black')
-    # # par(new=T)
-    # # plot(prop_reads_seq_main_topic[normal_ordered_seq[1:nb_topics]],log(prop_max_topic_seq[normal_ordered_seq[1:nb_topics]])/log(10),type="p",ann=F,yaxt="n",xaxt="n",col="blue")
-    # # axis(4, ylim=range(log(prop_max_topic_seq)/log(10)), col='blue')
-    # # mtext("Proportion of the sequence in the topic where it is most dominant (log_10)",side=4,line=3,col="blue")
-    # dev.off()
-    # 
-    # # figure utilisant le classement "sorted_normal_abundances2$ix" des séquences selon leur abondance site-normalized, obtenu en sortie de H20_GH.R
-    # pdf(paste("Prop_in_main_topic_vs_total_read_share_in_main_topic_",nb_topics*2,"firstseq.pdf",sep=""))
-    # par(mar=c(5.1,4.1,4.1,4.1))
-    # plot(prop_reads_seq_main_topic[normal_ordered_seq[1:nb_topics*2]],prop_max_topic_seq[normal_ordered_seq[1:nb_topics*2]],type="p", yaxt="n",
-    #      main="Proportion of a sequence in the topic where it is most dominant\n with respect to this topic's share of the sequence's total number of reads",
-    #      xlab = "Share of the sequence's total number of reads\n in the topic where the sequence is most dominant",
-    #      ylab = "Proportion of the sequence in the topic where it is most dominant")
-    # axis(2, ylim=range(prop_max_topic_seq), col='black')
-    # par(new=T)
-    # plot(prop_reads_seq_main_topic[normal_ordered_seq[1:nb_topics*2]],log(prop_max_topic_seq[normal_ordered_seq[1:nb_topics*2]])/log(10),type="p",ann=F,yaxt="n",xaxt="n",col="blue")
-    # axis(4, ylim=range(log(prop_max_topic_seq)/log(10)), col='blue')
-    # mtext("Proportion of the sequence in the topic where it is most dominant (log_10)",side=4,line=3,col="blue")
-    # dev.off()
     
     pdf("Topic_dominance_by_sequence_wrt_site-normalized_sequence_rank.pdf")
     par(mar=c(5.1,5.1,4.1,4.1))
@@ -3578,145 +3367,6 @@ if (!mpar)
       write(paste(topic_compo[[k0]][i,1],"-",topic_compo[[k0]][i,11],"-",topic_compo[[k0]][i,10]),file=Taxo_compo_file,append=T)
   }
   
-  # KL symmetrised distance between topic's site repartition and sequence site's repartition (result from H20_GH.R)
-  # -> the goal was to identify whether some topics predominantly contain one particular MOTU (which is the case for plants GH)
-  #############################
-  
-  #     KL = matrix(nrow=nb_topics,ncol=nb_terms,data=0)
-  #     smoothed_KL = matrix(nrow=nb_topics,ncol=nb_terms,data=0)
-  #     smoothed_KL2 = matrix(nrow=nb_topics,ncol=nb_terms,data=0)
-  #     # KL = matrix(nrow=nb_topics,ncol=nb_topics,data=0)
-  #     # smoothed_KL = matrix(nrow=nb_topics,ncol=nb_topics,data=0)
-  #     # smoothed_KL2 = matrix(nrow=nb_topics,ncol=nb_topics,data=0)
-  #     for (topic in 1:nb_topics)
-  #     {
-  #       # on enlève les quatre derniers séquences qui ont des counts nuls et KL_normal_data2m=NA
-  #       # for (seq in 1:(nb_terms-4))
-  #       for (seq in 1:(2*nb_topics))
-  #       {
-  #         for (site in 1:nb_doc)
-  #         {
-  #           if (KL_documents[site,rev(sort_normal_topic$ix)[topic]]!=0 && !is.na(KL_normal_data2m[normal_ordered_seq[seq],site]))
-  #             #if (KL_documents[site,rev(sort_normal_topic$ix)[topic]]!=0)
-  #             #if (KL_normal_data2m[normal_ordered_seq[seq],site]!=0)
-  #           {
-  #             # KL[topic,seq]=1/(2*log(2))*(documents[site,rev(sort_normal_topic$ix)[topic]]*(log(documents[site,rev(sort_normal_topic$ix)[topic]])-log(normal_data2m[normal_ordered_seq[seq],site]))
-  #             # + normal_data2m[normal_ordered_seq[seq],site]*(log(normal_data2m[normal_ordered_seq[seq],site])-log(documents[site,rev(sort_normal_topic$ix)[topic]]))) 
-  #             KL[topic,seq]=1/(2*log(2))*(KL_documents[site,rev(sort_normal_topic$ix)[topic]]*log(KL_documents[site,rev(sort_normal_topic$ix)[topic]]/KL_normal_data2m[normal_ordered_seq[seq],site])
-  #                                         + KL_normal_data2m[normal_ordered_seq[seq],site]*log(KL_normal_data2m[normal_ordered_seq[seq],site]/KL_documents[site,rev(sort_normal_topic$ix)[topic]])) + KL[topic,seq] 
-  #           }
-  #           smoothed_KL[topic,seq] = (1/(2*log(2))*(smoothed_KL_documents[site,rev(sort_normal_topic$ix)[topic]]*log(smoothed_KL_documents[site,rev(sort_normal_topic$ix)[topic]]/smoothed_KL_normal_data2m[normal_ordered_seq[seq],site])
-  #                                                   + smoothed_KL_normal_data2m[normal_ordered_seq[seq],site]*log(smoothed_KL_normal_data2m[normal_ordered_seq[seq],site]/smoothed_KL_documents[site,rev(sort_normal_topic$ix)[topic]])) 
-  #                                     + smoothed_KL[topic,seq]) 
-  #           smoothed_KL2[topic,seq] = (1/(2*log(2))*(smoothed_KL2_documents[site,rev(sort_normal_topic$ix)[topic]]*log(smoothed_KL2_documents[site,rev(sort_normal_topic$ix)[topic]]/smoothed_KL2_normal_data2m[normal_ordered_seq[seq],site])
-  #                                                    + smoothed_KL2_normal_data2m[normal_ordered_seq[seq],site]*log(smoothed_KL2_normal_data2m[normal_ordered_seq[seq],site]/smoothed_KL2_documents[site,rev(sort_normal_topic$ix)[topic]])) 
-  #                                      + smoothed_KL2[topic,seq]) 
-  #         }
-  #       }
-  #     }  
-  
-  # pdf("KL_distance_between_topic_and_sequence_site_repartitions.pdf")
-  # color2D.matplot(KL[,1:nb_topics],c(1,0),c(0,0),c(0,1),
-  #                 extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,
-  #                 ylab="Topics ranked by site-normalized abundances",
-  #                 xlab="Sequences ranked by\n site-normalized abundances",
-  #                 main="KL symmetrized divergence between topics' site distribution\n and sequences' site distribution -\n topics and sequences ranked by site-averaged relative abundances",
-  #                 #main="KL symmetrized distance between topics' site repartition\n and sequences' site repartition -\n topics and sequences ranked by site-normalized abundances",
-  #                 do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                 border="black",na.color=NA)
-  # dev.off()
-  # 
-  # pdf("KL_distance_between_smoothed_topic_and_sequence_site_repartitions.pdf")
-  # color2D.matplot(smoothed_KL[,1:nb_topics],c(1,0),c(0,0),c(0,1),
-  #                 extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,
-  #                 ylab="Topics ranked by site-normalized abundances",
-  #                 xlab="Sequences ranked by\n site-normalized abundances",
-  #                 main="KL symmetrized divergence between smoothed topics' site distribution\n and smoothed sequences' site distribution -\n topics and sequences ranked by site-averaged relative abundances",
-  #                 do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                 border="black",na.color=NA)
-  # dev.off()
-  
-  # pdf(paste("KL_distance_between_topic_and_sequence_site_repartitions_",nb_topics,"firstseq.pdf",sep=""))
-  # color2D.matplot(KL[1:nb_topics,1:nb_topics],c(1,0),c(0,0),c(0,1),
-  #                 extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,
-  #                 ylab="Topics ranked by site-normalized abundances",
-  #                 xlab="Sequences ranked by\n site-normalized abundances",
-  #                 main="KL symmetrized divergence between topics' site distribution\n and sequences' site distribution -\n topics and sequences ranked by site-averaged relative abundances",
-  #                 #main="KL symmetrized distance between topics' site repartition\n and sequences' site repartition -\n topics and sequences ranked by site-normalized abundances",
-  #                 do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                 border="black",na.color=NA)
-  # dev.off()
-  
-  # pdf("KL_distance_(log)_between_topic_and_sequence_site_repartitions_20firstseq.pdf")
-  # color2D.matplot(log(KL[1:20,1:20]),c(1,0),c(0,0),c(0,1),
-  #                 extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,
-  #                 ylab="Topics ranked by site-normalized abundances",
-  #                 xlab="Sequences ranked by\n site-normalized abundances",
-  #                 main="KL symmetrized divergence (log) between topics' site distribution\n and sequences' site distribution -\n topics and sequences ranked by site-averaged relative abundances",
-  #                 #main="KL symmetrized distance (log) between topics' site repartition\n and sequences' site repartition -\n topics and sequences ranked by site-normalized abundances",
-  #                 do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                 border="black",na.color=NA)
-  # dev.off()
-  
-  # KL[which(KL[,1:nb_topics]==0)]=NA
-  # pdf("KL_distance_(log)_between_topic_and_sequence_site_repartitions.pdf")
-  # color2D.matplot(log(KL[,1:nb_topics]),c(1,0),c(0,0),c(0,1),
-  #                 extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,
-  #                 ylab="Topics ranked by site-normalized abundances",
-  #                 xlab="Sequences ranked by\n site-normalized abundances",
-  #                 main="KL symmetrized divergence (log) between topics' site distribution\n and sequences' site distribution -\n topics and sequences ranked by site-averaged relative abundances",
-  #                 #main="KL symmetrized distance (log) between topics' site repartition\n and sequences' site repartition -\n topics and sequences ranked by site-normalized abundances",
-  #                 do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                 border="black",na.color=NA)
-  # dev.off()
-  
-  # pdf("KL2_distance_between_smoothed_topic_and_sequence_site_repartitions.pdf")
-  # #par(mar=c(5.1,4.1,4.1,2.1))
-  # par(mar=c(6.1,6.1,5.1,2.1))
-  # color2D.matplot(smoothed_KL2[,1:nb_topics],c(1,0),c(0,0),c(0,1),
-  #                 extremes=NA,cellcolors=NA,show.legend=F,nslices=10,
-  #                 ylab="Classes ranked by\n relative abundances averaged over samples",xlab="",
-  #                 main="Symmetrized KL divergence\n between smoothed topics' spatial distribution\n and smoothed sequences' spatial distribution",
-  #                 #main="KL symmetrized distance between smoothed topics' site repartition\n and smoothed sequences' site repartition -\n topics and sequences ranked by site-normalized abundances",
-  #                 do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2,
-  #                 border="black",na.color=NA)
-  # mtext("Sequences ranked by\n relative abundances averaged over samples",side=1,line=4,cex=1.5) 
-  # dev.off()
-  # 
-  # pdf("KL2_distance_between_smoothed_topic_and_sequence_site_repartitions_seq=2nb_topics.pdf")
-  # color2D.matplot(smoothed_KL2[,1:(2*nb_topics)],c(1,0),c(0,0),c(0,1),
-  #                 extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,
-  #                 ylab="Topics ranked by site-normalized abundances",
-  #                 xlab="Sequences ranked by\n site-normalized abundances",
-  #                 main="KL symmetrized divergence between smoothed topics' site distribution\n and smoothed sequences' site distribution -\n classes and sequences ranked by site-averaged relative abundances",
-  #                 #main="KL symmetrized distance between smoothed topics' site repartition\n and smoothed sequences' site repartition -\n topics and sequences ranked by site-normalized abundances",
-  #                 do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                 border="black",na.color=NA)
-  # dev.off()
-  
-  #     pdf("KL2_distance_between_smoothed_topic_and_norm-sorted_sequence_site_repartitions_seq=3nb_topics.pdf")
-  #     par(mar=c(6.1,6.1,5.1,2.1))
-  #     color2D.matplot(smoothed_KL2[,1:(3*nb_topics)],c(226/255,2/255),c(226/255,63/255),c(226/255,165/255),
-  #                     extremes=NA,cellcolors=NA,show.legend=F,nslices=10,
-  #                     ylab="Classes ranked by\n relative abundances averaged over samples",xlab="",
-  #                     main="Symmetrized KL divergence\n between smoothed classes' spatial distribution\n and smoothed sequences' spatial distribution",
-  #                     #main="KL symmetrized distance between smoothed topics' site repartition\n and smoothed sequences' site repartition -\n topics and sequences ranked by site-normalized abundances",
-  #                     do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2,
-  #                     border="black",na.color=NA)
-  #     mtext("Sequences ranked by\n relative abundances averaged over samples",side=1,line=4,cex=1.5) 
-  #     dev.off()
-  
-  # pdf("KL2_distance_between_smoothed_topic_and_prop-sorted_sequence_site_repartitions_seq=3nb_topics.pdf")
-  # par(mar=c(6.1,6.1,5.1,2.1))
-  # color2D.matplot(smoothed_KL2[,1:(3*nb_topics)],c(1,0),c(0,0),c(0,1),
-  #                 extremes=NA,cellcolors=NA,show.legend=F,nslices=10,
-  #                 ylab="Classes ranked by\n relative abundances averaged over samples",xlab="",
-  #                 main="Symmetrized KL divergence\n between smoothed classes' spatial distribution\n and smoothed sequences' spatial distribution",
-  #                 #main="KL symmetrized distance between smoothed topics' site repartition\n and smoothed sequences' site repartition -\n topics and sequences ranked by site-normalized abundances",
-  #                 do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2,
-  #                 border="black",na.color=NA)
-  # mtext("Sequences ranked by\n relative abundances averaged over samples",side=1,line=4,cex=1.5) 
-  # dev.off()
 }
 
 ##################################################
@@ -3797,115 +3447,6 @@ if (!mpar)
       legend(x="topleft",legend=c("Threshold 0.5","Threshold 0.6","Threshold 0.7","Threshold 0.8","Threshold 0.9"),text.col=col_topic[1:5],inset=0.1)
       dev.off()
     }
-    
-    # Figure illisible
-    # #################################
-    # pdf("Site_topic_composition.pdf")
-    # plot(1,documents[1,1],type="n",ann=FALSE,xlim=c(1,nb_doc),ylim=range(documents))
-    # for (i in 1:nb_topics)
-    #   lines(1:nb_doc,documents[,i],type="p",col=col_topic[i])
-    # #lines(range1,c(log(1/8),log(1/8)),type="l",col="black",lty=2)
-    # #axis(2,at=log(1/8),lab="log(1/8)",col.axis="black",col="black")
-    # title(xlab="Sample number",ylab="Topic proportion")
-    # legend(x="topright",legend=legend_topic[1:nb_topics],text.col=col_topic[1:nb_topics],inset=0.1)
-    # title("Topic composition per site, replicates counted as sites")
-    # dev.off()
-    ##############################
-    
-    # The following two figures need manual assignment of colors to topics
-    #################################
-    # pdf("Site_dominant_topic_map.pdf")
-    # # color2D.matplot(spatial_dominant_topic,c(0,1),c(0,1),c(1,0),
-    # #                   extremes=NA,cellcolors=NA,show.legend=FALSE,nslices=10,xlab="Column",
-    # #                   ylab="Row",do.hex=FALSE,axes=TRUE,show.values=TRUE,vcol="white",vcex=1,
-    # #                   border="black",na.color=NA,main="Dominant topic map")
-    # cellcolors <- matrix(nrow=19,ncol=19)
-    # # Loop over topics (one picturing the dominant topic for each site)
-    # for (k in 1:nb_topics)
-    #   {
-    #   #cellcolors[spatial_dominant_topic==k] = rgb(k/(nb_topics+1),0,1-k/(nb_topics+1))
-    #   cellcolors[spatial_dominant_topic==k] = rgb(col_vector_rgb[k,1],col_vector_rgb[k,2],col_vector_rgb[k,3])
-    # #color.scale(spatial_dominant_topic[spatial_dominant_topic==k],cs1=c(),cs2=c(),cs3=())  
-    #   }
-    #   color2D.matplot(spatial_dominant_topic,
-    #   extremes=NA,cellcolors=cellcolors,show.legend=FALSE,nslices=nb_topics,xlab="Column",
-    #   ylab="Row",do.hex=FALSE,axes=TRUE,show.values=TRUE,vcol="white",vcex=1,
-    #   border="black",na.color=NA,main="Dominant topic map")
-    # dev.off()
-    # 
-    # pdf("Site_dominant_topic_threshold_maps.pdf")
-    # par(mfrow=c(2,2))
-    # #lattice::levelplot(abund2.pred~x+y, z2, 
-    # #col.regions=topo.colors(100), aspect = "iso",contour=T,main=binomial)
-    # # Loop over threshold values (one map for each threshold value)
-    # for (k in 2:5)
-    #   {
-    #   spatial_dominant_topic_thres = matrix(nrow=19,ncol=19)
-    #   for (j in 1:19)
-    #     {
-    #     for (i in 1:19)
-    #       {
-    #       spatial_dominant_topic_thres[i,j] = dominant_topic_thres[(j-1)*19+i,k]
-    #       }
-    #     }
-    #   cellcolors <- matrix(nrow=19,ncol=19)
-    #   # Loop over topics (on each map, the dominant topic of each site is shown, except when its proportion is below the threshold, 
-    #   # in which case the site's color is white)
-    #   for (l in 1:nb_topics)
-    #     {
-    #     #cellcolors[spatial_dominant_topic==k] = rgb(k/(nb_topics+1),0,1-k/(nb_topics+1))
-    #     cellcolors[spatial_dominant_topic_thres==l] = rgb(col_vector_rgb[l,1],col_vector_rgb[l,2],col_vector_rgb[l,3])
-    #     #color.scale(spatial_dominant_topic[spatial_dominant_topic==k],cs1=c(),cs2=c(),cs3=())  
-    #     }
-    #   cellcolors[spatial_dominant_topic==0] = rgb(col_vector_rgb[last_element,1],col_vector_rgb[last_element,2],col_vector_rgb[last_element,3])  
-    #   # colors Red Green Blue
-    #   color2D.matplot(spatial_dominant_topic_thres,
-    #                   extremes=NA,cellcolors=cellcolors,show.legend=FALSE,nslices=10,xlab="Column",
-    #                   ylab="Row",do.hex=FALSE,axes=TRUE,show.values=TRUE,vcol="white",vcex=1,
-    #                   border="black",na.color=NA,main=paste("Threshold ",threshold[k]))
-    #   }
-    # dev.off()
-    
-    # # cellcolors<-matrix(NA,nrow=10,ncol=10)
-    # # cellcolors[corr.matrix >= 0]<-
-    # #   color.scale(corr.matrix[corr.matrix >= 0],
-    # #               cs1=c(0.7,0),cs2=c(0,0.7),cs3=0)
-    # # cellcolors[corr.matrix < 0]<-
-    # #   color.scale(corr.matrix[corr.matrix < 0],
-    # #               cs1=c(0.7,0),cs2=0,cs3=0.7)
-    # # color2D.matplot(corr.matrix,cellcolors=cellcolors,
-    # #                 show.values=TRUE)   
-    ##############################
-    
-    # Topic composition maps with default topic ordering
-    #######################################
-    # pdf("Site_topic_composition_maps.pdf")
-    # # 2 topics :
-    # #par(mfrow=c(2,1))
-    # # 5 topics :
-    # #par(mfrow=c(3,2))
-    # # 10 topics
-    # par(mfrow=c(2,2))
-    # #lattice::levelplot(abund2.pred~x+y, z2, 
-    #                #col.regions=topo.colors(100), aspect = "iso",contour=T,main=binomial)
-    # # Loop over topics (one map per topic, the color stands for the proportion of the topic)
-    # for (k in 1:nb_topics)
-    #   {  
-    #   spatial_topicmix = matrix(nrow=19,ncol=19)
-    #   for (j in 1:19)
-    #     {
-    #     for (i in 1:19)
-    #       {
-    #       spatial_topicmix[i,j] = documents[(j-1)*19+i,k]
-    #       }
-    #     }
-    #   # colors Red Green Blue
-    #   color2D.matplot(spatial_topicmix,c(0,1),c(0,0),c(1,0),
-    #                 extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab="Column",
-    #                 ylab="Row",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-    #                 border="black",na.color=NA,main=paste("Topic ",k))
-    #   }
-    # dev.off()
     
     # end of abundance_calculation
   }
@@ -4164,15 +3705,6 @@ if (!mpar)
         # image(spatial_topicmix_kriged[[k]], col = terrain.colors(100))
         #         axis(2, at=c(0,5,10,15,20,25,30), labels=c("","50","100","150","200","250","300"))
         #         axis(1, at=c(0,5,10,15,20,25,30,35,40), labels=c("0","","100","","200","","300","","400"))
-        
-        #       coordPP = expand.grid(x=seq(10,290,10), y=seq(10,390,10))
-        #       newdata = expand.grid(x=seq(0,300,2), y=seq(0,400,2))
-        #       tmp = data.frame(x=coordPP$x,y=coordPP$y,z=as.vector(spatial_topicmix))
-        #       mod = gstat(id = "z", formula = z~1, locations = ~x+y, data=tmp, model=vgm(10, "Exp", 20))
-        #       spatial_topicmix_kriged = predict(mod, newdata, na.action=na.omit)
-        #       
-        #ton dataframe avec les coordonnées et la valeur que tu veux plotter
-        #tmp = data.frame(spatial_topicmix_kriged$map[,1:2], z=spatial_topicmix_kriged$map[,3])
         
         # Shifting from Lucie's indexing to Blaise's indexing
         #         spatial_topicmix_Blaise = spatial_topicmix_kriged[[k0]]
@@ -4572,131 +4104,6 @@ if (!mpar)
 #       }
 #     }
     
-    #     pdf("Topic_ordered_by_site-normalized_abundance_composition_maps_filled.pdf")
-    #     # 2 topics :
-    #     #par(mfrow=c(2,1))
-    #     # 5 topics :
-    #     #par(mfrow=c(3,2))
-    #     # 10 topics
-    #     par(mfrow=c(2,2))
-    #     #lattice::levelplot(abund2.pred~x+y, z2, 
-    #     #col.regions=topo.colors(100), aspect = "iso",contour=T,main=binomial)
-    #     # Loop over topics (one map per topic, the color stands for the proportion of the topic)
-    #     for (k in 1:nb_topics)
-    #     {  
-    #       if (data_h20)
-    #       {
-    #         spatial_topicmix = matrix(nrow=19,ncol=19) 
-    #         for (j in 1:19)
-    #         {
-    #           for (i in 1:19)
-    #           {
-    #             spatial_topicmix[i,j] = documents[(j-1)*19+i,rev(sort_normal_topic$ix)[k]]
-    #           }
-    #         }
-    #       } else if (data_pp)
-    #       { 
-    #         spatial_topicmix = matrix(nrow=29,ncol=39)
-    #         position_shift = 0
-    #         for (j in 1:39)
-    #         {
-    #           for (i in 1:29)
-    #           {
-    #             if (Missing_positions_indices[(j-1)*29+i]==0)
-    #               spatial_topicmix[i,j] = documents[(j-1)*29+i-position_shift,rev(sort_normal_topic$ix)[k]]    
-    #             else if (Missing_positions_indices[(j-1)*29+i]==1)
-    #             {
-    #               spatial_topicmix[i,j] = NA
-    #               position_shift = position_shift+1
-    #             }
-    #           }
-    #         }
-    #         
-    #         spatial_topicmix_filled = matrix(nrow=29,ncol=39)
-    #         for (j in 1:39)
-    #         {
-    #           for (i in 1:29)
-    #           {
-    #             if (Missing_positions_indices[(j-1)*29+i]==0)
-    #               spatial_topicmix[i,j] = documents[(j-1)*29+i-position_shift,rev(sort_normal_topic$ix)[k]]    
-    #             else if (Missing_positions_indices[(j-1)*29+i]==1)
-    #             {
-    #               spatial_topicmix[i,j] = NA
-    #               position_shift = position_shift+1
-    #             }
-    #           }
-    #         }
-    #       }
-    #       # colors Red Green Blue
-    #       color2D.matplot(spatial_topicmix,c(0,1),c(0,0),c(1,0),
-    #                       extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab="Column",
-    #                       ylab="Row",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-    #                       border="black",na.color="white",main=paste("Topic ",rev(sort_normal_topic$ix)[k]," - #",k,sep=""))
-    #     }
-    #     dev.off()
-    
-    #     pdf("Smoothed_plot-normalized_topic_proportion_ordered_by_site-normalized_abundance_composition_maps.pdf")
-    #     # 2 topics :
-    #     #par(mfrow=c(2,1))
-    #     # 5 topics :
-    #     #par(mfrow=c(3,2))
-    #     # 10 topics
-    #     par(mfrow=c(2,2))
-    #     #lattice::levelplot(abund2.pred~x+y, z2, 
-    #     #col.regions=topo.colors(100), aspect = "iso",contour=T,main=binomial)
-    #     # Loop over topics (one map per topic, the color stands for the proportion of the topic)
-    #     for (k in 1:nb_topics)
-    #     {  
-    #       if (data_h20)
-    #       {
-    #         spatial_topicmix = matrix(nrow=19,ncol=19) 
-    #         for (j in 1:19)
-    #         {
-    #           for (i in 1:19)
-    #           {
-    #             spatial_topicmix[i,j] = smoothed_KL_documents[(j-1)*19+i,rev(sort_normal_topic$ix)[k]]
-    #           }
-    #         }
-    #       } else if (data_pp)
-    #       { 
-    #         spatial_topicmix = matrix(nrow=29,ncol=39)
-    #         if (filled && !filled_with_gaps)
-    #         {
-    #           for (j in 1:39)
-    #           {
-    #             for (i in 1:29)
-    #             {
-    #               spatial_topicmix[i,j] = smoothed_KL_documents[(j-1)*29+i,rev(sort_normal_topic$ix)[k]]
-    #             }
-    #           }
-    #         } else
-    #         {
-    #           position_shift = 0
-    #           for (j in 1:39)
-    #           {
-    #             for (i in 1:29)
-    #             {
-    #               if (Missing_positions_indices[(j-1)*29+i]==0)
-    #                 spatial_topicmix[i,j] = smoothed_KL_documents[(j-1)*29+i-position_shift,rev(sort_normal_topic$ix)[k]]    
-    #               else if (Missing_positions_indices[(j-1)*29+i]==1)
-    #               {
-    #                 spatial_topicmix[i,j] = NA
-    #                 position_shift = position_shift+1
-    #               }
-    #             }
-    #           }
-    #         }
-    #       }
-    #       # colors Red Green Blue
-    #       color2D.matplot(spatial_topicmix,c(226/255,2/255),c(226/255,63/255),c(226/255,165/255),
-    #                       extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab="",xrange=c(0,1),
-    #                       ylab="",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-    #                       border=NA,na.color="white",main=paste("Topic ",rev(sort_normal_topic$ix)[k]," - #",k,sep=""))
-    #       axis(2, at=c(5,10,15,20,25), labels=c("50","100","150","200","250"))
-    #       axis(1, at=c(5,10,15,20,25,30,35), labels=c("50","100","150","200","250","300","350"))
-    #     }
-    #     dev.off()
-    
   } 
   
   else if (data_betadiv_pooled)
@@ -4735,26 +4142,6 @@ if (!mpar)
     dev.off()
     
   }
-  
-  #   plot(normal_abundances_taxo2[1:20,1],type="p",ann=F,yaxt="n",xaxt="n")
-  # axis(2, ylim=range(normal_abundances_taxo2[,1]), col='black')
-  # # for (i in 1:20) 
-  # #   mtext("aaaaaaaaaa",at=i,side=1,line=1)
-  # axis(1, at=1:20, labels = F)
-  # labels = vector(length=20,mode="character")
-  # for (i in 1:20)
-  #   labels[i]=paste(normal_abundances_taxo2[i,11],normal_abundances_taxo2[i,10],sep=" - ")
-  # # text(1:20, par("usr")[3] + 0.25, srt = 45, adj = c(1,1), labels = abundances_taxo2[1:20,10], xpd = TRUE)
-  # text(1:20, par("usr")[3], srt = 45, adj = c(1.05,1.75), labels = labels, xpd = TRUE, cex=1.1)
-  # #par(new=T)
-  # #plot(log(normal_abundances_taxo2[1:20,1])/log(10),type="p",col="blue",ann=F,yaxt="n",xaxt="n")
-  # #axis(4, ylim=range(log(normal_abundances_taxo2[,1])), col='blue')
-  # #mtext("Relative abundance\n averaged over samples (log_10)",side=4,line=4,col="blue",cex=1.5) 
-  # title(ylab="Relative abundance\n averaged over samples")
-  # title("Relative abundances averaged over samples\n for the 20 most abundant sequences")
-  # dev.off()
-  
-  ############################
   
   # The three following figures need the results of other runs to be plotted
   ###############################################
@@ -4865,82 +4252,65 @@ if (select_real && realization_comparison)
   # saving the correlation file
   #     save(Correlation_MOTUwise,Correlation_samplewise,KL_samplewise,KL_MOTUwise,file="Topic_KL-correlation_between_best_real_and_following_reals.Rdata")
   #     save(Correlation_samplewise_allRealPairs,Correlation_MOTUwise_allRealPairs,KL_samplewise_allRealPairs,KL_MOTUwise_allRealPairs,file="Topic_KL-correlation_matrices_between_all_real.Rdata")
-  save(Correlation,KL,DKL100,file=paste0("Topic_KL-correlation_between_best_real_and_following_reals_",MOTU_sample_insert,"_",bij_insert,".Rdata"))
-  save(Correlation_allRealPairs,KL_allRealPairs_w_rndzations,KL_allRealPairs,DKL100_allRealPairs,llh_differences_allRealPairs,p_value_allRealPairs,SES_allRealPairs,file=paste0("Topic_KL-correlation_matrices_between_all_real_",MOTU_sample_insert,"_",bij_insert,".Rdata"))
+  save(Correlation,KL,DKL100,file=paste0("SKL-correlation_toBestReal_",MOTU_sample_insert,"_",bij_insert,".Rdata"))
+  save(Correlation_allRealPairs,KL_allRealPairs_w_rndzations,KL_allRealPairs,DKL100_allRealPairs,llh_differences_allRealPairs,p_value_allRealPairs,SES_allRealPairs,file=paste0("SKL-correlation_allRealPairs_",MOTU_sample_insert,"_",bij_insert,".Rdata"))
   save(Correlation_allRealPairs_byTopic,Correlation_allRealPairs_byTopic,KL_allRealPairs_byTopic,KL_allRealPairs_randomized_byTopic,SES_allRealPairs_byTopic,DKL100_allRealPairs_byTopic,Var_KL_topic_comparison_randomized_allRealPairs_byTopic,
-       p_value_allRealPairs_byTopic,Topic_correspondence_to_best_real,file=paste0("Topic_KL-correlation_matrices_between_all_real_by_topic_",MOTU_sample_insert,"_",bij_insert,".Rdata"))
+       p_value_allRealPairs_byTopic,Topic_correspondence_to_best_real,file=paste0("SKL-correlation_allRealPairs_byTopic_",MOTU_sample_insert,"_",bij_insert,".Rdata"))
   
   Stability_file = paste0("Stability_",MOTU_sample_insert,"_",bij_insert,".txt")
   
   write(paste(barcode_insert,"-",nb_topics,"topics -",length_selected_real,"realizations -",MOTU_sample_insert,"-",bij_insert,"\n%%%%%%%%%%%%%\n"),file=Stability_file,append=F)
   write(paste("For all topics :\n%%%%%%%%%%%%%\n"),file=Stability_file,append=T)
+  ###
   write(paste("Mean correlation =",mean(Correlation_allRealPairs[which(Correlation_allRealPairs!=0)]),"\n"),file=Stability_file,append=T)
+  ###
   write(paste("Mean KL distance =",mean(KL_allRealPairs[which(!is.na(KL_allRealPairs))]),"\n"),file=Stability_file,append=T)
+  ###
   # Intercept of SKL = f(llh)
   fitted_llh = Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real]
   fit1 = lm(KL_allRealPairs[1,-1] ~ fitted_llh)
   write(paste("Mean KL distance = f(llh difference) intercept =",fit1$coefficient[1],"\n"),file=Stability_file,append=T)
+  ###
   #write(paste("Mean randomized KL distance for",nb_rndzations,"randomizations per topic =",mean(KL_allRealPairs_w_rndzations[lower.tri(KL_allRealPairs_w_rndzations,diag=F)]),"\n"),file=Stability_file,append=T)
+  ###
   write(paste("Mean KL distance difference (ES) for",nb_rndzations,"randomizations per topic =",mean(DKL100_allRealPairs[which(!is.na(DKL100_allRealPairs))]),"\n"),file=Stability_file,append=T)
-  
+  ###
+  nES = t(DKL100_allRealPairs)[lower.tri(DKL100_allRealPairs,diag=F)]/KL_allRealPairs_w_rndzations[lower.tri(KL_allRealPairs_w_rndzations,diag=F)]
+  write(paste("Mean normalized KL distance difference (nES) for",nb_rndzations,"randomizations per topic =",mean(nES),"\n"),file=Stability_file,append=T)
+  ###
+  # Intercept of nES = f(llh) : 
+  fit2 = lm(nES[1:length(fitted_llh)] ~ fitted_llh)
+  write(paste("nES = f(llh difference) intercept =",fit2$coefficient[1],"\n"),file=Stability_file,append=T)  
+  ###
   SES_denominator = sqrt(mean(Var_KL_topic_comparison_randomized_allRealPairs[which(!is.na(Var_KL_topic_comparison_randomized_allRealPairs))]) -
                            mean(KL_allRealPairs_w_rndzations[lower.tri(KL_allRealPairs_w_rndzations,diag=F)])^2)
   SES = mean(DKL100_allRealPairs[which(!is.na(DKL100_allRealPairs))])/SES_denominator
   write(paste("Mean standardized KL distance difference (SES) for",nb_rndzations,"randomizations per topic =",SES,"\n"),file=Stability_file,append=T)
-  
+  ###
   SES_topicByTopic = mean(SES_allRealPairs[which(!is.na(SES_allRealPairs))])
   write(paste("Mean standardized KL distance difference (SES) computed topic by topic for",nb_rndzations,"randomizations per topic =",SES_topicByTopic,"\n"),file=Stability_file,append=T)
-  
+  ###
   write(paste("Mean p-value for",nb_rndzations,"randomizations per topic =",mean(p_value_allRealPairs[which(!is.na(p_value_allRealPairs))]),"\n"),file=Stability_file,append=T)
-  # Intercept of p-value = f(llh) : 
-  fit2 = lm(p_value_allRealPairs[1,-1] ~ fitted_llh)
-  write(paste("p-value = f(llh difference) intercept =",fit2$coefficient[1],"\n"),file=Stability_file,append=T)
   
   if (bij)
-    stability_data.frame = as.data.frame(matrix(nrow=nb_topics+1,ncol=10,data=0))
+    stability_data.frame = as.data.frame(matrix(nrow=nb_topics+1,ncol=11,data=0))
   else
-    stability_data.frame = as.data.frame(matrix(nrow=1,ncol=10,data=0))
+    stability_data.frame = as.data.frame(matrix(nrow=1,ncol=11,data=0))
   rownames(stability_data.frame)[1] = barcode_insert
   stability_data.frame[1,] = c(diversity$Diversity[nb_topics+1],
                              mean(Correlation_allRealPairs[which(Correlation_allRealPairs!=0)]),
                              mean(KL_allRealPairs[which(!is.na(KL_allRealPairs))]),
                              fit1$coefficient[1],
                              mean(DKL100_allRealPairs[which(!is.na(DKL100_allRealPairs))]),
+                             mean(nES),
+                             fit2$coefficient[1],
                              SES,
                              SES_topicByTopic,
                              mean(p_value_allRealPairs[which(!is.na(p_value_allRealPairs))]),
-                             fit2$coefficient[1],
                              alpha_est_mean)
   
-  # Computing the correspondence betwwen the topics of all realizations and the topics of the best realization
-  #   if ((j_select == 1) && realization_comparison)
-  #   {
-  #     Topic_correspondence_samplewise_to_best_real = list()
-  #     Topic_correspondence_samplewise_to_best_real[[1]] = seq(1,nb_topics,1)
-  #     for (j_real in 2:length_selected_real)
-  #     {
-  #       KL_samplewise_topic_comparison = matrix(nrow=nb_topics,ncol=nb_topics,data=0)
-  #       for (k in 1:nb_topics)
-  #       {
-  #         for (k1 in 1:nb_topics)
-  #         {
-  #           KL_samplewise_topic_comparison[k1,k] = 1/2*(KL.plugin(KL_documents_allreal[[j_real]][,k],KL_documents_allreal[[1]][,k1]) +
-  #                                                         KL.plugin(KL_documents_allreal[[1]][,k1],KL_documents_allreal[[j_real]][,k]))
-  #         }
-  #       }
-  #       KL_samplewise_topic_comparison[[j_real]]
-  #       
-  #       Best_topic_comparison_samplewise = apply(KL_samplewise_topic_comparison,1,min)
-  #       Topic_correspondence_samplewise = vector(length=nb_topics,mode="numeric")
-  #       for (k in 1:nb_topics)
-  #         Topic_correspondence_samplewise[k] = which(Best_topic_comparison_samplewise[k] == KL_samplewise_topic_comparison[[j_real]][k,])
-  #       Topic_correspondence_samplewise_to_best_real[[j_real]] = Topic_correspondence_samplewise
-  #     }
-  #   }
-  #   Topic_correspondence_samplewise_to_best_real[[j_real]][k]
-  
   if (bij)
-  {
+  {   
     # Comparing realizations topic by topic
     for (k in 1:nb_topics)
     {
@@ -4949,6 +4319,7 @@ if (select_real && realization_comparison)
       p_value = 0
       mean_KL = 0
       mean_DKL100 = 0
+      mean_nES = 0
       mean_KL_randomized = 0
       mean_SES_denominator = 0
       mean_correlation = 0
@@ -4957,7 +4328,8 @@ if (select_real && realization_comparison)
       {
         p_value = sum(p_value_allRealPairs_byTopic[[Topic_correspondence_to_best_real[[j_real]][k0]]][j_real,-(1:j_real)])/((length_selected_real-1)*length_selected_real/2) + p_value
         mean_KL = sum(KL_allRealPairs_byTopic[[Topic_correspondence_to_best_real[[j_real]][k0]]][j_real,-(1:j_real)])/((length_selected_real-1)*length_selected_real/2) + mean_KL
-        mean_DKL100 = sum(DKL100_allRealPairs_byTopic[[Topic_correspondence_to_best_real[[j_real]][k0]]][j_real,-(1:j_real)])/((length_selected_real-1)*length_selected_real/2) + mean_DKL100
+        mean_DKL100 = sum(DKL100_allRealPairs_byTopic[[Topic_correspondence_to_best_real[[j_real]][k0]]][j_real,-(1:j_real)])/((length_selected_real-1)*length_selected_real/2) + mean_DKL100 
+        mean_nES = sum(DKL100_allRealPairs_byTopic[[Topic_correspondence_to_best_real[[j_real]][k0]]][j_real,-(1:j_real)]/KL_allRealPairs_randomized_byTopic[[Topic_correspondence_to_best_real[[j_real]][k0]]][j_real,-(1:j_real)])/((length_selected_real-1)*length_selected_real/2) + mean_nES
         mean_KL_randomized = sum(KL_allRealPairs_randomized_byTopic[[Topic_correspondence_to_best_real[[j_real]][k0]]][j_real,-(1:j_real)])/((length_selected_real-1)*length_selected_real/2) + mean_KL_randomized
         mean_SES_denominator = sum(Var_KL_topic_comparison_randomized_allRealPairs_byTopic[[Topic_correspondence_to_best_real[[j_real]][k0]]][j_real,-(1:j_real)])/((length_selected_real-1)*length_selected_real/2) + mean_SES_denominator
         SES_topicByTopic = sum(SES_allRealPairs_byTopic[[Topic_correspondence_to_best_real[[j_real]][k0]]][j_real,-(1:j_real)])/((length_selected_real-1)*length_selected_real/2) + SES_topicByTopic
@@ -4969,8 +4341,8 @@ if (select_real && realization_comparison)
       # fit of SKL = f(llh) :
       fitted_llh = Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real]
       fit1 = lm(KL_allRealPairs_byTopic[[k0]][1,-1] ~ fitted_llh)
-      # fit of p-value = f(llh) :
-      fit2 = lm(p_value_allRealPairs_byTopic[[k0]][1,-1] ~ fitted_llh)
+      # fit of nES = f(llh) :
+      fit2 = lm(DKL100_allRealPairs_byTopic[[k0]][1,-1]/KL_allRealPairs_randomized_byTopic[[k0]][1,-1] ~ fitted_llh)
       
       if (data_pp && !testdata && (nb_topics == 3))
       {
@@ -4994,32 +4366,37 @@ if (select_real && realization_comparison)
       write(paste("Mean KL distance =",mean_KL,"\n"),file=Stability_file,append=T)
       write(paste("Mean KL distance = f(llh difference) intercept =",fit1$coefficient[1],"\n"),file=Stability_file,append=T)
       write(paste("Mean KL distance difference (ES) for",nb_rndzations,"randomizations per topic =",mean_DKL100,"\n"),file=Stability_file,append=T)
+      write(paste("Mean normalized KL distance difference (nES) for",nb_rndzations,"randomizations per topic =",mean_nES,"\n"),file=Stability_file,append=T)
+      write(paste("nES = f(llh difference) intercept =",fit2$coefficient[1],"\n"),file=Stability_file,append=T)
       write(paste("Mean standardized KL distance difference (SES) for",nb_rndzations,"randomizations per topic =",SES,"\n"),file=Stability_file,append=T)
       write(paste("Mean standardized KL distance difference (SES) computed topic by topic for",nb_rndzations,"randomizations per topic =",SES_topicByTopic,"\n"),file=Stability_file,append=T)
       write(paste("Mean p-value for",nb_rndzations,"randomizations per topic =",p_value,"\n"),file=Stability_file,append=T)
-      write(paste("p-value = f(llh difference) intercept =",fit2$coefficient[1],"\n"),file=Stability_file,append=T)
       
       stability_data.frame[k+1,] = c(diversity$Diversity[k],
                                      mean_correlation,
                                      mean_KL,
                                      fit1$coefficient[1],
                                      mean_DKL100,
+                                     mean_nES,
+                                     fit2$coefficient[1],
                                      SES,
                                      SES_topicByTopic,
                                      p_value,
-                                     fit2$coefficient[1],
                                      NA)
     }
   }
 
-  colnames(stability_data.frame) = c("Diversity","Correlation","SKL","SKL=f(llh) intercept","ES","Total SES","Mean SES over assemblages","p-value","p-value=f(llh) intercept","alpha")
+  colnames(stability_data.frame) = c("Diversity","Correlation","SKL","SKL=f(llh) intercept","ES","Normalized ES","Normalized ES=f(llh) intercept","Total SES","Mean SES over assemblages","p-value","alpha")
   saveRDS(stability_data.frame,file="stability_data.frame.rds")
-  
+  setwd(local_subdirname)
+  write.csv(stability_data.frame,paste0("Stability_",MOTU_sample_insert,"_",bij_insert,".csv"))
+  setwd(realization_comparison_dirname)
+
   #########
   # Plots #
   #########
   
-  pdf(paste0("Topic_KL_distance_",MOTU_sample_insert,"_between_real_color2D.pdf"))
+  pdf(paste0("SKL_",MOTU_sample_insert,"_RealByReal_color2D.pdf"))
   # 2 topics :
   #par(mfrow=c(2,1))
   # 5 topics :
@@ -5049,81 +4426,32 @@ if (select_real && realization_comparison)
   }
   dev.off()
   
-  #     pdf("Topic_KL_distance_MOTUwise_between_real_color2D.pdf")
-  #     # 2 topics :
-  #     #par(mfrow=c(2,1))
-  #     # 5 topics :
-  #     #par(mfrow=c(3,2))
-  #     # 10 topics
-  #     par(mfrow=c(4,4))
-  #     #par(mar=c(5.1,4.1,4.1,2.1)
-  #     par(mar=c(5.1,5.1,4.1,2.1))
-  #     for (j_select in 2:length_selected_real)
-  #     {
-  #       if (j_select == 2)
-  #         tag = "nd"
-  #       else if (j_select == 3)
-  #         tag = "rd"
-  #       else tag = "th"
-  #       
-  #       color2D.matplot(KL_MOTUwise[[j_select-1]],c(0,1),c(0,0),c(1,0),
-  #                       extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Topics in the ",Selected_real[j_select],tag," best realization",sep=""),
-  #                       ylab="Topics in the best realization",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                       border="black",na.color="white",main=paste(Selected_real[j_select],tag," best realization",sep=""))
-  #     }
-  #     dev.off()
+#   pdf(paste0("Correlation_",MOTU_sample_insert,"_RealByReal_color2D.pdf"))
+#   # 2 topics :
+#   #par(mfrow=c(2,1))
+#   # 5 topics :
+#   #par(mfrow=c(3,2))
+#   # 10 topics
+#   par(mfrow=c(4,4))
+#   #par(mar=c(5.1,4.1,4.1,2.1)
+#   par(mar=c(5.1,5.1,4.1,2.1))
+#   for (j_select in 2:length_selected_real)
+#   {
+#     if (j_select == 2)
+#       tag = "nd"
+#     else if (j_select == 3)
+#       tag = "rd"
+#     else tag = "th"
+#     
+#     # red-grey-blue divergence_hcl(3) color scale: c(142/255,226/255,2/255),c(6/255,226/255,63/255),c(59/255,226/255,165/255)
+#     color2D.matplot(Correlation[[j_select-1]],c(0,1),c(0,0),c(1,0),xrange=c(-1,1),
+#                     extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Topics in the ",Selected_real[j_select],tag," best realization",sep=""),
+#                     ylab="Topics in the best realization",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
+#                     border="black",na.color="white",main=paste(Selected_real[j_select],tag," best realization",sep=""))
+#   }
+#   dev.off()
   
-  #     pdf("Topic_correlation_MOTUwise_between_real_color2D.pdf")
-  #     # 2 topics :
-  #     #par(mfrow=c(2,1))
-  #     # 5 topics :
-  #     #par(mfrow=c(3,2))
-  #     # 10 topics
-  #     par(mfrow=c(4,4))
-  #     #par(mar=c(5.1,4.1,4.1,2.1)
-  #     par(mar=c(5.1,5.1,4.1,2.1))
-  #     for (j_select in 2:length_selected_real)
-  #     {
-  #       if (j_select == 2)
-  #         tag = "nd"
-  #       else if (j_select == 3)
-  #         tag = "rd"
-  #       else tag = "th"
-  #       
-  #       # red-grey-blue divergence_hcl(3) color scale: c(142/255,226/255,2/255),c(6/255,226/255,63/255),c(59/255,226/255,165/255)
-  #       color2D.matplot(Correlation_MOTUwise[[j_select-1]],c(0,1),c(0,0),c(1,0),xrange=c(-1,1),
-  #                       extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Topics in the ",Selected_real[j_select],tag," best realization",sep=""),
-  #                       ylab="Topics in the best realization",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                       border="black",na.color="white",main=paste(Selected_real[j_select],tag," best realization",sep=""))
-  #     }
-  #     dev.off()
-  
-  pdf(paste0("Topic_correlation_",MOTU_sample_insert,"_between_real_color2D.pdf"))
-  # 2 topics :
-  #par(mfrow=c(2,1))
-  # 5 topics :
-  #par(mfrow=c(3,2))
-  # 10 topics
-  par(mfrow=c(4,4))
-  #par(mar=c(5.1,4.1,4.1,2.1)
-  par(mar=c(5.1,5.1,4.1,2.1))
-  for (j_select in 2:length_selected_real)
-  {
-    if (j_select == 2)
-      tag = "nd"
-    else if (j_select == 3)
-      tag = "rd"
-    else tag = "th"
-    
-    # red-grey-blue divergence_hcl(3) color scale: c(142/255,226/255,2/255),c(6/255,226/255,63/255),c(59/255,226/255,165/255)
-    color2D.matplot(Correlation[[j_select-1]],c(0,1),c(0,0),c(1,0),xrange=c(-1,1),
-                    extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Topics in the ",Selected_real[j_select],tag," best realization",sep=""),
-                    ylab="Topics in the best realization",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-                    border="black",na.color="white",main=paste(Selected_real[j_select],tag," best realization",sep=""))
-  }
-  dev.off()
-  
-  pdf(paste0("KL_distance_matrix_",MOTU_sample_insert,"_color2D.pdf"))
+  pdf(paste0("SKL_",MOTU_sample_insert,"_allRealMatrix_color2D.pdf"))
   # 2 topics :
   #par(mfrow=c(2,1))
   # 5 topics :
@@ -5139,7 +4467,7 @@ if (select_real && realization_comparison)
   
   if (max(p_value_allRealPairs[!is.na(p_value_allRealPairs)])!=0)
   {
-    pdf(paste0("p-value_matrix_based_on_KL_",MOTU_sample_insert,"_color2D.pdf"))
+    pdf(paste0("p-value_",MOTU_sample_insert,"_allRealMatrix_color2D.pdf"))
     #par(mar=c(5.1,4.1,4.1,2.1)
     par(mar=c(5.1,5.1,4.1,2.1))
     color2D.matplot(p_value_allRealPairs,c(0,1),c(0,0),c(1,0),
@@ -5149,7 +4477,7 @@ if (select_real && realization_comparison)
     dev.off()
   }
   
-  pdf(paste0("KL_distance_matrix_",MOTU_sample_insert,"_randomized_and_non-randomized_color2D.pdf"))
+  pdf(paste0("SKL_",MOTU_sample_insert,"_allRealMatrix_wRandomizations_color2D.pdf"))
   # 2 topics :
   #par(mfrow=c(2,1))
   # 5 topics :
@@ -5163,30 +4491,22 @@ if (select_real && realization_comparison)
                   border="black",na.color="white")
   dev.off()
   
-  #     pdf("KL_distance_matrix_samplewise_color2D.pdf")
-  #     par(mar=c(5.1,5.1,4.1,2.1))
-  #     color2D.matplot(DKL100_samplewise_allRealPairs[-nrow(DKL100_samplewise_allRealPairs),-1],c(0,1),c(0,0),c(1,0),
-  #                 extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Realizations ranked by decreasing likelihood",sep=""),
-  #                 ylab="Realizations ranked by decreasing likelihood",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                 border="black",na.color="white")
-  #     dev.off()
+#   pdf(paste0("Correlation_",MOTU_sample_insert,"_allRealMatrix_color2D.pdf"))
+#   # 2 topics :
+#   #par(mfrow=c(2,1))
+#   # 5 topics :
+#   #par(mfrow=c(3,2))
+#   # 10 topics
+#   #par(mar=c(5.1,4.1,4.1,2.1)
+#   par(mar=c(5.1,5.1,4.1,2.1))
+#   
+#   color2D.matplot(Correlation_allRealPairs[-nrow(Correlation_allRealPairs),-1],c(0,1),c(0,0),c(1,0),
+#                   extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Realizations ranked by decreasing likelihood",sep=""),
+#                   ylab="Realizations ranked by decreasing likelihood",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
+#                   border="black",na.color="white")
+#   dev.off()
   
-  pdf(paste0("Correlation_matrix_",MOTU_sample_insert,"_color2D.pdf"))
-  # 2 topics :
-  #par(mfrow=c(2,1))
-  # 5 topics :
-  #par(mfrow=c(3,2))
-  # 10 topics
-  #par(mar=c(5.1,4.1,4.1,2.1)
-  par(mar=c(5.1,5.1,4.1,2.1))
-  
-  color2D.matplot(Correlation_allRealPairs[-nrow(Correlation_allRealPairs),-1],c(0,1),c(0,0),c(1,0),
-                  extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Realizations ranked by decreasing likelihood",sep=""),
-                  ylab="Realizations ranked by decreasing likelihood",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-                  border="black",na.color="white")
-  dev.off()
-  
-  pdf(paste0("Topic_KL_",MOTU_sample_insert,"_between_all_real_pairs.pdf"))  
+  pdf(paste0("SKL_",MOTU_sample_insert,"_allRealPairs_vs_llh-diff.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
   par(mar = c(5, 5, 4, 3) + 0.1)
@@ -5196,94 +4516,33 @@ if (select_real && realization_comparison)
        xlab = "Loglikelihood difference", ylab = "KL distance")
   dev.off()
   
-  pdf(paste0("Topic_KL_difference_",MOTU_sample_insert,"_between_all_real_pairs_w_randomizations.pdf"))  
+  pdf(paste0("ES_",MOTU_sample_insert,"_allRealPairs_vs_llh-diff.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
   par(mar = c(5, 5, 4, 3) + 0.1)
   #     plot(seq(2,length_selected_real,1),apply(Topic_comparison,1,mean),ylim=c(0,1),type="p", main = "Averaged Hellinger similarity between\n the component communities in different realizations",
   #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")  
   if (length(which(!is.na(DKL100_allRealPairs))) != length(which(!is.na(llh_differences_allRealPairs))))
-    cat("\nError in DKL100_allRealPairs values")
+    stop("\nError in DKL100_allRealPairs values")
   plot(llh_differences_allRealPairs[!is.na(llh_differences_allRealPairs)],DKL100_allRealPairs[!is.na(DKL100_allRealPairs)],type="p", main = "Averaged KL distance difference between\n pairs of realizations",
        xlab = "Loglikelihood difference", ylab = "Difference of KL distance")
   dev.off()
-  
-  #     pdf("KL_distance_matrix_MOTUwise_color2D.pdf")
-  #     # 2 topics :
-  #     #par(mfrow=c(2,1))
-  #     # 5 topics :
-  #     #par(mfrow=c(3,2))
-  #     # 10 topics
-  #     #par(mar=c(5.1,4.1,4.1,2.1)
-  #     par(mar=c(5.1,5.1,4.1,2.1))
-  #     color2D.matplot(KL_MOTUwise_allRealPairs[-nrow(KL_samplewise_allRealPairs),-1],c(0,1),c(0,0),c(1,0),
-  #                     extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Realizations ranked by decreasing likelihood",sep=""),
-  #                     ylab="Realizations ranked by decreasing likelihood",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                     border="black",na.color="white")
-  #     dev.off()
-  #     
-  #     pdf("KL_distance_matrix_MOTUwise_color2D.pdf")
-  #     # 2 topics :
-  #     #par(mfrow=c(2,1))
-  #     # 5 topics :
-  #     #par(mfrow=c(3,2))
-  #     # 10 topics
-  #     #par(mar=c(5.1,4.1,4.1,2.1)
-  #     par(mar=c(5.1,5.1,4.1,2.1))
-  #     color2D.matplot(KL_MOTUwise_allRealPairs[-nrow(KL_MOTUwise_allRealPairs),-1],c(0,1),c(0,0),c(1,0),
-  #                     extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Realizations ranked by decreasing likelihood",sep=""),
-  #                     ylab="Realizations ranked by decreasing likelihood",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-  #                     border="black",na.color="white")
-  #     dev.off()
-  
-  ####################
-  #     Topic_comparison = matrix(nrow=length_selected_real-1,ncol=nb_topics)
-  #     for (j_select in 2:length_selected_real)
-  #       Topic_comparison[j_select-1,] = apply(Hellinger[[j_select-1]],1,max)
-  #     #save(Topic_comparison,file="Topic_comparison.Rdata")
-  
-  
-  #     pdf("Topic_KL_samplewise_between_real.pdf")
-  #     par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-  #     # par(mar = c(bottom, left, top, right))
-  #     par(mar = c(5, 5, 4, 3) + 0.1)
-  #     for (k in 1:nb_topics)
-  #     {
-  #       if (k == 1)
-  #         tag = "st"
-  #       else if (k == 2)
-  #         tag = "nd"
-  #       else if (k == 3)
-  #         tag = "rd"
-  #       else tag = "th"
-  #       plot(seq(2,length_selected_real,1),Topic_comparison[,k],ylim=c(0,1),type="p",main = paste("Hellinger similarity between the\n ",k,tag," component community in different realizations",sep=""),
-  #            xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")
-  #       if (barcode_itsfungi) 
-  #         lines(c(0,100),c(0.25,0.25),type="l",lty=2)
-  #       else if (barcode_16sbact) 
-  #         lines(c(0,100),c(0.37,0.37),type="l",lty=2)
-  #       else if (barcode_18smetazoa) 
-  #         lines(c(0,100),c(0.39,0.39),type="l",lty=2)
-  #       else if (barcode_16sarch) 
-  #         lines(c(0,100),c(0.30,0.30),type="l",lty=2)    
-  #       else if (barcode_gh) 
-  #         lines(c(0,100),c(0.30,0.30),type="l",lty=2)
-  #     }
-  #     dev.off()
-  
-  pdf(paste0("Topic_KL_",MOTU_sample_insert,"_between_real_averaged_vs_llh_difference.pdf")) 
+
+  pdf(paste0("nES_",MOTU_sample_insert,"_allRealPairs_vs_llh-diff.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
   par(mar = c(5, 5, 4, 3) + 0.1)
   #     plot(seq(2,length_selected_real,1),apply(Topic_comparison,1,mean),ylim=c(0,1),type="p", main = "Averaged Hellinger similarity between\n the component communities in different realizations",
-  #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")
-  plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],KL_allRealPairs[1,-1],type="p", main = "Averaged KL distance between\n the component communities in different realizations",
-       xlab = "Loglikelihood difference with best realization", ylab = "KL distance to best realization")
+  #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")  
+  if (length(which(!is.na(DKL100_allRealPairs))) != length(which(!is.na(llh_differences_allRealPairs))))
+    stop("\nError in DKL100_allRealPairs values")
+  plot(t(llh_differences_allRealPairs)[lower.tri(llh_differences_allRealPairs,diag=F)],nES,type="p", main = "Normalized KL distance difference between\n pairs of realizations",
+      xlab = "Loglikelihood difference", ylab = "Normalized Effect Size")
   dev.off()
   
   if (bij)
   {
-    pdf(paste0("Topic_KL_",MOTU_sample_insert,"_between_real_averaged_topic_by_topic_vs_llh_difference.pdf"))  
+    pdf(paste0("SKL_",MOTU_sample_insert,"_toBestReal_byTopic_vs_llh-diff.pdf"))  
     par(mfrow=c(2,2))
     for (k in 1:nb_topics)
     {
@@ -5298,7 +4557,7 @@ if (select_real && realization_comparison)
     }
     dev.off()
     
-    pdf(paste0("Topic_KL_",MOTU_sample_insert,"_between_real_averaged_topic_by_topic_vs_rank.pdf"))  
+    pdf(paste0("SKL_",MOTU_sample_insert,"_toBestReal_byTopic_vs_rank.pdf"))  
     par(mfrow=c(2,2))
     for (k in 1:nb_topics)
     {
@@ -5312,9 +4571,38 @@ if (select_real && realization_comparison)
            xlab = "Realizations sorted\n by decreasing llh", ylab = "KL distance\n to best realization")
     }
     dev.off()
+    
+    nES_byTopic = list()
+    for (k in 1:nb_topics)
+      nES_byTopic[[k]] = t(DKL100_allRealPairs_byTopic[[k]])[lower.tri(DKL100_allRealPairs_byTopic[[k]],diag=F)]/t(KL_allRealPairs_randomized_byTopic[[k]])[lower.tri(KL_allRealPairs_randomized_byTopic[[k]],diag=F)]
+    
+    pdf(paste0("nES_",MOTU_sample_insert,"_toBestReal_byTopic_vs_llh-diff.pdf"))  
+    par(mfrow=c(2,2))
+    for (k in 1:nb_topics)
+    {
+      par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
+      # par(mar = c(bottom, left, top, right))
+      par(mar = c(5, 5, 4, 3) + 0.1)
+      #     plot(seq(2,length_selected_real,1),apply(Topic_comparison,1,mean),ylim=c(0,1),type="p", main = "Averaged Hellinger similarity between\n the component communities in different realizations",
+      #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")   
+      plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],nES_byTopic[[rev(sort_normal_topic_allreal[[1]]$ix)[k]]][1:(length_selected_real-1)],
+           type="p", main = paste("Averaged KL distance\n assemblage", k),
+           xlab = "Loglikelihood difference\n with best realization", ylab = "Normalized Effect Size")
+    }
+    dev.off()
   }
   
-  pdf(paste0("Topic_KL_",MOTU_sample_insert,"_between_real_averaged_vs_rank.pdf"))  
+  pdf(paste0("SKL_",MOTU_sample_insert,"_toBestReal_vs_llh-diff.pdf")) 
+  par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
+  # par(mar = c(bottom, left, top, right))
+  par(mar = c(5, 5, 4, 3) + 0.1)
+  #     plot(seq(2,length_selected_real,1),apply(Topic_comparison,1,mean),ylim=c(0,1),type="p", main = "Averaged Hellinger similarity between\n the component communities in different realizations",
+  #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")
+  plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],KL_allRealPairs[1,-1],type="p", main = "Averaged KL distance between\n the component communities in different realizations",
+      xlab = "Loglikelihood difference with best realization", ylab = "KL distance to best realization")
+  dev.off()
+
+  pdf(paste0("SKL_",MOTU_sample_insert,"_toBestReal_vs_rank.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
   par(mar = c(5, 5, 4, 3) + 0.1)
@@ -5324,23 +4612,23 @@ if (select_real && realization_comparison)
        xlab = "Realizations sorted by decreasing llh", ylab = "KL distance to best realization")
   dev.off()
   
-  pdf(paste0("Topic_KL_difference_",MOTU_sample_insert,"_between_real_averaged_w_randomizations_vs_llh_difference.pdf"))  
+  pdf(paste0("ES_",MOTU_sample_insert,"_toBestReal_vs_llh-diff.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
   par(mar = c(5, 5, 4, 3) + 0.1)
   plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],DKL100_allRealPairs[1,-1],type="p", main = "Averaged KL distance diffrence between\n the component communities in different realizations",
        xlab = "Loglikelihood difference with best realization", ylab = "Difference in KL distance to best realization")
   dev.off()
-  
-  pdf(paste0("Topic_KL_difference_",MOTU_sample_insert,"_between_real_averaged_vs_p-value.pdf"))  
+
+  pdf(paste0("nES_",MOTU_sample_insert,"_toBestReal_vs_llh-diff.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
   par(mar = c(5, 5, 4, 3) + 0.1)
-  plot(p_value_allRealPairs[1,-1],DKL100_allRealPairs[1,-1],type="p", main = "Averaged KL distance diffrence between\n the component communities in different realizations",
-       xlab = "p-value", ylab = "Difference in KL distance to best realization", xlim=range(p_value_allRealPairs[1,-1]))
+  plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],nES[1:(length_selected_real-1)],type="p", main = "Averaged KL distance diffrence between\n the component communities in different realizations",
+     xlab = "Loglikelihood difference with best realization", ylab = "Normalized Effect Size")
   dev.off()
   
-  pdf(paste0("p-value_",MOTU_sample_insert,"_averaged_vs_llh_difference.pdf"))  
+  pdf(paste0("p-value_",MOTU_sample_insert,"_toBestReal_vs_llh-diff.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
   par(mar = c(5, 5, 4, 3) + 0.1)
@@ -5348,64 +4636,11 @@ if (select_real && realization_comparison)
        xlab = "Llh difference with best realization", ylab = "p-value wrt best realization", xlim=range(p_value_allRealPairs[1,-1]))
   dev.off()
   
-  pdf("Topic_KL_difference_between_real_averaged_w_randomizations_vs_rank.pdf")  
-  par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-  # par(mar = c(bottom, left, top, right))
-  par(mar = c(5, 5, 4, 3) + 0.1)
-  #     plot(seq(2,length_selected_real,1),apply(Topic_comparison,1,mean),ylim=c(0,1),type="p", main = "Averaged Hellinger similarity between\n the component communities in different realizations",
-  #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")
-  plot(seq(2,length_selected_real,1),DKL100_allRealPairs[1,-1],type="p", main = "Averaged KL distance difference between\n the component communities in different realizations",
-       xlab = "Realizations sorted by decreasing llh", ylab = "Difference in KL distance to best realization")
-  dev.off()
-  
-  #     pdf("Topic_KL_MOTUwise_between_real.pdf")  
-  #     par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-  #     # par(mar = c(bottom, left, top, right))
-  #     par(mar = c(5, 5, 4, 3) + 0.1)
-  #     #     plot(seq(2,length_selected_real,1),apply(Topic_comparison,1,mean),ylim=c(0,1),type="p", main = "Averaged Hellinger similarity between\n the component communities in different realizations",
-  #     #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")
-  #     plot(seq(2,length_selected_real,1),KL_MOTUwise_allRealPairs[1,-1],type="p", main = "Averaged KL distance MOTUwise between\n the component communities in different realizations",
-  #          xlab = "Realizations ranked by decreasing likelihood", ylab = "KL distance MOTUwise")
-  #     dev.off()
-  
-  ####################
-  #     Topic_comparison_cor = matrix(nrow=length_selected_real-1,ncol=nb_topics)
-  #     for (j_select in 2:length_selected_real)
-  #       Topic_comparison_cor[j_select-1,] = apply(Correlation[[j_select-1]],1,max)
-  
-  #     pdf("Topic_correlation_between_real.pdf")
-  #     par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-  #     for (k in 1:nb_topics)
-  #     {
-  #       if (k == 1)
-  #         tag = "st"
-  #       else if (k == 2)
-  #         tag = "nd"
-  #       else if (k == 3)
-  #         tag = "rd"
-  #       else tag = "th"
-  #       plot(seq(2,length_selected_real,1),Topic_comparison_cor[,k],type="p",main = paste("Correlation between the\n ",k,tag," component community in different realizations",sep=""),
-  #            xlab = "Realizations ranked by decreasing likelihood", ylab = "Correlation coefficient")
-  #     }
-  #     dev.off()
-  
-  pdf(paste0("Topic_correlation_",MOTU_sample_insert,"_between_real_averaged.pdf"))  
+  pdf(paste0("Correlation_",MOTU_sample_insert,"_toBestReal_vs_llh-diff.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],Correlation_allRealPairs[1,-1],type="p", main = "Averaged correlation between\n the component communities in different realizations",
        xlab = "Loglikelihood difference with best realization", ylab = "Correlation coefficient with best realization")
   dev.off()
-  
-  pdf(paste0("Topic_correlation_",MOTU_sample_insert,"_between_real_averaged_vs_rank.pdf"))  
-  par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-  plot(seq(2,length_selected_real,1),Correlation_allRealPairs[1,-1],type="p", main = "Averaged correlation between\n the component communities in different realizations",
-       xlab = "Realizations sorted by decreasing llh", ylab = "Correlation coefficient with best realization")
-  dev.off()
-  
-  #     pdf("Topic_correlation_MOTUwise_between_real_averaged.pdf")  
-  #     par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-  #     plot(seq(2,length_selected_real,1),Correlation_MOTUwise_allRealPairs[1,-1],type="p", main = "Averaged correlation MOTUwise between\n the component communities in different realizations",
-  #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Correlation coefficient")
-  #     dev.off()
   
   # Back to the main directory
   setwd(local_subdirname)
@@ -5631,6 +4866,8 @@ if (data_betadiv_pooled)
   # if (!(file.exists(dirname)))
   #   {dir.create(dirname)}
   # setwd(subdirname)
+  
+  save(nb_topics_range,LLH_final0,AIC0,AIC1,file="AIC-llh.Rdata")
   
   if (mnb_topics)
   {
