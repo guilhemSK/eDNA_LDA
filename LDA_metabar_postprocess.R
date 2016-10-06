@@ -1,37 +1,5 @@
 #!/usr/bin/env Rscript
 
-# To use command-line arguments:
-#library(optparse)
-# To use color2D.matplot function :
-library(plotrix)
-# To use errbar function :
-library(Hmisc)
-# To use dudi.pca function :
-library(ade4)
-# To use rainbow_hcl function :
-library(colorspace)
-#library(lattice)
-# To compute KL divergence using KL.plugin:
-library(entropy)
-# To perform kriging:
-library(kriging)
-# To plot the kriged maps:
-library(ggplot2)
-library(gridExtra)
-library(scales)
-library(gstat)
-# To call grid.newpage()
-library(grid)
-# To plot shapes using readOGR:
-library(rgdal)
-library(sp)
-library(rgeos)
-library(maptools)
-# To use raster manipulating functions:
-library(raster)
-# To use coltorgb:
-library(grDevices)
-
 # Exécution lda :
 #./lda est 0.1 20 settings.txt /Users/guilhemsommeria-klein/Desktop/These/Données_H20/Plantes_GH/H20_GH_sequences_lda_norep.txt random /Users/guilhemsommeria-klein/Desktop/These/Données_H20/algo_result1
 #Exécution hdp-faster :
@@ -48,6 +16,82 @@ library(grDevices)
 # ssh gsommeria@genotoul.toulouse.inra.fr
 # sshfs gsommeria@genotoul.toulouse.inra.fr:/home/gsommeria/ /Users/guilhemsommeria-klein/Desktop/Serveur_Genotoul.home/ 
 # sshfs gsommeria@genotoul.toulouse.inra.fr:/home/gsommeria/work/ /Users/guilhemsommeria-klein/Desktop/Serveur_Genotoul.work/
+
+# Where the code is run from:
+locally_based = 1
+genotoul_cluster_based = 0
+EDB_cluster_based = 0
+
+if (locally_based)
+{
+  lib_path = "/Library/Frameworks/R.framework/Resources/library"
+} else if (genotoul_cluster_based)
+{
+  lib_path = "/home/gsommeria/packages_R/"
+} else if (EDB_cluster_based)
+{
+  lib_path = "/home/gsommeriaklein/packages_R/"
+  #lib_path = "/usr/lib64/R/library/"    
+}
+
+# To use command-line arguments:
+#library(optparse)
+# To use color2D.matplot function :
+library(plotrix)
+# To use errbar function :
+library(Hmisc)
+# To use dudi.pca function :
+library(ade4)
+# To use rainbow_hcl function :
+library(colorspace)
+#library(lattice)
+# To compute KL divergence using KL.plugin:
+library(entropy,lib.loc=lib_path)
+# To perform kriging:
+library(kriging,lib.loc=lib_path)
+# To plot the kriged maps:
+library(ggplot2)
+library(gridExtra)
+library(scales)
+if (genotoul_cluster_based)
+{
+  library(gstat,lib.loc=lib_path)
+} else
+{
+  library(gstat)
+}
+# To call grid.newpage()
+library(grid)
+# To plot shapes using readOGR (not available on cluster):
+if (locally_based)
+{
+  library(rgdal)
+  library(sp)
+  library(rgeos)
+  library(maptools)
+}
+# To use raster manipulating functions:
+if (genotoul_cluster_based)
+{
+  library(raster,lib.loc=lib_path)
+} else
+{
+  library(raster)
+}
+# To use coltorgb:
+library(grDevices)
+# To load results:
+if (genotoul_cluster_based)
+{
+  library(topicmodels,lib.loc=lib_path)
+} else
+{
+  library(topicmodels)
+}
+# To use the agnes function (hierarchical clustering):
+library(cluster)
+# To use the cophenetic function (cophenetic distance on a clustering tree):
+library(stats)
 
 ############################
 # Parsing command-line options
@@ -78,7 +122,7 @@ library(grDevices)
 local = 0
 # Existing LDA decomposition stored locally:
 existingresult = 1
-# Existing LDA decomposition stored on the Genotoul cluster:
+# Existing LDA decomposition stored on the Genotoul cluster, only available for locally_based = 1:
 cluster = 0
 
 if (local)
@@ -92,7 +136,7 @@ data_h20 = 0
 data_pp = 1
 # data_gs = 1 requires filled = 1:
 data_gs = 0
-filled = 0
+filled = 1
 data_betadiv = 0
 data_betadiv_pooled = 0
 
@@ -112,14 +156,14 @@ barcode_itsasco = 0
 barcode_itsbasidio = 0
 barcode_itsglomero = 0
 bacteriafungiarchaea = 0
-barcode_16sbact = 0
+barcode_16sbact = 1
 barcode_18s = 0
 barcode_18sfungi = 0
 barcode_18smetazoa = 0
 barcode_18sannelids = 0
 barcode_18sarthropods = 0
 barcode_18snematodes = 0
-barcode_18sprotists = 1
+barcode_18sprotists = 0
 barcode_18splatyhelminthes = 0
 barcode_18splants = 0
 barcode_16sarch = 0
@@ -139,13 +183,15 @@ frogs_poly2_open = 0
 
 # testdata = 1 requires data_pp = 1 and filled = 1
 testdata = 0
-testdata_dir = "Continuous-mixed_samples_nbtopics5_nbmotus1000_randomtopics_sampledreads"
+testdata_dir = "Continuous-mixed_samples_nbtopics5_nbmotus1000_dirichlettopics0.02_1000sampledreads"
+#testdata_dir = "Continuous-mixed_samples_nbtopics5_nbmotus1000_dirichlettopics0.02_1000sampledreads_lnornoise_sig0.5"
+#testdata_dir = "Continuous-mixed_samples_nbtopics5_nbmotus1000_randomtopics_sampledreads"
 # testdata_dir = "Continuous-mixed_samples_nbtopics5_nbmotus1000_randomtopics_sampledreads_lnornoise_sig1"
 nb_rndzations_true_documents = 10000
 # The baseline proportion of the topics in true_KL_documents in samples where they are actuallt absent
 # (added due to KL.pugin() taking only non-zero values as input)
 #true_KL_documents_baseline = 10^-6
-true_KL_documents_baseline = 10^-4
+#true_KL_documents_baseline = 1/1131000
 
 blei = 0
 Rtopicmodels_Gibbs = 0
@@ -190,8 +236,8 @@ select_real = 1
 # Selected_real must start at 1
 #Selected_real = c(seq(1,10,1),seq(91,100,1))
 #Selected_real = seq(1,100,1)
-Selected_real = seq(1,1,1)
-#Selected_real = 1
+#Selected_real = seq(1,100,1)
+Selected_real = 1
 
 # only useful for Gibbs sampling
 nb_iter = 2000
@@ -216,7 +262,7 @@ nb_abiotic_rndzations = 100000
 pca_abiotic = 0
 
 # Comparing realizations to each other
-realization_comparison = 0
+realization_comparison = 1
 # Comparing the realizations MOTUwise or samplewise (with spatial randomizations)
 # For testdata = 1, MOTUwise = 1 would require loading true_topic_compo (not done yet)
 samplewise = 1
@@ -227,10 +273,16 @@ bij = 1
 # Number of randomizations in computing the distance between realizations (only useful if realization_comparison=1)
 nb_rndzations = 1000
 
+# Comparing topics within the best realization:
+best_real_comparison = 0
+# Number of randomization in comparing the topics to each other
+nb_rndzations_best_real = 10000
+
 # kriging for the spatial distribution of topics in the best realization
 kriging = 0
 # required if kriging = 1, only the kriged_real are kriged (all kriged realizations must be included in Selected_real)
-kriged_real = seq(1,5,1)
+#kriged_real = seq(1,5,1)
+kriged_real = c(54,55)
 
 #########################
 #########################
@@ -238,6 +290,14 @@ kriged_real = seq(1,5,1)
 #########################
 #########################
 
+if (length(Selected_real)==1 && realization_comparison)
+  stop("Needs more than one realization to compare realizations")
+
+if (length(which(c(barcode_gh,barcode_ghassigned,barcode_itsfungi,barcode_itsasco,barcode_itsbasidio,barcode_itsglomero,bacteriafungiarchaea,barcode_16sbact,
+                   barcode_18s,barcode_18sfungi,barcode_18smetazoa,barcode_18sannelids,barcode_18sarthropods,barcode_18snematodes,barcode_18sprotists,
+                   barcode_18splatyhelminthes,barcode_18splants,barcode_16sarch,barcode_itsplant,barcode_16sins,plantfungi,frogs_iucn_all,frogs_iucn_forest,
+                   frogs_iucn_open,frogs_poly1_all,frogs_poly1_forest,frogs_poly1_open,frogs_poly2_all,frogs_poly2_forest,frogs_poly2_open)==1))>1)
+  stop("More than one barcode provided")
 
 ##################################
 # DATA LOADING AND PREPROCESSING #
@@ -385,7 +445,17 @@ if (blei) {
 
 #cluster_prefix = "/Users/guilhemsommeria-klein/Desktop/Serveur_EDB/"
 cluster_prefix = "/Users/guilhemsommeria-klein/Desktop/Serveur_Genotoul.work/"
-local_prefix = "/Users/guilhemsommeria-klein/Desktop/These/" 
+if (genotoul_cluster_based)
+{
+  local_prefix = "/home/gsommeria/work/"
+} else if (EDB_cluster_based)
+{
+  local_prefix = "/home/gsommeriaklein/"
+} else if (locally_based)
+{
+  local_prefix = "/Users/guilhemsommeria-klein/Desktop/These/" 
+  cluster_prefix = "/Users/guilhemsommeria-klein/Desktop/Serveur_Genotoul.work/"
+}
 
 if (occurrence)
 {
@@ -423,7 +493,7 @@ if (bij) {
 
 # H20_GH.R (retrieve general information on the original data) :
 ###############
-setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/",barcode_insert,"/",sep=""))
+setwd(paste(local_prefix,data_insert,"/",barcode_insert,"/",sep=""))
 # taxo_ref <- read.table(paste(short_data_insert,"_",short_barcode_insert,"_taxo_ref_table.txt",sep=""), sep=" ")
 if (plantfungi)
 {
@@ -1311,14 +1381,14 @@ for (par_index in 1:mpar_range)
           #nb_terms1 = Result[[j]]@fitted[[1]]@wordassignments$ncol
           #nb_doc = Result[[j]]@fitted[[1]]@wordassignments$nrow
           LLH1[j,] = Result[[j]]@fitted[[1]]@logLiks
-#           LLH0[1,] = Result[[j]]@fitted[[1]]@logLiks/nb_real + LLH0[1,]
-#           LLH0[2,] = Result[[j]]@fitted[[1]]@logLiks^2/nb_real + LLH0[2,]
+          #           LLH0[1,] = Result[[j]]@fitted[[1]]@logLiks/nb_real + LLH0[1,]
+          #           LLH0[2,] = Result[[j]]@fitted[[1]]@logLiks^2/nb_real + LLH0[2,]
           #llh[j] = Result[[j]]@fitted[[1]]@loglikelihood
         }
         LLH0[1,] = apply(LLH1,2,mean)
         LLH0[2,] = apply(LLH1,2,sd)
-#         LLH0[2,] = LLH0[2,] - LLH0[1,]^2
-#         LLH0[2,] = sqrt(LLH0[2,])
+        #         LLH0[2,] = LLH0[2,] - LLH0[1,]^2
+        #         LLH0[2,] = sqrt(LLH0[2,])
       } else if (Rtopicmodels_VEM)
       {
         # different number of iterations for each realization
@@ -1374,7 +1444,7 @@ if (!mpar)
   } else if ((!select_real && best_keep) || best)
     length_selected_real = 1
   
-  if (select_real && (testdata || data_betadiv_pooled))
+  if (select_real && (testdata || data_betadiv_pooled) && realization_comparison)
     Correlation_old = vector(mode="list",length=length_selected_real-1)
   
   if (select_real && realization_comparison)
@@ -1545,23 +1615,24 @@ if (!mpar)
     # nrow(documents) = nb_doc and ncol(documents) = nb_topics
     
     # saving the result of all realizations, without reordering the MOTUs as in topic_compo
-    topic_compo_notaxo = matrix(nrow=nb_terms,ncol=nb_topics,data=0)
+    topic_compo = matrix(nrow=nb_terms,ncol=nb_topics,data=0)
     for (k in 1:nb_topics)
-      topic_compo_notaxo[,k] = exp(t(logbeta[k,]))
-    KL_topic_compo_notaxo = topic_compo_notaxo
-    KL_topic_compo_notaxo[which(topic_compo_notaxo < 1/sum(data2m))] = 1/sum(data2m)
-    KL_topic_compo_notaxo = sweep(KL_topic_compo_notaxo,MARGIN=2,colSums(KL_topic_compo_notaxo),`/`)   
+      topic_compo[,k] = exp(t(logbeta[k,]))
+    KL_topic_compo = topic_compo
+    KL_topic_compo[which(topic_compo < 1/sum(data2m))] = 1/sum(data2m)
+    KL_topic_compo = sweep(KL_topic_compo,MARGIN=2,colSums(KL_topic_compo),`/`)   
     
     # setting the minimal proportion of a topic in a sample as 1/#readsInSample :
     #     for (i in 1:nrow(documents))
     #       documents[which(documents[i,]<1/sum(data2m[,i]))] = 1/sum(data2m[,i])
-    # setting the minimal proportion of a topic in a sample as 1/total#reads (same as for the minimal proportion of an OTU in a sample) :
+    # setting the minimal proportion of a topic in a sample as 1/total#reads (same as for the minimal proportion of an OTU in a sample)
+    # in the case of occurrence data, it is the sum of OTU occurrences over the dataset (the total number of reads would be given by sum(count2) for occurrence data)
     KL_documents = documents
     KL_documents[which(documents < 1/sum(data2m))] = 1/sum(data2m)
     
     # documents : propotion of each topic in a site/document (sums to 1 over topics)
     # KL_documents : propotion of each site/document in a topic (sums to 1 over sites/documents)
-#     KL_documents = sweep(documents,MARGIN=2,colSums(documents),`/`)
+    #     KL_documents = sweep(documents,MARGIN=2,colSums(documents),`/`)
     KL_documents = sweep(KL_documents,MARGIN=2,colSums(KL_documents),`/`)
     
     # smoothed_KL_documents = sweep(documents+1,MARGIN=2,colSums(documents)+nb_doc,`/`)
@@ -1572,8 +1643,8 @@ if (!mpar)
       documents_allreal[[j_select]] = documents
       KL_documents_allreal[[j_select]] = KL_documents
       
-      topic_compo_allreal[[j_select]] = topic_compo_notaxo
-      KL_topic_compo_allreal[[j_select]] = KL_topic_compo_notaxo
+      topic_compo_allreal[[j_select]] = topic_compo
+      KL_topic_compo_allreal[[j_select]] = KL_topic_compo
     }
     
     # Topic dominance calculations
@@ -1657,7 +1728,7 @@ if (!mpar)
     
     # Saving topic composition
     ###########################################
-    topic_compo = vector(length = nb_topics, mode = "list")
+    topic_compo_taxo = vector(length = nb_topics, mode = "list")
     for (k in 1:nb_topics)
     {
       # saving the result of all realizations, without reordering the MOTUs
@@ -1674,7 +1745,7 @@ if (!mpar)
       colnames(mat)=taxo_ref_names
       #topic_compo1=data.frame(vect,cbind(mat[1:(length(taxo_ref[1,])+1),]))
       #topic_compo1=data.frame(vect,mat)
-      topic_compo[[k]]=data.frame(proba,mat)
+      topic_compo_taxo[[k]]=data.frame(proba,mat)
       #     for (i in 1:nb_terms)
       #     {
       #     #topic_compo_index[i]=taxo_ref[i+1,1]
@@ -1684,7 +1755,7 @@ if (!mpar)
       {
         #topic_compo_index[i]=taxo_ref[i+1,1]
         for (j in 1:length(taxo_ref[1,]))
-          topic_compo[[k]][i,j+1]=as.character(taxo_ref[vect$ix[i]+1,j])
+          topic_compo_taxo[[k]][i,j+1]=as.character(taxo_ref[vect$ix[i]+1,j])
       }
     }
     
@@ -1694,7 +1765,7 @@ if (!mpar)
     
     # Computing the correlation between topics (columns) over sites (lines):
     # -> Redundant with Correlation_samplewise up to the ordering of the topics, but used for testdata=1 and data_betadiv_pooled=1
-    if ((j_select != 1) && (testdata || data_betadiv_pooled) && select_real)
+    if ((j_select != 1) && (testdata || data_betadiv_pooled) && select_real && realization_comparison)
       Correlation_old[[j_select-1]] = cor(documents_allreal[[1]],documents)
     # Correlation_samplewise[[j_select-1]] = cor(topic_compo_allreal[[1]],topic_compo_allreal[[j_select]][,Topic_correspondence_samplewise])
     
@@ -2120,7 +2191,7 @@ if (!mpar)
         
         if (case == "chemi")
         {
-          setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Chemistery/",sep=""))
+          setwd(paste(local_prefix,data_insert,"/Chemistery/",sep=""))
           # produces a dataframe with columns as vectors instead of factors (otherwise one cannot direclty apply "as.numeric" to the values)
           data_abiotic = read.table("chemistry_pred_CRIJ.txt",sep=" ",colClasses="vector")
           data_abiotic = apply(data_abiotic,2,as.numeric)
@@ -2128,7 +2199,7 @@ if (!mpar)
         } else if (case == "lidar")
         {
           # Lidar data
-          setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/",sep=""))
+          setwd(paste(local_prefix,data_insert,"/Lidar/",sep=""))
           data_abiotic_data.frame = read.table("Lidar_locsites_E20_origin_mean_10_extended.csv",colClasses="vector",sep=";")
           data_abiotic = matrix(nrow=length(data_abiotic_data.frame$V5[-1]),ncol=11)
           colnames(data_abiotic) = c("Topography","Canopy height","Light","Wetness","Slope","Canopy height difference 2008-2012","Tree density","Number of tree deaths 2008-2012","Loss of above-ground biomass 2008-2012","Slope standard deviation","Slope (log)")
@@ -2154,7 +2225,7 @@ if (!mpar)
         } else if (case == "climate")
         {
           # Lidar data
-          setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Climate/",sep=""))
+          setwd(paste(local_prefix,data_insert,"/Climate/",sep=""))
           #data_abiotic = GDALinfo("Isothermality.grd")
           isothermality = as.data.frame(raster("Isothermality.grd"), row.names=NULL, optional=T, xy=TRUE, na.rm=T, long=FALSE)
           data_abiotic = matrix(nrow = nrow(isothermality), ncol = 5, data=0)
@@ -2230,19 +2301,34 @@ if (!mpar)
           data_abiotic1 = matrix(nrow = ncol(data2m), ncol = ncol0+3)
           data_abiotic1[,1:ncol0] = data_abiotic
           
-          setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert))
-          documents_bacteria = readRDS("documents_bacteria_PP_3topics_best_real.rds")
-          if (!filled || filled_with_gaps)
-            documents_bacteria = documents_bacteria[-which(Missing_positions_indices==1),]
+          setwd(paste0(local_prefix,data_insert))
+          if (!occurrence)
+            documents_bacteria = readRDS("documents_bacteria_PP_3topics_best_real.rds")
+          else if (occurrence)
+            documents_bacteria = readRDS("documents_bacteria_PP_3topics_occ_best_real.rds")
+          if (!filled || filled_with_gaps) 
+            documents_bacteria = documents_bacteria[-which(Missing_positions_indices==1),] 
           if (case == "lidar") {
-            setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/"))
+            setwd(paste0(local_prefix,data_insert,"/Lidar/"))
           } else if (case == "chemi")
-            setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Chemistery/",sep=""))
+            setwd(paste(local_prefix,data_insert,"/Chemistery/",sep=""))
           data_abiotic1[,(ncol0+1):(ncol0+3)] = documents_bacteria
           colnames(data_abiotic1) = c(colnames(data_abiotic),"Terra firme","Hydromorphic","Exposed rock")
           colnames_abiotic = colnames(data_abiotic1)
           ncol1 = ncol(data_abiotic1)
           data_abiotic = data_abiotic1
+          
+          if (case == case_list[1])
+          {
+            KL_documents_bacteria = documents_bacteria
+            #           if (occurrence)
+            #             KL_documents_bacteria[which(documents_bacteria < 1/2008486)] = 1/2008486
+            #           else if (!occurrence)
+            #             KL_documents_bacteria[which(documents_bacteria < 1/21850334)] = 1/21850334
+            # Bacterial data are applied the same abundance threshold factor as the barcode of interest, so as to have the same minimal value in both distributions
+            KL_documents_bacteria[which(documents_bacteria < 1/sum(data2m))] = 1/sum(data2m)
+            KL_documents_bacteria = sweep(KL_documents_bacteria,MARGIN=2,colSums(KL_documents_bacteria),`/`)
+          }
         }
         
         #         if (case == "chemi")
@@ -2261,6 +2347,13 @@ if (!mpar)
         {
           Correlation_abiotic[[1]] = matrix(nrow = nb_topics, ncol = ncol1)
           Correlation_abiotic[[2]] = matrix(nrow = nb_topics, ncol = ncol1)
+          
+          if (case == case_list[1])
+          {
+            SKL_bacteria = list()
+            SKL_bacteria[[1]] = matrix(nrow = nb_topics, ncol = nb_topics)
+            SKL_bacteria[[2]] = matrix(nrow = nb_topics, ncol = nb_topics)
+          }
         } else
         {
           Correlation_abiotic[[1]] = matrix(nrow = nb_topics, ncol = ncol0)
@@ -2275,13 +2368,20 @@ if (!mpar)
         if (nb_topics == 3 && data_pp)
         {
           Mean_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol1,data=0)
-          Var_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol1,data=0)
+          Sd_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol1,data=0)
           p_value_abiotic = matrix(nrow=nb_topics,ncol=ncol1,data=0)
           j_abiotic_range = ncol1
+          
+          if (case == case_list[1])
+          {
+            Mean_SKL_bacteria_comparison_randomized = matrix(nrow=nb_topics,ncol=nb_topics,data=0)
+            Sd_SKL_bacteria_comparison_randomized = matrix(nrow=nb_topics,ncol=nb_topics,data=0)
+            p_value_SKL_bacteria = matrix(nrow=nb_topics,ncol=nb_topics,data=0)
+          }
         } else
         {
           Mean_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol0,data=0)
-          Var_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol0,data=0)
+          Sd_cor_abiotic_comparison_randomized = matrix(nrow=nb_topics,ncol=ncol0,data=0)
           p_value_abiotic = matrix(nrow=nb_topics,ncol=ncol0,data=0)
           j_abiotic_range = ncol0
         }
@@ -2291,14 +2391,16 @@ if (!mpar)
         
         for (j_abiotic in 1:j_abiotic_range)
         {
-          if ((j_abiotic == 1) && data_pp)
+          if ((j_abiotic == 1) && data_pp && (case == case_list[1]))
           {
             if (filled && !filled_with_gaps)
             { 
               documents_randomized = vector(length=nb_abiotic_rndzations,mode="list")
+              KL_documents_randomized = vector(length=nb_abiotic_rndzations,mode="list")
               for (rndzation in 1:nb_abiotic_rndzations)
               {
                 documents_randomized[[rndzation]] = matrix(nrow=ncol(data2m),ncol=nb_topics,data=0)
+                KL_documents_randomized[[rndzation]] = matrix(nrow=ncol(data2m),ncol=nb_topics,data=0)
                 # Performing spatial randomizations
                 for (k in 1:nb_topics)
                 {
@@ -2317,6 +2419,7 @@ if (!mpar)
                   else if (a==29)
                     Spatial_documents_randomized = Spatial_documents[,c((b+1):39,1:b)] 
                   documents_randomized[[rndzation]][,k] = as.vector(Spatial_documents_randomized)
+                  KL_documents_randomized[[rndzation]][,k] = documents_randomized[[rndzation]][,k]/sum(documents_randomized[[rndzation]][,k])
                 }
               }
             } else if (!filled || filled_with_gaps)
@@ -2341,9 +2444,11 @@ if (!mpar)
                 }
               }
               documents_randomized = vector(length=nb_abiotic_rndzations,mode="list")
+              KL_documents_randomized = vector(length=nb_abiotic_rndzations,mode="list")
               for (rndzation in 1:nb_abiotic_rndzations)
               {
                 documents_randomized[[rndzation]] = matrix(nrow=ncol(data2m),ncol=nb_topics,data=0)
+                KL_documents_randomized[[rndzation]] = matrix(nrow=ncol(data2m),ncol=nb_topics,data=0)
                 # Performing spatial randomizations
                 for (k in 1:nb_topics)
                 {
@@ -2361,6 +2466,7 @@ if (!mpar)
                   else if (a==29)
                     Spatial_documents_randomized = Spatial_documents[[k]][,c((b+1):39,1:b)] 
                   documents_randomized[[rndzation]][,k] = as.vector(Spatial_documents_randomized[!is.na(Spatial_documents_randomized)])
+                  KL_documents_randomized[[rndzation]][,k] = documents_randomized[[rndzation]][,k]/sum(documents_randomized[[rndzation]][,k])
                 }
               }
             }
@@ -2379,27 +2485,26 @@ if (!mpar)
               Correlation_abiotic[[4]][k,j_abiotic] = Cor_test$p.value
             }
             
+            # Randomizations not implemented yet for data_gs
             if (data_pp)
             {
               nb_non_significant_rndzations = 0
               #nb_non_significant_rndzations_PCA = 0
+              cor_abiotic_comparison_randomized = vector(length=nb_rndzations,mode="numeric")
               for (rndzation in 1:nb_rndzations) 
               {
-                cor_abiotic_comparison_randomized = cor(documents_randomized[[rndzation]][,k],data_abiotic[,j_abiotic])
+                cor_abiotic_comparison_randomized[rndzation] = cor(documents_randomized[[rndzation]][,k],data_abiotic[,j_abiotic])
                 
                 #               cor_abiotic_comparison_randomized_PCA = cor.test(documents_randomized[[rndzation]][,rev(sort_normal_topic$ix)[k]],lidar_PCA$li[,j])
                 #               if (Correlation_lidar[[3]][k,j] < cor_abiotic_comparison_randomized_PCA)
                 #                 nb_non_significant_rndzations_PCA = nb_non_significant_rndzations_PCA + 1
                 
                 
-                if (Correlation_abiotic[[1]][k,j_abiotic] < cor_abiotic_comparison_randomized)
+                if (Correlation_abiotic[[1]][k,j_abiotic] < cor_abiotic_comparison_randomized[rndzation])
                   nb_non_significant_rndzations = nb_non_significant_rndzations + 1
-                
-                Mean_cor_abiotic_comparison_randomized[k,j_abiotic] = 1/nb_rndzations*cor_abiotic_comparison_randomized +
-                  Mean_cor_abiotic_comparison_randomized[k,j_abiotic]
-                Var_cor_abiotic_comparison_randomized[k,j_abiotic] = cor_abiotic_comparison_randomized^2/nb_rndzations + 
-                  Var_cor_abiotic_comparison_randomized[k,j_abiotic]
               }
+              Mean_cor_abiotic_comparison_randomized[k,j_abiotic] = mean(cor_abiotic_comparison_randomized)
+              Sd_cor_abiotic_comparison_randomized[k,j_abiotic] = sd(cor_abiotic_comparison_randomized)
               
               if (Correlation_abiotic[[1]][k,j_abiotic] > 0)
                 p_value_abiotic[k,j_abiotic] = nb_non_significant_rndzations/nb_rndzations
@@ -2410,6 +2515,39 @@ if (!mpar)
           # End loop over j_abiotic  :
         }
         
+        if (data_pp && (nb_topics == 3) && (case == case_list[1]))
+        {
+          for (j_abiotic in 1:nb_topics)
+          {
+            for (k in 1:nb_topics)
+            {
+              SKL_bacteria[[1]][k,j_abiotic] = 1/2*(KL.plugin(KL_documents[,k],KL_documents_bacteria[,j_abiotic]) + KL.plugin(KL_documents_bacteria[,j_abiotic],KL_documents[,k]))
+              
+              nb_non_significant_rndzations_SKL = 0
+              SKL_bacteria_comparison_randomized = vector(length=nb_rndzations,mode="numeric")
+              for (rndzation in 1:nb_rndzations) 
+              {
+                SKL_bacteria_comparison_randomized[rndzation] = 1/2*(KL.plugin(KL_documents_randomized[[rndzation]][,k],KL_documents_bacteria[,j_abiotic]) + KL.plugin(KL_documents_bacteria[,j_abiotic],KL_documents_randomized[[rndzation]][,k]))
+                
+                #               cor_abiotic_comparison_randomized_PCA = cor.test(documents_randomized[[rndzation]][,rev(sort_normal_topic$ix)[k]],lidar_PCA$li[,j])
+                #               if (Correlation_lidar[[3]][k,j] < cor_abiotic_comparison_randomized_PCA)
+                #                 nb_non_significant_rndzations_PCA = nb_non_significant_rndzations_PCA + 1
+                
+                if (SKL_bacteria[[1]][k,j_abiotic] > SKL_bacteria_comparison_randomized[rndzation])
+                  nb_non_significant_rndzations_SKL = nb_non_significant_rndzations_SKL + 1
+              }
+              Mean_SKL_bacteria_comparison_randomized[k,j_abiotic] = mean(SKL_bacteria_comparison_randomized)
+              Sd_SKL_bacteria_comparison_randomized[k,j_abiotic] = sd(SKL_bacteria_comparison_randomized)
+              SKL_bacteria[[2]][k,j_abiotic] = (Mean_SKL_bacteria_comparison_randomized[k,j_abiotic] - SKL_bacteria[[1]][k,j_abiotic])/Mean_SKL_bacteria_comparison_randomized[k,j_abiotic]
+              
+              if (SKL_bacteria[[2]][k,j_abiotic] > 0)
+                p_value_SKL_bacteria[k,j_abiotic] = nb_non_significant_rndzations_SKL/nb_rndzations
+              else if (SKL_bacteria[[2]][k,j_abiotic] < 0)
+                p_value_SKL_bacteria[k,j_abiotic] = 1 - nb_non_significant_rndzations_SKL/nb_rndzations 
+            }
+          }
+        }
+        
         #         if (case == "chemi")
         #           browser()
         
@@ -2418,7 +2556,7 @@ if (!mpar)
           Correlation_lidar = Correlation_abiotic
           ncol_lidar = ncol0
           Mean_cor_lidar_comparison_randomized = Mean_cor_abiotic_comparison_randomized 
-          Var_cor_lidar_comparison_randomized = Var_cor_abiotic_comparison_randomized
+          Sd_cor_lidar_comparison_randomized = Sd_cor_abiotic_comparison_randomized
           p_value_lidar = p_value_abiotic 
           colnames_lidar = colnames_abiotic
         } else if (case == "chemi")
@@ -2426,7 +2564,7 @@ if (!mpar)
           Correlation_chemi = Correlation_abiotic
           ncol_chemi = ncol0
           Mean_cor_chemi_comparison_randomized = Mean_cor_abiotic_comparison_randomized 
-          Var_cor_chemi_comparison_randomized = Var_cor_abiotic_comparison_randomized
+          Sd_cor_chemi_comparison_randomized = Sd_cor_abiotic_comparison_randomized
           p_value_chemi = p_value_abiotic 
           colnames_chemi = colnames_abiotic
         } else if (case == "climate")
@@ -2446,72 +2584,188 @@ if (!mpar)
     # Resuming to the main subdirectory
     setwd(local_subdirname)
     
+    #########################################################################################
+    # Correlation to bacterial assemblages to name the assemblages in case (nb_topics == 3) #
+    #########################################################################################
+    
+    # assemblage_names_vect and correlations_to_bacterial_assemblages are reused to label the assemblages
+    # for realization_comparison in the (data_pp && nb_topics == 3) case
+    assemblage_names_vect = vector(length=nb_topics,mode="character")
+    correlations_to_bacterial_assemblages = vector(length=nb_topics,mode="numeric")
+    if (data_pp && (nb_topics==3))
+    {
+      # Retrieving the name of the assemblage based on the correlation with the 3 bacterial assemblages:
+      setwd(paste0(local_prefix,data_insert))
+      documents_bacteria = readRDS("documents_bacteria_PP_3topics_best_real.rds")
+      setwd(local_subdirname)
+      if (!filled || filled_with_gaps)
+        documents_bacteria = documents_bacteria[-which(Missing_positions_indices==1),]
+      colnames(documents_bacteria) = c("Terra firme","Hydromorphic","Exposed rock")
+      for (k in 1:nb_topics)
+      {
+        k0 = rev(sort_normal_topic$ix)[k]
+        Correlation_bacteria = cor(documents[,k0],documents_bacteria)
+        sorted_correlations_to_bacteria = sort.int(Correlation_bacteria,index=T,decreasing=T)
+        k_bact = sorted_correlations_to_bacteria$ix[1]
+        correlations_to_bacterial_assemblages[k] = Correlation_bacteria[k_bact]
+        assemblage_names_vect[k] = colnames(documents_bacteria)[k_bact]
+      }
+    } else
+      assemblage_names_vect = seq(1,nb_topics,1)
+    
+    diversity = vector(length = nb_topics+1, mode="numeric")
+    for (k in 1:nb_topics)
+    {
+      k0 = rev(sort_normal_topic$ix)[k]
+      diversity[k] = length(which(topic_compo[,k0] > 1/sum(data2m)))
+    }
+    diversity[nb_topics+1] = nrow(data2m)
+    diversity = data.frame(Assemblage = c(assemblage_names_vect,"Total diversity"),Diversity = diversity)
+    
+    if (j_select == 1)
+    {
+      diversity_bestReal = diversity
+      assemblage_names_vect_bestReal = assemblage_names_vect
+      correlations_to_bacterial_assemblages_bestReal = correlations_to_bacterial_assemblages
+    }
+    
     ################################################
     # Topic comparison within the best realization #
     ################################################
     
-    if (j_select == 1)
+    if ((j_select == 1) && best_real_comparison)
     {
+      KL_topic_compo_randomized = vector(length=nb_rndzations,mode="list")
+      # Performing permutations (non-spatial randomizations)
+      for (rndzation in 1:nb_rndzations_best_real)
+      {
+        KL_topic_compo_randomized[[rndzation]] = matrix(nrow=nrow(data2m),ncol=nb_topics,data=0)
+        for (k in 1:nb_topics)
+          KL_topic_compo_randomized[[rndzation]][,k] = KL_topic_compo[sample(seq(1,nrow(data2m),1),nrow(data2m)),k]
+      }
+      
       KL_topic_comparison_samplewise = matrix(nrow=nb_topics,ncol=nb_topics,data=NA)
       KL_topic_comparison_MOTUwise = matrix(nrow=nb_topics,ncol=nb_topics,data=NA)
+      nES_topic_comparison_MOTUwise = matrix(nrow=nb_topics,ncol=nb_topics,data=NA)
+      #       pvalue_topic_comparison_MOTUwise = matrix(nrow=nb_topics,ncol=nb_topics,data=NA)
       for (i_topic in 1:(nb_topics-1))
       {
         for (j_topic in (i_topic+1):nb_topics)
         {
           k = rev(sort_normal_topic$ix)[i_topic]
           k1 = rev(sort_normal_topic$ix)[j_topic]
-          KL_topic_comparison_samplewise[k,k1] = 1/2*(KL.plugin(KL_documents[,k],KL_documents[,k1]) + KL.plugin(KL_documents[,k1],KL_documents[,k]))
-          KL_topic_comparison_MOTUwise[k,k1] = 1/2*(KL.plugin(KL_topic_compo_notaxo[,k],KL_topic_compo_notaxo[,k1]) + KL.plugin(KL_topic_compo_notaxo[,k1],KL_topic_compo_notaxo[,k]))     
+          KL_topic_comparison_samplewise[i_topic,j_topic] = 1/2*(KL.plugin(KL_documents[,k],KL_documents[,k1]) + KL.plugin(KL_documents[,k1],KL_documents[,k]))
+          KL_topic_comparison_samplewise[j_topic,i_topic] = KL_topic_comparison_samplewise[i_topic,j_topic]
+          KL_topic_comparison_MOTUwise[i_topic,j_topic] = 1/2*(KL.plugin(KL_topic_compo[,k],KL_topic_compo[,k1]) + KL.plugin(KL_topic_compo[,k1],KL_topic_compo[,k]))
+          KL_topic_comparison_MOTUwise[j_topic,i_topic] = KL_topic_comparison_MOTUwise[i_topic,j_topic]
+          
+          KL_topic_comparison_MOTUwise_randomized = vector(length=nb_rndzations,mode="numeric")
+          #           nb_non_significant_rndzations = 0
+          for (rndzation in 1:nb_rndzations_best_real)
+          {
+            KL_topic_comparison_MOTUwise_randomized[rndzation] = 1/2*(KL.plugin(KL_topic_compo[,k],KL_topic_compo_randomized[[rndzation]][,k1]) + KL.plugin(KL_topic_compo_randomized[[rndzation]][,k1],KL_topic_compo[,k]))
+            
+            #             if (KL_topic_comparison_MOTUwise[k,k1] > SKL_topic_comparison_MOTUwise_randomized[rndzation])
+            #               nb_non_significant_rndzations = nb_non_significant_rndzations + 1
+          }
+          
+          #           if (KL_topic_comparison_MOTUwise[k,k1] > 0)
+          #             pvalue_topic_comparison_MOTUwise[k,k1] =  = nb_non_significant_rndzations/nb_rndzations
+          #           else if (KL_topic_comparison_MOTUwise[k,k1] < 0)
+          #             pvalue_topic_comparison_MOTUwise[k,k1] =  = 1 - nb_non_significant_rndzations/nb_rndzations 
+          
+          nES_topic_comparison_MOTUwise[i_topic,j_topic] = (mean(KL_topic_comparison_MOTUwise_randomized) - KL_topic_comparison_MOTUwise[i_topic,j_topic])/mean(KL_topic_comparison_MOTUwise_randomized)
+          nES_topic_comparison_MOTUwise[j_topic,i_topic] = nES_topic_comparison_MOTUwise[i_topic,j_topic]
         }
       }
-      
-      # assemblage_names_vect and correlations_to_bacterial_assemblages are reused to label the assemblages
-      # for realization_comparison in the (data_pp && nb_topics == 3) case
-      assemblage_names_vect = vector(length=nb_topics,mode="character")
-      correlations_to_bacterial_assemblages = vector(length=nb_topics,mode="numeric")
-      if (data_pp && (nb_topics==3))
-      {
-        # Retrieving the name of the assemblage based on the correlation with the 3 bacterial assemblages:
-        setwd(paste0("/Users/guilhemsommeria-klein/Desktop/These/",data_insert))
-        documents_bacteria = readRDS("documents_bacteria_PP_3topics_best_real.rds")
-        setwd(local_subdirname)
-        if (!filled || filled_with_gaps)
-          documents_bacteria = documents_bacteria[-which(Missing_positions_indices==1),]
-        colnames(documents_bacteria) = c("Terra firme","Hydromorphic","Exposed rock")
-        for (k in 1:nb_topics)
-        {
-          k0 = rev(sort_normal_topic$ix)[k]
-          Correlation_bacteria = cor(documents[,k0],documents_bacteria)
-          sorted_correlations_to_bacteria = sort.int(Correlation_bacteria,index=T,decreasing=T)
-          k_bact = sorted_correlations_to_bacteria$ix[1]
-          correlations_to_bacterial_assemblages[k] = Correlation_bacteria[k_bact]
-          assemblage_names_vect[k] = colnames(documents_bacteria)[k_bact]
-        }
-      } else
-        assemblage_names_vect = seq(1,nb_topics,1)
       
       colnames(KL_topic_comparison_samplewise) = assemblage_names_vect
       colnames(KL_topic_comparison_MOTUwise) = assemblage_names_vect
+      colnames(nES_topic_comparison_MOTUwise) = assemblage_names_vect
+      #       colnames(pvalue_topic_comparison_MOTUwise) = assemblage_names_vect
       rownames(KL_topic_comparison_samplewise) = assemblage_names_vect
       rownames(KL_topic_comparison_MOTUwise) = assemblage_names_vect
+      rownames(nES_topic_comparison_MOTUwise) = assemblage_names_vect
+      #       rownames(pvalue_topic_comparison_MOTUwise) = assemblage_names_vect
       
       documents1 = documents[,rev(sort_normal_topic$ix)]
-      topic_compo_notaxo1 = topic_compo_notaxo[,rev(sort_normal_topic$ix)]
+      topic_compo1 = topic_compo[,rev(sort_normal_topic$ix)]
       colnames(documents1) = assemblage_names_vect
-      colnames(topic_compo_notaxo1) = assemblage_names_vect
+      colnames(topic_compo1) = assemblage_names_vect
       Corr_topic_comparison_samplewise = cor(documents1)
-      Corr_topic_comparison_MOTUwise = cor(topic_compo_notaxo1)
+      Corr_topic_comparison_MOTUwise = cor(topic_compo1)
       
-      diversity = vector(length = nb_topics+1, mode="numeric")
-      for (k in 1:nb_topics)
-      {
-        k0 = rev(sort_normal_topic$ix)[k]
-        diversity[k] = length(which(topic_compo_notaxo[,k0] > 1/sum(data2m)))
-      }
-      diversity[nb_topics+1] = nrow(data2m)
-      diversity = data.frame(Assemblage = c(assemblage_names_vect,"Total diversity"),Diversity = diversity)
+      Hellinger_topic_comparison_MOTUwise = 1/sqrt(2)*dist(t(sqrt(topic_compo1)), method = "euclidean", diag = FALSE, upper = FALSE)
+      KL_topic_compo1 = KL_topic_compo[,rev(sort_normal_topic$ix)]
+      #Hellinger_topic_comparison_MOTUwise1 = 1/sqrt(2)*dist(t(sqrt(KL_topic_compo1)), method = "euclidean", diag = FALSE, upper = FALSE)
+      topic_compo1_bin = topic_compo1
+      topic_compo1_bin[topic_compo1 < 1/sum(data2m)] = 0
+      #Hellinger_topic_comparison_MOTUwise2 = 1/sqrt(2)*dist(t(sqrt(topic_compo1_bin)), method = "euclidean", diag = FALSE, upper = FALSE)
+      Jaccard_topic_comparison_MOTUwise = vegan::designdist(t(topic_compo1_bin), "(b+c)/(a+b+c)", abcd=TRUE)
+      Beta.sim_topic_comparison_MOTUwise = vegan::designdist(t(topic_compo1_bin), "pmin(b,c)/(pmin(b,c)+a)", abcd=TRUE)
       
-      save(KL_topic_comparison_samplewise, KL_topic_comparison_MOTUwise, Corr_topic_comparison_samplewise, Corr_topic_comparison_MOTUwise, diversity, file = "Topic_comparison_inBestReal.Rdata")
+      # Code Antoine :
+#       upgma_Hellinger2 <- agnes(Hellinger_topic_comparison_MOTUwise2, diss =T, method = "average", keep.diss =F, keep.data =F)
+#       upgma_Hellinger1 <- agnes(Hellinger_topic_comparison_MOTUwise1, diss =T, method = "average", keep.diss =F, keep.data =F)
+      upgma_Hellinger <- agnes(Hellinger_topic_comparison_MOTUwise, diss =T, method = "average", keep.diss =F, keep.data =F)
+      upgma_Jaccard <- agnes(Jaccard_topic_comparison_MOTUwise, diss =T, method = "average", keep.diss =F, keep.data =F)
+      upgma_Beta.sim <- agnes(Beta.sim_topic_comparison_MOTUwise, diss =T, method = "average", keep.diss =F, keep.data =F)
+      
+#       cor(cophenetic(upgma_Hellinger2),Hellinger_topic_comparison_MOTUwise2)
+#       cor(cophenetic(upgma_Hellinger1),Hellinger_topic_comparison_MOTUwise1)
+#       cor(cophenetic(upgma_Hellinger),Hellinger_topic_comparison_MOTUwise)
+#       cor(cophenetic(upgma_Jaccard),Jaccard_topic_comparison_MOTUwise)
+      
+      #       coph_Hellinger = cophenetic(upgma)
+      #       cor(spdist, coph)
+      #       # 0.7432604
+      # 
+      #       wpgma <- agnes(spdist, diss =T, method = "weighted", keep.diss =F, keep.data =F)
+      #       coph=cophenetic(wpgma)
+      #       cor(spdist, coph)
+      #       # 0.6194799
+      # 
+      #       ward <- agnes(spdist, diss =T, method = "ward", keep.diss =F, keep.data =F)
+      #       coph=cophenetic(ward)
+      #       cor(spdist, coph)
+      #       # 0.6047672
+      # 
+      # sl <- agnes(spdist, diss =T, method = "single", keep.diss =F, keep.data =F)
+      # coph=cophenetic(sl)
+      # cor(spdist, coph)
+      # # 0.1811903
+      # 
+      # cl<- agnes(spdist, diss =T, method = "complete", keep.diss =F, keep.data =F)
+      # coph=cophenetic(cl)
+      # cor(spdist, coph) 
+      
+#       pdf("Hierarchical_clustering_of_topics_Hellinger2.pdf")
+#       plot(upgma_Hellinger2)
+#       title("Hellinger2")
+#       dev.off()
+#       
+#       pdf("Hierarchical_clustering_of_topics_Hellinger1.pdf")
+#       plot(upgma_Hellinger1)
+#       title("Hellinger1")
+#       dev.off()
+      
+      pdf("Hierarchical_clustering_of_topics_Hellinger.pdf")
+      plot(upgma_Hellinger, which.plots=2, ann=F, cex=2, cex.axis = 2, lwd=1.5)
+      title("Average Hellinger")
+      dev.off()
+      
+      pdf("Hierarchical_clustering_of_topics_Jaccard.pdf")
+      plot(upgma_Jaccard, which.plots=2, ann=F, cex=2, cex.axis = 2, lwd=1.5)
+      title("Average Jaccard")
+      dev.off()
+
+      pdf("Hierarchical_clustering_of_topics_beta.sim.pdf")
+      plot(upgma_Beta.sim, which.plots=2, ann=F, cex=2, cex.axis = 2, lwd=1.5)
+      title("Average beta.sim")
+      dev.off()
+      
+      save(KL_topic_comparison_samplewise, KL_topic_comparison_MOTUwise, nES_topic_comparison_MOTUwise, Corr_topic_comparison_samplewise, Corr_topic_comparison_MOTUwise,
+           Hellinger_topic_comparison_MOTUwise, Jaccard_topic_comparison_MOTUwise, Beta.sim_topic_comparison_MOTUwise, diversity, file = "Topic_comparison_inBestReal.Rdata")
     }
     
     #if (local)
@@ -2569,22 +2823,22 @@ if (!mpar)
         if (Rtopicmodels_Gibbs)
         {
           save(Result,alpha,delta,logbeta,documents,nb_doc,nb_terms,nb_topics,nb_real,nb_iter,llh_keep,llh,
-               topic_compo,sort_normal_topic,KL_documents,documents,Prop_OTU_removed,Prop_reads_removed,file=filename)
+               topic_compo_taxo,sort_normal_topic,KL_documents,documents,Prop_OTU_removed,Prop_reads_removed,file=filename)
         } else if (Rtopicmodels_VEM) {
           cat("Saving result ...\n")
           save(Result,alpha_est,logbeta,documents,nb_doc,nb_terms,nb_topics,nb_real,llh,
-               topic_compo,sort_normal_topic,KL_documents,documents,Prop_OTU_removed,Prop_reads_removed,file=filename)
+               topic_compo_taxo,sort_normal_topic,KL_documents,documents,Prop_OTU_removed,Prop_reads_removed,file=filename)
         }
       } else if (best_keep && (j_select == 1) && local)
       {
         if (Rtopicmodels_Gibbs)
         {
           save(Result,alpha,delta,logbeta,documents,nb_doc,nb_terms,nb_topics,nb_real,nb_iter,llh_keep,llh,AIC1,AIC2,LLH_final_real1,Akaike_weights_llh,llh_iterations,
-               topic_compo,sort_normal_topic,KL_documents,documents,Prop_OTU_removed,Prop_reads_removed,file=filename)
+               topic_compo_taxo,sort_normal_topic,KL_documents,documents,Prop_OTU_removed,Prop_reads_removed,file=filename)
         } else if (Rtopicmodels_VEM) {
           cat("Saving result ...\n")
           save(Result,alpha_est,logbeta,documents,nb_doc,nb_terms,nb_topics,nb_real,llh,AIC1,AIC2,LLH_final_real1,Akaike_weights_llh,llh_iterations,
-               topic_compo,sort_normal_topic,KL_documents,documents,Prop_OTU_removed,Prop_reads_removed,file=filename)
+               topic_compo_taxo,sort_normal_topic,KL_documents,documents,Prop_OTU_removed,Prop_reads_removed,file=filename)
         }
       }
       
@@ -2680,16 +2934,16 @@ if (!mpar)
       if (best_keep && (j_select == 1) && testdata && (nb_topics == true_nb_topics))
       {
         # Computing randomizations in a spacialized way for the first realization for testdata=1 so as to compare the LDA results with the true topics 
-        KL_documents_jselect_randomized = vector(length=nb_rndzations_true_documents,mode="list")
+        KL_documents_randomized = vector(length=nb_rndzations_true_documents,mode="list")
         for (rndzation in 1:nb_rndzations_true_documents)
         {
           if (samplewise)
           {
-            KL_documents_jselect_randomized[[rndzation]] = matrix(nrow=ncol(data2m),ncol=nb_topics,data=0)
+            KL_documents_randomized[[rndzation]] = matrix(nrow=ncol(data2m),ncol=nb_topics,data=0)
             # Performing spatial randomizations
             for (k in 1:nb_topics)
             {
-              Spatial_KL_documents = matrix(KL_documents_allreal[[1]][,k],ncol=39)
+              Spatial_KL_documents = matrix(KL_documents[,k],ncol=39)
               a=29
               b=39
               while ((a==29) && (b==39))
@@ -2703,14 +2957,14 @@ if (!mpar)
                 Spatial_KL_documents_randomized = Spatial_KL_documents[c((a+1):29,1:a),]
               else if (a==29)
                 Spatial_KL_documents_randomized = Spatial_KL_documents[,c((b+1):39,1:b)] 
-              KL_documents_jselect_randomized[[rndzation]][,k] = as.vector(Spatial_KL_documents_randomized)
+              KL_documents_randomized[[rndzation]][,k] = as.vector(Spatial_KL_documents_randomized)
             }
           } else if (MOTUwise)
           {
-            KL_topic_compo_jselect_randomized = vector(length=nb_rndzations_true_documents,mode="list")
+            KL_topic_compo_randomized = vector(length=nb_rndzations_true_documents,mode="list")
             # Performing permutations (non-spatial randomizations)
             for (rndzation in 1:nb_rndzations_true_documents)
-              KL_topic_compo_jselect_randomized[[rndzation]] = KL_topic_compo_allreal[[j_select]][sample(seq(1,nrow(data2m),1),nrow(data2m)),]
+              KL_topic_compo_randomized[[rndzation]] = KL_topic_compo[sample(seq(1,nrow(data2m),1),nrow(data2m)),]
           }
         }
         
@@ -2729,8 +2983,7 @@ if (!mpar)
         #           }
         #         }
         
-        Correlation_true_documents = cor(documents_allreal[[1]],true_documents) 
-        save(Correlation_true_documents,file="Correlation_true_documents.Rdata")
+        Correlation_true_documents = cor(documents,true_documents) 
         
         # Computing a oneto-one topic correspondence between the first realization
         # and the true documents
@@ -2762,32 +3015,33 @@ if (!mpar)
         #Best_true_topic_comparison_samplewise = apply(Correlation_true_documents,1,max)
         
         true_KL_documents = sweep(true_documents,MARGIN=2,colSums(true_documents),`/`)
-        true_KL_documents[true_KL_documents==0] = true_KL_documents_baseline
+        true_KL_documents[true_KL_documents < 1/sum(data2m)] = 1/sum(data2m)
         
         #True_topic_correspondence_samplewise = vector(length=nb_topics,mode="numeric")
         Mean_KL_topic_comparison_true_documents_randomized = vector(length=nb_topics,mode="numeric")
         p_value_true_documents = vector(length = nb_topics, mode = "numeric")
         KL_topic_comparison_true_documents = vector(length = nb_topics, mode="numeric")
         DKL100_true_documents = vector(length = nb_topics, mode="numeric")
+        nES_true_documents = vector(length = nb_topics, mode="numeric")
         for (k in 1:nb_topics)
         {
           #True_topic_correspondence_samplewise[k] = which(Best_true_topic_comparison_samplewise[k] == Correlation_true_documents[k,])
           if (samplewise)
-            KL_topic_comparison_true_documents[k] = 1/2*(KL.plugin(KL_documents_allreal[[1]][,k],true_KL_documents[,True_topic_correspondence[k]]) +
-                                                           KL.plugin(true_KL_documents[,True_topic_correspondence[k]],KL_documents_allreal[[1]][,k]))
+            KL_topic_comparison_true_documents[k] = 1/2*(KL.plugin(KL_documents[,k],true_KL_documents[,True_topic_correspondence[k]]) +
+                                                           KL.plugin(true_KL_documents[,True_topic_correspondence[k]],KL_documents[,k]))
           else if (MOTUwise)
-            KL_topic_comparison_true_documents[k] = 1/2*(KL.plugin(KL_topic_compo_allreal[[1]][,k],true_KL_topic_compo[,True_topic_correspondence[k]]) +
-                                                           KL.plugin(true_KL_topic_compo[,True_topic_correspondence[k]],KL_topic_compo_allreal[[1]][,k]))
+            KL_topic_comparison_true_documents[k] = 1/2*(KL.plugin(KL_topic_compo[,k],true_KL_topic_compo[,True_topic_correspondence[k]]) +
+                                                           KL.plugin(true_KL_topic_compo[,True_topic_correspondence[k]],KL_topic_compo[,k]))
           
           nb_non_significant_rndzations = 0
           for (rndzation in 1:nb_rndzations_true_documents) 
           {
             if (samplewise)
-              KL_topic_comparison_true_documents_randomized = 1/2*(KL.plugin(KL_documents_jselect_randomized[[rndzation]][,k],true_KL_documents[,True_topic_correspondence[k]]) +
-                                                                     KL.plugin(true_KL_documents[,True_topic_correspondence[k]],KL_documents_jselect_randomized[[rndzation]][,k]))
+              KL_topic_comparison_true_documents_randomized = 1/2*(KL.plugin(KL_documents_randomized[[rndzation]][,k],true_KL_documents[,True_topic_correspondence[k]]) +
+                                                                     KL.plugin(true_KL_documents[,True_topic_correspondence[k]],KL_documents_randomized[[rndzation]][,k]))
             else if (MOTUwise)
-              KL_topic_comparison_true_documents_randomized = 1/2*(KL.plugin(KL_topic_compo_jselect_randomized[[rndzation]][,k],true_KL_topic_compo[,True_topic_correspondence[k]]) +
-                                                                     KL.plugin(true_KL_topic_compo[,True_topic_correspondence[k]],KL_topic_compo_jselect_randomized[[rndzation]][,k]))
+              KL_topic_comparison_true_documents_randomized = 1/2*(KL.plugin(KL_topic_compo_randomized[[rndzation]][,k],true_KL_topic_compo[,True_topic_correspondence[k]]) +
+                                                                     KL.plugin(true_KL_topic_compo[,True_topic_correspondence[k]],KL_topic_compo_randomized[[rndzation]][,k]))
             
             if (KL_topic_comparison_true_documents[k] > KL_topic_comparison_true_documents_randomized)
               nb_non_significant_rndzations = nb_non_significant_rndzations + 1
@@ -2795,7 +3049,10 @@ if (!mpar)
           }
           p_value_true_documents[k] = nb_non_significant_rndzations/nb_rndzations_true_documents
           DKL100_true_documents[k] = (Mean_KL_topic_comparison_true_documents_randomized[k] - KL_topic_comparison_true_documents[k])
+          nES_true_documents[k] = DKL100_true_documents[k]/Mean_KL_topic_comparison_true_documents_randomized[k]
         }
+        
+        save(Correlation_true_documents,KL_topic_comparison_true_documents,Mean_KL_topic_comparison_true_documents_randomized,p_value_true_documents,nES_true_documents,file="Goodness-of-fit_true_documents.Rdata")
       }
       
       #############################################
@@ -2813,8 +3070,10 @@ if (!mpar)
         if (data_pp)
         {
           # saving the lidar and chemistery correlation values and associated p-values
-          save(Correlation_lidar,Mean_cor_lidar_comparison_randomized,Var_cor_lidar_comparison_randomized,p_value_lidar,file="Correlation_between_lidar_data_and_topics_for_best_real.Rdata")
-          save(Correlation_chemi,Mean_cor_chemi_comparison_randomized,Var_cor_chemi_comparison_randomized,p_value_chemi,file="Correlation_between_soil_chemistery_data_and_topics_for_best_real.Rdata")
+          save(Correlation_lidar,Mean_cor_lidar_comparison_randomized,Sd_cor_lidar_comparison_randomized,p_value_lidar,file="Correlation_between_lidar_data_and_topics_for_best_real.Rdata")
+          save(Correlation_chemi,Mean_cor_chemi_comparison_randomized,Sd_cor_chemi_comparison_randomized,p_value_chemi,file="Correlation_between_soil_chemistery_data_and_topics_for_best_real.Rdata")
+          if (nb_topics == 3)
+            save(SKL_bacteria,Mean_SKL_bacteria_comparison_randomized,Sd_SKL_bacteria_comparison_randomized,p_value_SKL_bacteria,file="SKL_samplewise_between_bacterial_topics_and_best_real.Rdata")
         } else if (data_gs)
           save(Correlation_climate,file="Correlation_between_climate_data_and_topics_for_best_real.Rdata")
         #######################
@@ -2834,7 +3093,7 @@ if (!mpar)
           {
             Correlation_abiotic = Correlation_lidar
             Mean_cor_abiotic_comparison_randomized = Mean_cor_lidar_comparison_randomized
-            Var_cor_abiotic_comparison_randomized = Var_cor_lidar_comparison_randomized
+            Sd_cor_abiotic_comparison_randomized = Sd_cor_lidar_comparison_randomized
             p_value_abiotic = p_value_lidar
             ncol0 = ncol_lidar
             colnames_abiotic = colnames_lidar
@@ -2842,7 +3101,7 @@ if (!mpar)
           {
             Correlation_abiotic = Correlation_chemi
             Mean_cor_abiotic_comparison_randomized = Mean_cor_chemi_comparison_randomized
-            Var_cor_abiotic_comparison_randomized = Var_cor_chemi_comparison_randomized
+            Sd_cor_abiotic_comparison_randomized = Sd_cor_chemi_comparison_randomized
             p_value_abiotic = p_value_chemi
             ncol0 = ncol_chemi
             colnames_abiotic = colnames_chemi
@@ -2862,6 +3121,10 @@ if (!mpar)
             abiotic_data.frame = as.data.frame(matrix(ncol=length(colnames_abiotic)*3,nrow=nb_topics,data=0))
           else
             abiotic_data.frame = as.data.frame(matrix(ncol=length(colnames_abiotic)*2,nrow=nb_topics,data=0))
+          
+          if (data_pp && (nb_topics == 3))
+            SKL_bacteria_data.frame = as.data.frame(matrix(ncol=nb_topics*3,nrow=nb_topics,data=0))
+          
           write(paste(barcode_insert,"-",nb_topics,"topics\n%%%%%%%%%%%%%\n"),file=Abiotic_file,append=F)
           for (k in 1:nb_topics)
           {
@@ -2894,14 +3157,14 @@ if (!mpar)
               {
                 write(paste("Effect size with spatial randomizations =",Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j]),file=Abiotic_file,append=T)
                 write(paste("Standardized effect size with spatial randomizations =",
-                            (Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j])/sqrt(Var_cor_abiotic_comparison_randomized[k0,j]-Mean_cor_abiotic_comparison_randomized[k0,j]^2)),file=Abiotic_file,append=T)
+                            (Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j])/Sd_cor_abiotic_comparison_randomized[k0,j]),file=Abiotic_file,append=T)
                 write(paste("Normalized effect size with spatial randomizations =",
                             (Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j])/(1-Mean_cor_abiotic_comparison_randomized[k0,j])),file=Abiotic_file,append=T)
                 write(paste("p-value for spatial randomizations =",p_value_abiotic[k0,j]),file=Abiotic_file,append=T)
                 
                 abiotic_data.frame[k,(3*(j-1)+1):(3*(j-1)+3)] = c(Correlation_abiotic[[1]][k0,j],(Correlation_abiotic[[1]][k0,j] - Mean_cor_abiotic_comparison_randomized[k0,j])/(1-Mean_cor_abiotic_comparison_randomized[k0,j]),p_value_abiotic[k0,j])
                 if (k==1)
-                  colnames(abiotic_data.frame)[(3*(j-1)+1):(3*(j-1)+3)] = c(paste(colnames_abiotic[j],"corr."),paste(colnames_abiotic[j],"norm. ES"),paste(colnames_abiotic[j],"p-value"))
+                  colnames(abiotic_data.frame)[(3*(j-1)+1):(3*(j-1)+3)] = c(paste(colnames_abiotic[j],"corr."),paste(colnames_abiotic[j],"norm. ES"),paste(colnames_abiotic[j],"p-value"))  
               } else
               {
                 abiotic_data.frame[k,(2*(j-1)+1):(2*(j-1)+2)] = c(Correlation_abiotic[[1]][k0,j],p_value_abiotic[k0,j])
@@ -2911,12 +3174,27 @@ if (!mpar)
               
               # write(paste("p-value for Student's t-test =",Correlation_abiotic[[2]][k0,j]),file=Abiotic_file,append=T)
             }
+            
+            if (data_pp && nb_topics == 3)
+            {
+              for (j in 1:nb_topics)
+              {
+                SKL_bacteria_data.frame[k,(3*(j-1)+1):(3*(j-1)+3)] = c(SKL_bacteria[[1]][k0,j],SKL_bacteria[[2]][k0,j],p_value_SKL_bacteria[k0,j])
+                if (k==1)
+                  colnames(SKL_bacteria_data.frame)[(3*(j-1)+1):(3*(j-1)+3)] = c(paste(colnames_abiotic[ncol0+j],"SKL"),paste(colnames_abiotic[ncol0+j],"norm. ES"),paste(colnames_abiotic[ncol0+j],"p-value"))  
+              }
+              rownames(SKL_bacteria_data.frame) = rownames(abiotic_data.frame)
+            }
           }
           
           # Comparison to PCA components is not included in the output
           saveRDS(abiotic_data.frame,file=paste0(case0,"_data.frame.rds"))
+          if (data_pp && nb_topics == 3)
+            saveRDS(SKL_bacteria_data.frame,file="SKL_bacteria_data.frame.rds")
           setwd(local_subdirname)
           write.csv(abiotic_data.frame,paste0(case0,"_comparison.csv"))
+          if (data_pp && nb_topics == 3)
+            write.csv(SKL_bacteria_data.frame,"bacteria_SKL_samplewise_comparison.csv")
           setwd(abiotic_variables_dirname)
           
           #########
@@ -3026,11 +3304,11 @@ if (!mpar)
           if (Rtopicmodels_Gibbs)
           {
             save(alpha,delta,logbeta,documents,nb_doc,nb_terms,nb_topics,nb_real,nb_iter,llh_keep,llh,AIC1,AIC2,LLH_final_real1,Akaike_weights_llh,llh_iterations,
-                 topic_compo,sort_normal_topic,KL_documents,documents,Ordered_realizations,file=filename)
+                 topic_compo_taxo,sort_normal_topic,KL_documents,documents,Ordered_realizations,file=filename)
           } else if (Rtopicmodels_VEM) 
           {
             save(alpha_est,logbeta,documents,nb_doc,nb_terms,nb_topics,nb_real,llh,AIC1,AIC2,LLH_final_real1,Akaike_weights_llh,llh_iterations,
-                 topic_compo,sort_normal_topic,KL_documents,documents,Ordered_realizations,file=filename)
+                 topic_compo_taxo,sort_normal_topic,KL_documents,documents,Ordered_realizations,file=filename)
           }
         }
         
@@ -3308,12 +3586,12 @@ if (!mpar)
   par(mar=c(15.1,10.1,4.1,4.1))
   for (k in 1:nb_topics)
   {
-    plot(topic_compo[[rev(sort_normal_topic$ix)[k]]][1:20,1],type="p",ann=F,yaxt="n",xaxt="n")
-    axis(2, ylim=range(topic_compo[[rev(sort_normal_topic$ix)[k]]][1:20,1]), col='black')
+    plot(topic_compo_taxo[[rev(sort_normal_topic$ix)[k]]][1:20,1],type="p",ann=F,yaxt="n",xaxt="n")
+    axis(2, ylim=range(topic_compo_taxo[[rev(sort_normal_topic$ix)[k]]][1:20,1]), col='black')
     axis(1, at=1:20, labels = F)
     labels = vector(length=20,mode="character")
     for (i in 1:20)
-      labels[i]=paste(topic_compo[[rev(sort_normal_topic$ix)[k]]][i,11],topic_compo[[rev(sort_normal_topic$ix)[k]]][i,10],topic_compo[[rev(sort_normal_topic$ix)[k]]][i,2],sep=" - ")
+      labels[i]=paste(topic_compo_taxo[[rev(sort_normal_topic$ix)[k]]][i,11],topic_compo_taxo[[rev(sort_normal_topic$ix)[k]]][i,10],topic_compo_taxo[[rev(sort_normal_topic$ix)[k]]][i,2],sep=" - ")
     text(1:20, par("usr")[3], srt = 45, adj = c(1.05,1.75), labels = labels, xpd = TRUE, cex=1.1)
     if (k==1)
       title(ylab="Relative abundance in the\n 1st most abundant class")
@@ -3332,12 +3610,12 @@ if (!mpar)
   par(mar=c(15.1,10.1,4.1,4.1))
   for (k in 1:nb_topics)
   {
-    plot(topic_compo[[rev(sort_normal_topic$ix)[k]]][1:20,1],type="p",ann=F,yaxt="n",xaxt="n")
-    axis(2, ylim=range(topic_compo[[rev(sort_normal_topic$ix)[k]]][1:20,1]), col='black')
+    plot(topic_compo_taxo[[rev(sort_normal_topic$ix)[k]]][1:20,1],type="p",ann=F,yaxt="n",xaxt="n")
+    axis(2, ylim=range(topic_compo_taxo[[rev(sort_normal_topic$ix)[k]]][1:20,1]), col='black')
     axis(1, at=1:20, labels = F)
     labels = vector(length=20,mode="character")
     for (i in 1:20)
-      labels[i]=paste(topic_compo[[rev(sort_normal_topic$ix)[k]]][i,11],topic_compo[[rev(sort_normal_topic$ix)[k]]][i,10],sep=" - ")
+      labels[i]=paste(topic_compo_taxo[[rev(sort_normal_topic$ix)[k]]][i,11],topic_compo_taxo[[rev(sort_normal_topic$ix)[k]]][i,10],sep=" - ")
     text(1:20, par("usr")[3], srt = 45, adj = c(1.05,1.75), labels = labels, xpd = TRUE, cex=1.1)
     if (k==1)
       title(ylab="Relative abundance in the\n 1st most abundant class")
@@ -3351,10 +3629,14 @@ if (!mpar)
   
   # Writing the taxonomic composition to a .txt file
   Taxo_compo_file = "Taxonomic_composition.txt"
+  Ordered_topic_compo_taxo_full = list()
+  Ordered_topic_compo_taxo = list()
   write(paste(barcode_insert,"-",nb_topics,"topics\n%%%%%%%%%%%%%\n"),file=Taxo_compo_file,append=F)
   for (k in 1:nb_topics)
   {
     k0 = rev(sort_normal_topic$ix)[k]
+    Ordered_topic_compo_taxo[[k]] = topic_compo_taxo[[k0]][which(topic_compo_taxo[[k0]][,1]>1/sum(data2m)),]
+    Ordered_topic_compo_taxo_full[[k]] = topic_compo_taxo[[k0]]
     if (nb_topics == 3 && data_pp && abiotic_variables)
     {
       sorted_correlations_to_bacteria = sort.int(Correlation_abiotic[[1]][k0,ncol0+(1:3)],index=T,decreasing=T)
@@ -3363,10 +3645,11 @@ if (!mpar)
                    " assemblage (rho = ",Correlation_abiotic[[1]][k0,j0],", p = ",p_value_abiotic[k0,j0],"):\n%%%%%%%%%%%%%"),file=Taxo_compo_file,append=T)
     } else
       write(paste0("\n%%%%%%%%%%%%%\nFor topic ",k,":\n%%%%%%%%%%%%%"),file=Taxo_compo_file,append=T)
-    for (i in 1:min(50,length(which(topic_compo[[k0]][,1]>0.01))))
-      write(paste(topic_compo[[k0]][i,1],"-",topic_compo[[k0]][i,11],"-",topic_compo[[k0]][i,10]),file=Taxo_compo_file,append=T)
+    for (i in 1:min(50,length(which(topic_compo_taxo[[k0]][,1]>1/sum(data2m)))))
+      write(paste(topic_compo_taxo[[k0]][i,1],"-",topic_compo_taxo[[k0]][i,11],"-",topic_compo_taxo[[k0]][i,10]),file=Taxo_compo_file,append=T)
   }
   
+  save(Ordered_topic_compo_taxo,Ordered_topic_compo_taxo_full,file = "Taxonomic_composition.Rdata")
 }
 
 ##################################################
@@ -3959,9 +4242,9 @@ if (!mpar)
     
     if (kriging && any(kriged_real == j_select))
     { 
-      if ((nb_topics == 3) && j_select==1 && data_pp)
+      if ((nb_topics == 3) && (j_select == kriged_real[1]) && data_pp)
       {
-        setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/",sep=""))
+        setwd(paste(local_prefix,data_insert,"/Lidar/",sep=""))
         
         ########
         library(raster)
@@ -4052,57 +4335,57 @@ if (!mpar)
       }
       dev.off()
     }
-
-# Plots the spatial distribution of topics while removing abundance values lower than threshold_val   
-#     threshold_val = 0.1
-#     if ((!kriging || !any(kriged_real == j_select)) && !data_gs)
-#     {
-#       if (filled && !filled_with_gaps)
-#       {
-#         pdf(paste("Topic_ordered_by_site-normalized_abundance_composition_maps_onebyone_thres",threshold_val,".pdf",sep=""))
-#         # 2 topics :
-#         #par(mfrow=c(2,1))
-#         # 5 topics :
-#         #par(mfrow=c(3,2))
-#         # 10 topics
-#         #par(mfrow=c(2,2))
-#         par(cex.lab=1.5,cex.main=1.7,cex.axis=2)
-#         # par(mar = c(bottom, left, top, right))
-#         par(mar = c(5, 4, 4, 5) + 0.1)
-#         #lattice::levelplot(abund2.pred~x+y, z2, 
-#         #col.regions=topo.colors(100), aspect = "iso",contour=T,main=binomial)
-#         # Loop over topics (one map per topic, the color stands for the proportion of the topic)
-#         for (k in 1:nb_topics)
-#         {  
-#           k0 = rev(sort_normal_topic$ix)[k]
-#           # colors based on colorspace::divergence_hcl(3)
-#           # c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)
-#           # rev(col_values$red)/255,rev(col_values$green)/255,rev(col_values$blue)/255
-#           # grey to green : c(242,0)/255,c(242,166)/255,c(242,0)/255
-#           # grey to blue : c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)
-#           cellcol = matrix(nrow=29,ncol=39,data=0.1)
-#           # Uniform grey between 0 and threshold_val, and then a grey to blue color gradient
-#           cellcol[spatial_topicmix[[k0]]<threshold_val] = color.scale(spatial_topicmix[[k0]][spatial_topicmix[[k0]]<threshold_val],226/255,226/255,226/255)
-#           cellcol[spatial_topicmix[[k0]]>threshold_val] = color.scale(spatial_topicmix[[k0]][spatial_topicmix[[k0]]>threshold_val],c(226/255,2/255),c(226/255,63/255),c(226/255,165/255))
-#           color2D.matplot(spatial_topicmix[[k0]],
-#                           extremes=NA,cellcolors=cellcol,show.legend=F,nslices=10,xlab="",
-#                           ylab="",do.hex=FALSE,axes=F,show.values=FALSE,vcol="white",vcex=1,xrange=c(0,1),
-#                           border=NA,na.color="white",main=paste("Topic ",k0," - #",k,sep=""))
-#           axis(2, at=c(0,5,10,15,20,25,30), labels=c("","50","100","150","200","250","300"))
-#           axis(1, at=c(0,5,10,15,20,25,30,35,40), labels=c("0","","100","","200","","300","","400"))
-#           #       color.legend(xl=39+1.392857,yb=4.53125,xr=39+2.785714,yt=13.59375,legend=c(0,1),
-#           #                    rect.col=color.scale(seq(0,1,1/255),c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)),gradient="y",cex=1.5, 
-#           #                    align="rb")
-#           color.legend(xl=39+1.392857,yb=4.53125,xr=39+2.785714,yt=13.59375,legend=c(0,1),
-#                        rect.col=color.scale(c(rep(threshold_val,threshold_val/(1-threshold_val)*255),
-#                                               seq(threshold_val,1,1/(255+threshold_val/(1-threshold_val)*255))),
-#                                             c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)),gradient="y",cex=1.5, 
-#                        align="rb")
-#           
-#         }
-#         dev.off()
-#       }
-#     }
+    
+    # Plots the spatial distribution of topics while removing abundance values lower than threshold_val   
+    #     threshold_val = 0.1
+    #     if ((!kriging || !any(kriged_real == j_select)) && !data_gs)
+    #     {
+    #       if (filled && !filled_with_gaps)
+    #       {
+    #         pdf(paste("Topic_ordered_by_site-normalized_abundance_composition_maps_onebyone_thres",threshold_val,".pdf",sep=""))
+    #         # 2 topics :
+    #         #par(mfrow=c(2,1))
+    #         # 5 topics :
+    #         #par(mfrow=c(3,2))
+    #         # 10 topics
+    #         #par(mfrow=c(2,2))
+    #         par(cex.lab=1.5,cex.main=1.7,cex.axis=2)
+    #         # par(mar = c(bottom, left, top, right))
+    #         par(mar = c(5, 4, 4, 5) + 0.1)
+    #         #lattice::levelplot(abund2.pred~x+y, z2, 
+    #         #col.regions=topo.colors(100), aspect = "iso",contour=T,main=binomial)
+    #         # Loop over topics (one map per topic, the color stands for the proportion of the topic)
+    #         for (k in 1:nb_topics)
+    #         {  
+    #           k0 = rev(sort_normal_topic$ix)[k]
+    #           # colors based on colorspace::divergence_hcl(3)
+    #           # c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)
+    #           # rev(col_values$red)/255,rev(col_values$green)/255,rev(col_values$blue)/255
+    #           # grey to green : c(242,0)/255,c(242,166)/255,c(242,0)/255
+    #           # grey to blue : c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)
+    #           cellcol = matrix(nrow=29,ncol=39,data=0.1)
+    #           # Uniform grey between 0 and threshold_val, and then a grey to blue color gradient
+    #           cellcol[spatial_topicmix[[k0]]<threshold_val] = color.scale(spatial_topicmix[[k0]][spatial_topicmix[[k0]]<threshold_val],226/255,226/255,226/255)
+    #           cellcol[spatial_topicmix[[k0]]>threshold_val] = color.scale(spatial_topicmix[[k0]][spatial_topicmix[[k0]]>threshold_val],c(226/255,2/255),c(226/255,63/255),c(226/255,165/255))
+    #           color2D.matplot(spatial_topicmix[[k0]],
+    #                           extremes=NA,cellcolors=cellcol,show.legend=F,nslices=10,xlab="",
+    #                           ylab="",do.hex=FALSE,axes=F,show.values=FALSE,vcol="white",vcex=1,xrange=c(0,1),
+    #                           border=NA,na.color="white",main=paste("Topic ",k0," - #",k,sep=""))
+    #           axis(2, at=c(0,5,10,15,20,25,30), labels=c("","50","100","150","200","250","300"))
+    #           axis(1, at=c(0,5,10,15,20,25,30,35,40), labels=c("0","","100","","200","","300","","400"))
+    #           #       color.legend(xl=39+1.392857,yb=4.53125,xr=39+2.785714,yt=13.59375,legend=c(0,1),
+    #           #                    rect.col=color.scale(seq(0,1,1/255),c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)),gradient="y",cex=1.5, 
+    #           #                    align="rb")
+    #           color.legend(xl=39+1.392857,yb=4.53125,xr=39+2.785714,yt=13.59375,legend=c(0,1),
+    #                        rect.col=color.scale(c(rep(threshold_val,threshold_val/(1-threshold_val)*255),
+    #                                               seq(threshold_val,1,1/(255+threshold_val/(1-threshold_val)*255))),
+    #                                             c(226/255,2/255),c(226/255,63/255),c(226/255,165/255)),gradient="y",cex=1.5, 
+    #                        align="rb")
+    #           
+    #         }
+    #         dev.off()
+    #       }
+    #     }
     
   } 
   
@@ -4297,17 +4580,17 @@ if (select_real && realization_comparison)
   else
     stability_data.frame = as.data.frame(matrix(nrow=1,ncol=11,data=0))
   rownames(stability_data.frame)[1] = barcode_insert
-  stability_data.frame[1,] = c(diversity$Diversity[nb_topics+1],
-                             mean(Correlation_allRealPairs[which(Correlation_allRealPairs!=0)]),
-                             mean(KL_allRealPairs[which(!is.na(KL_allRealPairs))]),
-                             fit1$coefficient[1],
-                             mean(DKL100_allRealPairs[which(!is.na(DKL100_allRealPairs))]),
-                             mean(nES),
-                             fit2$coefficient[1],
-                             SES,
-                             SES_topicByTopic,
-                             mean(p_value_allRealPairs[which(!is.na(p_value_allRealPairs))]),
-                             alpha_est_mean)
+  stability_data.frame[1,] = c(diversity_bestReal$Diversity[nb_topics+1],
+                               mean(Correlation_allRealPairs[which(Correlation_allRealPairs!=0)]),
+                               mean(KL_allRealPairs[which(!is.na(KL_allRealPairs))]),
+                               fit1$coefficient[1],
+                               mean(DKL100_allRealPairs[which(!is.na(DKL100_allRealPairs))]),
+                               mean(nES),
+                               fit2$coefficient[1],
+                               SES,
+                               SES_topicByTopic,
+                               mean(p_value_allRealPairs[which(!is.na(p_value_allRealPairs))]),
+                               alpha_est_mean)
   
   if (bij)
   {   
@@ -4348,14 +4631,14 @@ if (select_real && realization_comparison)
       {
         i = 0
         i_insert = ""
-        while (any(rownames(stability_data.frame)==paste(assemblage_names_vect[k],barcode_insert,i_insert)))
+        while (any(rownames(stability_data.frame)==paste(assemblage_names_vect_bestReal[k],barcode_insert,i_insert)))
         {
           i = i+1
           i_insert = i
         }
-        rownames(stability_data.frame)[k+1] = paste(assemblage_names_vect[k],barcode_insert,i_insert) 
-        write(paste0("For topic ",k," - ",assemblage_names_vect[k],
-                     " assemblage (rho = ",correlations_to_bacterial_assemblages[k],"):\n%%%%%%%%%%%%%\n"),file=Stability_file,append=T)
+        rownames(stability_data.frame)[k+1] = paste(assemblage_names_vect_bestReal[k],barcode_insert,i_insert) 
+        write(paste0("For topic ",k," - ",assemblage_names_vect_bestReal[k],
+                     " assemblage (rho = ",correlations_to_bacterial_assemblages_bestReal[k],"):\n%%%%%%%%%%%%%\n"),file=Stability_file,append=T)
       } else
       {
         write(paste0("For topic ",k,":\n%%%%%%%%%%%%%\n"),file=Stability_file,append=T)
@@ -4372,7 +4655,7 @@ if (select_real && realization_comparison)
       write(paste("Mean standardized KL distance difference (SES) computed topic by topic for",nb_rndzations,"randomizations per topic =",SES_topicByTopic,"\n"),file=Stability_file,append=T)
       write(paste("Mean p-value for",nb_rndzations,"randomizations per topic =",p_value,"\n"),file=Stability_file,append=T)
       
-      stability_data.frame[k+1,] = c(diversity$Diversity[k],
+      stability_data.frame[k+1,] = c(diversity_bestReal$Diversity[k],
                                      mean_correlation,
                                      mean_KL,
                                      fit1$coefficient[1],
@@ -4385,13 +4668,13 @@ if (select_real && realization_comparison)
                                      NA)
     }
   }
-
+  
   colnames(stability_data.frame) = c("Diversity","Correlation","SKL","SKL=f(llh) intercept","ES","Normalized ES","Normalized ES=f(llh) intercept","Total SES","Mean SES over assemblages","p-value","alpha")
   saveRDS(stability_data.frame,file="stability_data.frame.rds")
   setwd(local_subdirname)
   write.csv(stability_data.frame,paste0("Stability_",MOTU_sample_insert,"_",bij_insert,".csv"))
   setwd(realization_comparison_dirname)
-
+  
   #########
   # Plots #
   #########
@@ -4426,30 +4709,30 @@ if (select_real && realization_comparison)
   }
   dev.off()
   
-#   pdf(paste0("Correlation_",MOTU_sample_insert,"_RealByReal_color2D.pdf"))
-#   # 2 topics :
-#   #par(mfrow=c(2,1))
-#   # 5 topics :
-#   #par(mfrow=c(3,2))
-#   # 10 topics
-#   par(mfrow=c(4,4))
-#   #par(mar=c(5.1,4.1,4.1,2.1)
-#   par(mar=c(5.1,5.1,4.1,2.1))
-#   for (j_select in 2:length_selected_real)
-#   {
-#     if (j_select == 2)
-#       tag = "nd"
-#     else if (j_select == 3)
-#       tag = "rd"
-#     else tag = "th"
-#     
-#     # red-grey-blue divergence_hcl(3) color scale: c(142/255,226/255,2/255),c(6/255,226/255,63/255),c(59/255,226/255,165/255)
-#     color2D.matplot(Correlation[[j_select-1]],c(0,1),c(0,0),c(1,0),xrange=c(-1,1),
-#                     extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Topics in the ",Selected_real[j_select],tag," best realization",sep=""),
-#                     ylab="Topics in the best realization",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-#                     border="black",na.color="white",main=paste(Selected_real[j_select],tag," best realization",sep=""))
-#   }
-#   dev.off()
+  #   pdf(paste0("Correlation_",MOTU_sample_insert,"_RealByReal_color2D.pdf"))
+  #   # 2 topics :
+  #   #par(mfrow=c(2,1))
+  #   # 5 topics :
+  #   #par(mfrow=c(3,2))
+  #   # 10 topics
+  #   par(mfrow=c(4,4))
+  #   #par(mar=c(5.1,4.1,4.1,2.1)
+  #   par(mar=c(5.1,5.1,4.1,2.1))
+  #   for (j_select in 2:length_selected_real)
+  #   {
+  #     if (j_select == 2)
+  #       tag = "nd"
+  #     else if (j_select == 3)
+  #       tag = "rd"
+  #     else tag = "th"
+  #     
+  #     # red-grey-blue divergence_hcl(3) color scale: c(142/255,226/255,2/255),c(6/255,226/255,63/255),c(59/255,226/255,165/255)
+  #     color2D.matplot(Correlation[[j_select-1]],c(0,1),c(0,0),c(1,0),xrange=c(-1,1),
+  #                     extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Topics in the ",Selected_real[j_select],tag," best realization",sep=""),
+  #                     ylab="Topics in the best realization",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
+  #                     border="black",na.color="white",main=paste(Selected_real[j_select],tag," best realization",sep=""))
+  #   }
+  #   dev.off()
   
   pdf(paste0("SKL_",MOTU_sample_insert,"_allRealMatrix_color2D.pdf"))
   # 2 topics :
@@ -4491,20 +4774,20 @@ if (select_real && realization_comparison)
                   border="black",na.color="white")
   dev.off()
   
-#   pdf(paste0("Correlation_",MOTU_sample_insert,"_allRealMatrix_color2D.pdf"))
-#   # 2 topics :
-#   #par(mfrow=c(2,1))
-#   # 5 topics :
-#   #par(mfrow=c(3,2))
-#   # 10 topics
-#   #par(mar=c(5.1,4.1,4.1,2.1)
-#   par(mar=c(5.1,5.1,4.1,2.1))
-#   
-#   color2D.matplot(Correlation_allRealPairs[-nrow(Correlation_allRealPairs),-1],c(0,1),c(0,0),c(1,0),
-#                   extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Realizations ranked by decreasing likelihood",sep=""),
-#                   ylab="Realizations ranked by decreasing likelihood",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
-#                   border="black",na.color="white")
-#   dev.off()
+  #   pdf(paste0("Correlation_",MOTU_sample_insert,"_allRealMatrix_color2D.pdf"))
+  #   # 2 topics :
+  #   #par(mfrow=c(2,1))
+  #   # 5 topics :
+  #   #par(mfrow=c(3,2))
+  #   # 10 topics
+  #   #par(mar=c(5.1,4.1,4.1,2.1)
+  #   par(mar=c(5.1,5.1,4.1,2.1))
+  #   
+  #   color2D.matplot(Correlation_allRealPairs[-nrow(Correlation_allRealPairs),-1],c(0,1),c(0,0),c(1,0),
+  #                   extremes=NA,cellcolors=NA,show.legend=TRUE,nslices=10,xlab=paste("Realizations ranked by decreasing likelihood",sep=""),
+  #                   ylab="Realizations ranked by decreasing likelihood",do.hex=FALSE,axes=TRUE,show.values=FALSE,vcol="white",vcex=1,
+  #                   border="black",na.color="white")
+  #   dev.off()
   
   pdf(paste0("SKL_",MOTU_sample_insert,"_allRealPairs_vs_llh-diff.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
@@ -4527,7 +4810,7 @@ if (select_real && realization_comparison)
   plot(llh_differences_allRealPairs[!is.na(llh_differences_allRealPairs)],DKL100_allRealPairs[!is.na(DKL100_allRealPairs)],type="p", main = "Averaged KL distance difference between\n pairs of realizations",
        xlab = "Loglikelihood difference", ylab = "Difference of KL distance")
   dev.off()
-
+  
   pdf(paste0("nES_",MOTU_sample_insert,"_allRealPairs_vs_llh-diff.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
@@ -4537,7 +4820,7 @@ if (select_real && realization_comparison)
   if (length(which(!is.na(DKL100_allRealPairs))) != length(which(!is.na(llh_differences_allRealPairs))))
     stop("\nError in DKL100_allRealPairs values")
   plot(t(llh_differences_allRealPairs)[lower.tri(llh_differences_allRealPairs,diag=F)],nES,type="p", main = "Normalized KL distance difference between\n pairs of realizations",
-      xlab = "Loglikelihood difference", ylab = "Normalized Effect Size")
+       xlab = "Loglikelihood difference", ylab = "Normalized Effect Size")
   dev.off()
   
   if (bij)
@@ -4599,9 +4882,9 @@ if (select_real && realization_comparison)
   #     plot(seq(2,length_selected_real,1),apply(Topic_comparison,1,mean),ylim=c(0,1),type="p", main = "Averaged Hellinger similarity between\n the component communities in different realizations",
   #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")
   plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],KL_allRealPairs[1,-1],type="p", main = "Averaged KL distance between\n the component communities in different realizations",
-      xlab = "Loglikelihood difference with best realization", ylab = "KL distance to best realization")
+       xlab = "Loglikelihood difference with best realization", ylab = "KL distance to best realization")
   dev.off()
-
+  
   pdf(paste0("SKL_",MOTU_sample_insert,"_toBestReal_vs_rank.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
@@ -4616,16 +4899,26 @@ if (select_real && realization_comparison)
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
   par(mar = c(5, 5, 4, 3) + 0.1)
-  plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],DKL100_allRealPairs[1,-1],type="p", main = "Averaged KL distance diffrence between\n the component communities in different realizations",
+  plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],DKL100_allRealPairs[1,-1],type="p", main = "Averaged KL distance difference between\n the component communities in different realizations",
        xlab = "Loglikelihood difference with best realization", ylab = "Difference in KL distance to best realization")
   dev.off()
-
+  
   pdf(paste0("nES_",MOTU_sample_insert,"_toBestReal_vs_llh-diff.pdf"))  
   par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
   # par(mar = c(bottom, left, top, right))
   par(mar = c(5, 5, 4, 3) + 0.1)
-  plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],nES[1:(length_selected_real-1)],type="p", main = "Averaged KL distance diffrence between\n the component communities in different realizations",
-     xlab = "Loglikelihood difference with best realization", ylab = "Normalized Effect Size")
+  plot(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real],nES[1:(length_selected_real-1)],type="p", main = "Normalized veraged KL distance difference between\n the component communities in different realizations",
+       xlab = "Loglikelihood difference with best realization", ylab = "Normalized Effect Size")
+  dev.off()
+  
+  pdf(paste0("nES_",MOTU_sample_insert,"_toBestReal_vs_rank.pdf"))  
+  par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
+  # par(mar = c(bottom, left, top, right))
+  par(mar = c(5, 5, 4, 3) + 0.1)
+  #     plot(seq(2,length_selected_real,1),apply(Topic_comparison,1,mean),ylim=c(0,1),type="p", main = "Averaged Hellinger similarity between\n the component communities in different realizations",
+  #          xlab = "Realizations ranked by decreasing likelihood", ylab = "Hellinger similarity")
+  plot(seq(2,length_selected_real,1),nES[1:(length_selected_real-1)],type="p", main = "Normalized averaged KL distance between\n the component communities in different realizations",
+       xlab = "Realizations sorted by decreasing llh", ylab = "Normalized Effect Size")
   dev.off()
   
   pdf(paste0("p-value_",MOTU_sample_insert,"_toBestReal_vs_llh-diff.pdf"))  
@@ -4781,8 +5074,7 @@ if (testdata)
   if (nb_topics == true_nb_topics)
   {
     # Saving the KL comparison between the true topics and the LDA topics:
-    KL_true_topics_file = paste0("KL_comparison_of_LDA_accuracy_nb_rndzations",nb_rndzations_true_documents,
-                                 "_baseline",true_KL_documents_baseline,".txt")
+    KL_true_topics_file = paste0("Goodness-of-fit_nb_rndzations",nb_rndzations_true_documents,".txt")
     
     write("KL distance between true topics and LDA topics:",file=KL_true_topics_file,append=F) 
     for (k in 1:nb_topics)
@@ -4794,10 +5086,15 @@ if (testdata)
       write(Mean_KL_topic_comparison_true_documents_randomized[k],file=KL_true_topics_file,append=T)
     write(paste("Mean =",mean(Mean_KL_topic_comparison_true_documents_randomized)),file=KL_true_topics_file,append=T)
     
-    write(paste("\nDifference between the KL distance between true topics and LDA topics and the mean KL distance over",nb_rndzations_true_documents,"randomizations:"),file=KL_true_topics_file,append=T)
+    write(paste("\nDifference between the KL distance between true topics and LDA topics and the mean KL distance (ES) over",nb_rndzations_true_documents,"randomizations:"),file=KL_true_topics_file,append=T)
     for (k in 1:nb_topics)
       write(DKL100_true_documents[k],file=KL_true_topics_file,append=T)
     write(paste("Mean =",mean(DKL100_true_documents)),file=KL_true_topics_file,append=T)
+    
+    write(paste("\nNormalized difference between the KL distance between true topics and LDA topics and the mean KL distance (nES) over",nb_rndzations_true_documents,"randomizations:"),file=KL_true_topics_file,append=T)
+    for (k in 1:nb_topics)
+      write(nES_true_documents[k],file=KL_true_topics_file,append=T)
+    write(paste("Mean =",mean(nES_true_documents)),file=KL_true_topics_file,append=T)
     
     write(paste("\np-value over",nb_rndzations_true_documents,"randomizations of the KL distance between true topics and LDA topics:"),file=KL_true_topics_file,append=T)
     for (k in 1:nb_topics)
@@ -4807,7 +5104,7 @@ if (testdata)
 }
 
 ##################
-if (data_betadiv_pooled)
+if (data_betadiv_pooled && realization_comparison)
 {
   pdf("Samples_composition_allreal_oneplot.pdf")
   #par(mfrow=c(2,2))
