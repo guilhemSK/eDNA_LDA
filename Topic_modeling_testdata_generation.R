@@ -4,6 +4,7 @@ library(gtools)
 nb_samples=29*39
 nb_topics=5
 nb_motus=1000
+nb_reads=1000
 
 nonmixed = 0
 discretemix = 0
@@ -11,13 +12,13 @@ continuousmix = 1
 randommix = 0
 dirichletmix = 0
 
-randomtopics = 1
-dirichlettopics = 0
+randomtopics = 0
+dirichlettopics = 1
 
 lnor_noise = 1
 
-dirichletalpha = 0.1
-sig_noise = 1.75
+dirichletalpha = 0.02
+sig_noise = 2
 
 if (nonmixed)
 {
@@ -46,16 +47,16 @@ if (randomtopics)
 
 if (lnor_noise)
 {
-  lnor_noise_insert = paste("lnornoise_sig",sig_noise,sep="")
+  lnor_noise_insert = paste("_lnornoise_sig",sig_noise,sep="")
 } else if (!lnor_noise)
 {
   lnor_noise_insert = ""
 }
 
-testdata_dir = paste(sample_compo,"_samples_nbtopics",nb_topics,"_nbmotus",nb_motus,"_",topic_compo,"_sampledreads_",lnor_noise_insert,"/",sep="")
-dirname = paste("/Users/guilhemsommeria-klein/Desktop/These/Données_PetitPlateau/Test_data/",testdata_dir,sep="")
+testdata_dir = paste(sample_compo,"_samples_nbtopics",nb_topics,"_nbmotus",nb_motus,"_",topic_compo,"_",nb_reads,"sampledreads",lnor_noise_insert,"/",sep="")
+dirname = paste("/Users/guilhemsommeria-klein/Desktop/These/Donnees_PetitPlateau/Test_data/",testdata_dir,sep="")
 if (!(file.exists(dirname)))
-{dir.create(dirname)}
+  dir.create(dirname)
 setwd(dirname) 
 
 Sample_composition = matrix(nrow=nb_topics,ncol=nb_samples,data=0)
@@ -185,7 +186,7 @@ if (lnor_noise)
 # Sampling the reads from a multinomial distribution
 data2m_num = matrix(nrow=nb_motus,ncol=nb_samples,data=0)
 for (j in 1:nb_samples)
-  data2m_num[,j] = rmultinom(1, 10000, Read_composition[,j])
+  data2m_num[,j] = rmultinom(1, nb_reads, Read_composition[,j])
 data2m = apply(data2m_num,MARGIN=2,FUN=as.character)
 
 nb_empty_motus = 0
@@ -210,7 +211,7 @@ write(dirname,directory_file)
 save(data2m,file="data2m_testdata.Rdata")
 save(taxo_ref,file="taxo_ref_testdata.Rdata")
 save(Missing_positions_indices,file="Missing_positions_indices.Rdata")
-save(true_norm_documents,file="true_norm_documents.Rdata")
+save(true_norm_documents,file="true_documents.Rdata")
 
 
   

@@ -28,28 +28,31 @@ if (kriged_topics)
   #     barcode_insert_list = "Arthropodes_18S"
   #     barcode_labels_list = "Arthropods"
   
-#       barcode_insert_list = "Bacteries_16S"
-#       barcode_labels_list = "Bacteria"
+  #       barcode_insert_list = "Bacteries_16S"
+  #       barcode_labels_list = "Bacteria"
   
-#   barcode_insert_list = c("Bacteries_16S","Archees_16S","Protistes_18S","Champignons_ITS","Plantes_GH","Arthropodes_18S","Nematodes_18S","PLatyhelminthes_18S")
-#   barcode_labels_list = c("Bacteria 16S","Archaea 16S","Protists 18S","Fungi ITS","Plants trnL","Arthropods 18S","Nematodes 18S","Platyhelminthes 18S")
+  #   barcode_insert_list = c("Bacteries_16S","Archees_16S","Protistes_18S","Champignons_ITS","Plantes_GH","Arthropodes_18S","Nematodes_18S","PLatyhelminthes_18S")
+  #   barcode_labels_list = c("Bacteria 16S","Archaea 16S","Protists 18S","Fungi ITS","Plants trnL","Arthropods 18S","Nematodes 18S","Platyhelminthes 18S")
   
   # All barcodes :
-#   barcode_insert_list = c("Bacteries_16S","Archees_16S","Protistes_18S","Champignons_ITS","Glomeromycetes_ITS","Basidiomycetes_ITS","Ascomycetes_ITS","Plantes_GH","Arthropodes_18S","Nematodes_18S","PLatyhelminthes_18S","Annelides_18S")
-#   barcode_labels_list = c("Bacteria 16S","Archaea 16S","Protists 18S","Fungi ITS","Glomeromycota ITS","Basidiomycota ITS","Ascomycota ITS","Plants trnL","Arthropods 18S","Nematodes 18S","Platyhelminthes 18S","Annelids 18S")
+  #   barcode_insert_list = c("Bacteries_16S","Archees_16S","Protistes_18S","Champignons_ITS","Glomeromycetes_ITS","Basidiomycetes_ITS","Ascomycetes_ITS","Plantes_GH","Arthropodes_18S","Nematodes_18S","PLatyhelminthes_18S","Annelides_18S")
+  #   barcode_labels_list = c("Bacteria 16S","Archaea 16S","Protists 18S","Fungi ITS","Glomeromycota ITS","Basidiomycota ITS","Ascomycota ITS","Plants trnL","Arthropods 18S","Nematodes 18S","Platyhelminthes 18S","Annelids 18S")
   
   # All barcodes except Nema :
-#   barcode_insert_list = c("Bacteries_16S","Archees_16S","Protistes_18S","Champignons_ITS","Glomeromycetes_ITS","Basidiomycetes_ITS","Ascomycetes_ITS","Plantes_GH","Arthropodes_18S","PLatyhelminthes_18S","Annelides_18S")
-#   barcode_labels_list = c("Bacteria 16S","Archaea 16S","Protists 18S","Fungi ITS","Glomeromycota ITS","Basidiomycota ITS","Ascomycota ITS","Plants trnL","Arthropods 18S","Platyhelminthes 18S","Annelids 18S")
-
+  #   barcode_insert_list = c("Bacteries_16S","Archees_16S","Protistes_18S","Champignons_ITS","Glomeromycetes_ITS","Basidiomycetes_ITS","Ascomycetes_ITS","Plantes_GH","Arthropodes_18S","PLatyhelminthes_18S","Annelides_18S")
+  #   barcode_labels_list = c("Bacteria 16S","Archaea 16S","Protists 18S","Fungi ITS","Glomeromycota ITS","Basidiomycota ITS","Ascomycota ITS","Plants trnL","Arthropods 18S","Platyhelminthes 18S","Annelids 18S")
+  
 #   barcode_insert_list = c("Bacteries_16S","Protistes_18S","Champignons_ITS")
 #   barcode_labels_list = c("Bacteria","Protists","Fungi")
-
-#   barcode_insert_list = rep(c("Bacteries_16S","Protistes_18S","Champignons_ITS"),3)
-#   barcode_labels_list = rep(c("Bacteria","Protists","Fungi"),3)
-
-barcode_insert_list = c(rep(c("Archees_16S","Arthropodes_18S","Nematodes_18S"),2),rep(c("Platyhelminthes_18S","Annelides_18S"),2))
-barcode_labels_list = c(rep(c("Archaea","Arthropods","Nematodes"),2),rep(c("Platyhelminthes","Annelids"),2))
+  
+  #   barcode_insert_list = rep(c("Bacteries_16S","Protistes_18S","Champignons_ITS"),3)
+  #   barcode_labels_list = rep(c("Bacteria","Protists","Fungi"),3)
+  
+    barcode_insert_list = rep(c("Bacteries_16S","Protistes_18S","Champignons_ITS"),2)
+    barcode_labels_list = rep(c("Bacteria","Protists","Fungi"),2)
+  
+  # barcode_insert_list = c(rep(c("Archees_16S","Arthropodes_18S","Nematodes_18S"),2),rep(c("Platyhelminthes_18S","Annelides_18S"),2))
+  # barcode_labels_list = c(rep(c("Archaea","Arthropods","Nematodes"),2),rep(c("Platyhelminthes","Annelids"),2))
   
   #   barcode_insert_list = c("Champignons_ITS","Plantes_GH")
   #   barcode_labels_list = c("Fungi","Plants")
@@ -61,18 +64,25 @@ barcode_labels_list = c(rep(c("Archaea","Arthropods","Nematodes"),2),rep(c("Plat
   #   barcode_labels_list = c("Fungi ITS","Plants trnL","Arthropods 18S")
   
   #occurrence_vect = c(0,0,0,1,1,1)
+  #occurrence_vect = c(1,1,1)
+  occurrence_vect = rep(1,6)
   #occurrence_vect = c(1,1,1,1,1,1,1,1,1)
-  occurrence_vect = c(1,1,1,0,0,0,1,1,0,0)
-#    occurrence_vect = 1
+  #occurrence_vect = c(1,1,1,0,0,0,1,1,0,0)
+  #    occurrence_vect = 1
   # Number of sites an OTU must ocuppy to be kept
   # (if nb_occupied_sites_threshold = 1, all OTUs with non-zero abundance are kept)
   #nb_occupied_sites_threshold_vect = c(1,1,1,2,2,2,1,1,1)
-  nb_occupied_sites_threshold_vect = rep(1,10)
+  #nb_occupied_sites_threshold_vect = rep(1,10)
+  nb_occupied_sites_threshold_vect = rep(1,6)
+  #nb_occupied_sites_threshold_vect = rep(1,3)
   # Removing OTUs with less reads than the number of sites
   #no_rare_vect = c(0,0,0,0,0,0,1,1,1)
-  no_rare_vect = rep(0,10)
-
-  nb_topics = 3
+  #no_rare_vect = rep(0,10)
+  no_rare_vect = rep(0,6)
+  
+  #nb_topics = 3
+  #nb_topics_vect = c(5,2,4)
+  nb_topics_vect = c(3,3,3,5,2,4)
   nb_real = 100
   em_tol = 10^-7
   var_tol = 10^-8
@@ -81,73 +91,77 @@ barcode_labels_list = c(rep(c("Archaea","Arthropods","Nematodes"),2),rep(c("Plat
     horizVert_insert = "_vertical"
   else if (horizontal)
     horizVert_insert = "_horizontal"
-
+  
   if (discrete)
     discrete_insert = "_discrete"
   else
     discrete_insert = ""
   
-########
-setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/",sep=""))
-r_topo <- raster("r_topol_0.asc")
-r_topo_transposed_flipped = flip(t(r_topo),'y')
-r_slope <- raster("r_slopel_0.asc")
-r_slope_transposed_flipped = flip(t(r_slope),'y')
-r_wetness <- raster("r_wetnessl_0.asc")
-r_wetness_transposed_flipped = flip(t(r_wetness),'y')
-
-#TopoPP = as.data.frame(r_topo, row.names=NULL, optional=FALSE, xy=TRUE, na.rm=FALSE, long=FALSE)
-TopoPP = as.data.frame(r_topo_transposed_flipped, row.names=NULL, optional=FALSE, xy=TRUE, na.rm=FALSE, long=FALSE)
-SlopePP = as.data.frame(r_slope_transposed_flipped, row.names=NULL, optional=FALSE, xy=TRUE, na.rm=FALSE, long=FALSE)
-SlopePPmod = SlopePP 
-SlopePPmod$layer[SlopePP$layer>0.50] = 0.50
-#     TopoPP_inverse = TopoPP
-#     TopoPP_inverse$layer = max(TopoPP_inverse$layer)-TopoPP_inverse$layer
-WetnessPP = as.data.frame(r_wetness_transposed_flipped, row.names=NULL, optional=FALSE, xy=TRUE, na.rm=FALSE, long=FALSE)
-data_lidar_3topics = list()
-data_lidar_3topics[[1]] = TopoPP
-#data_lidar_3topics[[2]] = TopoPP_inverse
-data_lidar_3topics[[2]] = WetnessPP
-#data_lidar_3topics[[3]] = SlopePP
-data_lidar_3topics[[3]] = SlopePPmod
-
-Assemblage_labels_list = c("Terra firme","Hydromorphic","Exposed rock")
-
-#map_labels = c("Topography","Inverse topography","Slope")
-map_labels = c("Topography (m a.s.l.)","Wetness","Slope")
-
-##########
-# if (occurrence && (any(barcode_insert_list == "Plantes_GH")))
-# {
-#   setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Chemistery/",sep=""))
-#   # produces a dataframe with columns as vectors instead of factors (otherwise one cannot direclty apply "as.numeric" to the values)
-#   data_abiotic = read.table("chemistry_pred_CRIJ.txt",sep=" ",colClasses="vector")
-#   data_abiotic = apply(data_abiotic,2,as.numeric)
-#   
-#   abiotic_PCA = dudi.pca(as.data.frame(data_abiotic), row.w = rep(1, nrow(data_abiotic))/nrow(data_abiotic), 
-#                          col.w = rep(1, ncol(data_abiotic)), center = TRUE, scale = TRUE, 
-#                          scannf = F, nf = ncol(data_abiotic)) 
-#   
-#   newdata = expand.grid(x=seq(0,300,2), y=seq(0,400,2))
-#   coordPP = expand.grid(x=seq(10,290,10), y=seq(10,390,10))
-#   spatial_chemi_kriged = list()
-#   for (k in 1:nb_topics)
-#   {
-#     data_chemi = data.frame(x=coordPP$x,y=coordPP$y,z=abiotic_PCA$li[,k])
-#     mod = gstat(id = "z", formula = z~1, locations = ~x+y, data=data_chemi, model=vgm(10, "Exp", 20))
-#     spatial_chemi_kriged[[k]] = predict(mod, newdata, na.action=na.omit)
-#   }
-# }
-
-###########
-
+  data_insert = "Donnees_PetitPlateau"  
+  
+  ########
+  setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Lidar/",sep=""))
+  r_topo <- raster("r_topol_0.asc")
+  r_topo_transposed_flipped = flip(t(r_topo),'y')
+  r_slope <- raster("r_slopel_0.asc")
+  r_slope_transposed_flipped = flip(t(r_slope),'y')
+  r_wetness <- raster("r_wetnessl_0.asc")
+  r_wetness_transposed_flipped = flip(t(r_wetness),'y')
+  
+  #TopoPP = as.data.frame(r_topo, row.names=NULL, optional=FALSE, xy=TRUE, na.rm=FALSE, long=FALSE)
+  TopoPP = as.data.frame(r_topo_transposed_flipped, row.names=NULL, optional=FALSE, xy=TRUE, na.rm=FALSE, long=FALSE)
+  SlopePP = as.data.frame(r_slope_transposed_flipped, row.names=NULL, optional=FALSE, xy=TRUE, na.rm=FALSE, long=FALSE)
+  SlopePPmod = SlopePP 
+  SlopePPmod$layer[SlopePP$layer>0.50] = 0.50
+  #     TopoPP_inverse = TopoPP
+  #     TopoPP_inverse$layer = max(TopoPP_inverse$layer)-TopoPP_inverse$layer
+  WetnessPP = as.data.frame(r_wetness_transposed_flipped, row.names=NULL, optional=FALSE, xy=TRUE, na.rm=FALSE, long=FALSE)
+  data_lidar_3topics = list()
+  data_lidar_3topics[[1]] = TopoPP
+  #data_lidar_3topics[[2]] = TopoPP_inverse
+  data_lidar_3topics[[2]] = WetnessPP
+  #data_lidar_3topics[[3]] = SlopePP
+  data_lidar_3topics[[3]] = SlopePPmod
+  
+  Assemblage_labels_list = c("Terra firme","Hydromorphic","Exposed rock")
+  
+  #map_labels = c("Topography","Inverse topography","Slope")
+  map_labels = c("Topography (m a.s.l.)","Wetness","Slope")
+  
+  ##########
+  # if (occurrence && (any(barcode_insert_list == "Plantes_GH")))
+  # {
+  #   setwd(paste("/Users/guilhemsommeria-klein/Desktop/These/",data_insert,"/Chemistery/",sep=""))
+  #   # produces a dataframe with columns as vectors instead of factors (otherwise one cannot direclty apply "as.numeric" to the values)
+  #   data_abiotic = read.table("chemistry_pred_CRIJ.txt",sep=" ",colClasses="vector")
+  #   data_abiotic = apply(data_abiotic,2,as.numeric)
+  #   
+  #   abiotic_PCA = dudi.pca(as.data.frame(data_abiotic), row.w = rep(1, nrow(data_abiotic))/nrow(data_abiotic), 
+  #                          col.w = rep(1, ncol(data_abiotic)), center = TRUE, scale = TRUE, 
+  #                          scannf = F, nf = ncol(data_abiotic)) 
+  #   
+  #   newdata = expand.grid(x=seq(0,300,2), y=seq(0,400,2))
+  #   coordPP = expand.grid(x=seq(10,290,10), y=seq(10,390,10))
+  #   spatial_chemi_kriged = list()
+  #   for (k in 1:nb_topics)
+  #   {
+  #     data_chemi = data.frame(x=coordPP$x,y=coordPP$y,z=abiotic_PCA$li[,k])
+  #     mod = gstat(id = "z", formula = z~1, locations = ~x+y, data=data_chemi, model=vgm(10, "Exp", 20))
+  #     spatial_chemi_kriged[[k]] = predict(mod, newdata, na.action=na.omit)
+  #   }
+  # }
+  
+  ###########
+  
   tmp.plot = list()
   lidar.plot = list()
-#   chemi.plot = list()
+  #   chemi.plot = list()
   barcode_index = 0
   for (barcode_insert in barcode_insert_list)
   {
     barcode_index = barcode_index+1
+    
+    nb_topics = nb_topics_vect[barcode_index]
     
     if (occurrence_vect[barcode_index])
       occurrence_insert = "_occurrence"
@@ -170,15 +184,14 @@ map_labels = c("Topography (m a.s.l.)","Wetness","Slope")
       no_rare_insert = ""
     }
     
-    data_insert = "Donnees_PetitPlateau"
     filename_insert = "Rtopicmodels_LDA_VEM"
     local_prefix = "/Users/guilhemsommeria-klein/Desktop/These/" 
     local_dirname = paste(local_prefix,data_insert,"/",barcode_insert,"/",filename_insert,"/",sep="")
     local_subdirname = paste(local_dirname,filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/",sep="")
-    if (occurrence_vect[barcode_index] && (nb_occupied_sites_threshold_vect[barcode_index] == 1) && !no_rare_vect[barcode_index] && (barcode_insert == "Platyhelminthes_18S"))
-      subsubdirname = paste(local_subdirname,"ordered_realization_number_5/",sep="")
-    else 
-      subsubdirname = paste(local_subdirname,"ordered_realization_number_1/",sep="")  
+    #     if (occurrence_vect[barcode_index] && (nb_occupied_sites_threshold_vect[barcode_index] == 1) && !no_rare_vect[barcode_index] && (barcode_insert == "Platyhelminthes_18S"))
+    #       subsubdirname = paste(local_subdirname,"ordered_realization_number_5/",sep="")
+    #     else 
+    subsubdirname = paste(local_subdirname,"ordered_realization_number_1/",sep="")  
     subsubsubdirname = paste(subsubdirname,"/topics_site_repartition_info/",sep="")  
     
     #newdata = expand.grid(x=seq(0,300,2), y=seq(0,400,2))
@@ -190,29 +203,39 @@ map_labels = c("Topography (m a.s.l.)","Wetness","Slope")
     load("sort_normal_topic.Rdata")
     #   filename = paste(filename_insert,"_nb_topics",nb_topics,"_nb_real",nb_real,"_em_tol",em_tol,"_var_tol",var_tol,"_best_keep.Rdata",sep="")
     #   load(filename)
-    if (!occurrence_vect[barcode_index])
+    if (nb_topics == 3)
     {
-      if (barcode_insert == "Archees_16S") 
-        topic_order = rev(sort_normal_topic$ix)[c(1,3,2)]
-      else if (barcode_insert == "Protistes_18S")
-        topic_order = rev(sort_normal_topic$ix)[c(1,3,2)]
-      else if (barcode_insert == "Plantes_GH")
-        topic_order = c(3,2,1)
-#       else if (barcode_insert == "Nematodes_18S")
-#         topic_order = rev(sort_normal_topic$ix)[c(2,3,1)]
-      else if (barcode_insert == "Annelides_18S")
-        topic_order = rev(sort_normal_topic$ix)[c(1,3,2)]
-      else 
-        topic_order = rev(sort_normal_topic$ix)
-    } else if (occurrence_vect[barcode_index])
-    {
-      if (barcode_insert == "Platyhelminthes_18S") 
-        topic_order = rev(sort_normal_topic$ix)[c(1,3,2)]
-      else if (barcode_insert == "Annelides_18S")
-        topic_order = rev(sort_normal_topic$ix)[c(1,3,2)]
-      else
-        topic_order = rev(sort_normal_topic$ix)
-    }
+      if (!occurrence_vect[barcode_index])
+      {
+        if (barcode_insert == "Archees_16S") 
+          topic_order = rev(sort_normal_topic$ix)[c(1,3,2)]
+        else if (barcode_insert == "Protistes_18S")
+          topic_order = rev(sort_normal_topic$ix)[c(1,3,2)]
+        else if (barcode_insert == "Plantes_GH")
+          topic_order = c(3,2,1)
+        #       else if (barcode_insert == "Nematodes_18S")
+        #         topic_order = rev(sort_normal_topic$ix)[c(2,3,1)]
+        else if (barcode_insert == "Annelides_18S")
+          topic_order = rev(sort_normal_topic$ix)[c(1,3,2)]
+        else 
+          topic_order = rev(sort_normal_topic$ix)
+      } else if (occurrence_vect[barcode_index])
+      {
+        #       if (barcode_insert == "Platyhelminthes_18S") 
+        #         topic_order = rev(sort_normal_topic$ix)[c(1,3,2)]
+        #       else if (barcode_insert == "Annelides_18S")
+        #         topic_order = rev(sort_normal_topic$ix)[c(1,3,2)]
+        if (barcode_insert == "Nematodes_18S") 
+          topic_order = rev(sort_normal_topic$ix)[c(2,1,3)]
+        else if (barcode_insert == "Arthropodes_18S")
+          topic_order = rev(sort_normal_topic$ix)[c(2,1,3)]
+        else if (barcode_insert == "Annelides_18S")
+          topic_order = rev(sort_normal_topic$ix)[c(2,3,1)]
+        else
+          topic_order = rev(sort_normal_topic$ix)
+      }
+    } else
+      topic_order = rev(sort_normal_topic$ix)
     
     setwd(subsubsubdirname)
     spatial_topicmix_kriged = readRDS("Spatial_topicmix_kriged.rds")
@@ -224,6 +247,7 @@ map_labels = c("Topography (m a.s.l.)","Wetness","Slope")
     if (one_plot)
     {
       color.pal = colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000"))
+      #color.pal = colorRampPalette(c(rgb(0,0,255,maxColorValue=255),rgb(0,255,0,maxColorValue=255),rgb(255,0,0,maxColorValue=255)))
       # Removing interpolated relative abundances falling outside of [0,1]
       # The sum of all assemblages may then not be 1 for all pixels
       for (k in 1:nb_topics)
@@ -278,24 +302,24 @@ map_labels = c("Topography (m a.s.l.)","Wetness","Slope")
       
       if (!discrete)
       {
-      # Plotting each topic as a distinct color on a single map
-      current_plot = ggplot(data = spatial_topicmix_kriged_all_topics_colors) +
-        geom_raster(data = spatial_topicmix_kriged_all_topics_colors, aes(x, y), 
-                    fill=rgb(spatial_topicmix_kriged_all_topics_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_colors[,3:5]))), inherit.aes = F) +
-        #geom_raster() +
-        coord_equal() + theme_minimal() +
-        labs(fill=barcode_labels_list[barcode_index]) + ggtitle(letters[barcode_index]) +
-        #labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
-        theme(legend.position="bottom", legend.text=element_text(size=13), 
-              legend.title=element_text(size=16), axis.title=element_blank(), 
-              axis.text = element_blank(),
-#               plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,1,-2,2),"mm")) +
-              plot.title=element_text(hjust=0,size=10), plot.margin=unit(c(2,-10,0,-10),"mm")) +
-        guides(fill = guide_colorbar(barwidth = 8, barheight = 0.5, title.position="bottom")) +
-        scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
-        scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
-        geom_point(data = data.frame(coordPP,z.pred=rep(0,nrow(coordPP))), aes(x,y), color="black", size=0.1, alpha=0.3, inherit.aes = F)
-      
+        # Plotting each topic as a distinct color on a single map
+        current_plot = ggplot(data = spatial_topicmix_kriged_all_topics_colors) +
+          geom_raster(data = spatial_topicmix_kriged_all_topics_colors, aes(x, y), 
+                      fill=rgb(spatial_topicmix_kriged_all_topics_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_colors[,3:5]))), inherit.aes = F) +
+          #geom_raster() +
+          coord_equal() + theme_minimal() +
+          labs(fill=barcode_labels_list[barcode_index]) + ggtitle(letters[barcode_index]) +
+          #labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
+          theme(legend.position="bottom", legend.text=element_text(size=13), 
+                legend.title=element_text(size=20), axis.title=element_blank(), 
+                axis.text = element_blank(),
+                #               plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,1,-2,2),"mm")) +
+                plot.title=element_text(hjust=0,size=20), plot.margin=unit(c(2,-10,0,-10),"mm")) +
+          guides(fill = guide_colorbar(barwidth = 8, barheight = 0.5, title.position="bottom")) +
+          scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
+          scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
+          geom_point(data = data.frame(coordPP,z.pred=rep(0,nrow(coordPP))), aes(x,y), color="black", size=0.1, alpha=0.3, inherit.aes = F)
+        
       } else if (discrete)
       {
         # Plotting only the dominant topic as a distinct color in each pixel
@@ -346,137 +370,139 @@ map_labels = c("Topography (m a.s.l.)","Wetness","Slope")
                 #           theme(legend.position="bottom", legend.text=element_text(size=11), 
                 #                 legend.title=element_text(size=12), axis.title=element_blank(), 
                 axis.text = element_blank(),
-#                 plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,1,-2,2),"mm")) +
+                #                 plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,1,-2,2),"mm")) +
                 plot.title=element_text(hjust=0,size=10), plot.margin=unit(c(2,-10,0,-10),"mm")) +
           #                 plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
           guides(fill = guide_colorbar(barwidth = 6, barheight = 0.3, title.position="bottom"))
         # size = 14 and 15 for vertical 5 topics
       }
     } else
-    #####################################################
-    {
-      
-      for (k in 1:nb_topics)
-      {
-        k0 = topic_order[k]
-        
-        if (horizontal)
-        {
-          if (barcode_index == 1)
-            tmp.plot[[k]] = list()
-        }
-        
-        current_plot = qplot(x, y, data=spatial_topicmix_kriged[[k0]], geom="raster", fill=z.pred) +
-          #tmp.plot[[k]] = qplot(x, y, spatial_topicmix_Blaise, geom="raster", fill=z.pred) +
-          #tmp.plot[[k]] = qplot(x, y, data=spatial_topicmix_kriged, geom="raster", fill=z.pred) +
-          #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", function(x) round(x,0))) + 
-          #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", scientific_format())) +
-          scale_fill_gradientn(colours=color.pal(7)) +
-          coord_equal() +
-          #labs(fill=paste("Assemblage",k,barcode_labels_list[barcode_index])) +
-          labs(fill=paste("Assemblage",k)) +
-          #labs(fill=paste(Assemblage_labels_list[k],"-",barcode_labels_list[barcode_index])) +
-          #labs(fill=Assemblage_labels_list[k]) +
-          theme_minimal() + 
-          scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
-          scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
-          theme(legend.position="bottom", legend.text=element_text(size=13), 
-                legend.title=element_text(size=25), axis.title=element_blank(), 
-                #           theme(legend.position="bottom", legend.text=element_text(size=11), 
-                #                 legend.title=element_text(size=12), axis.title=element_blank(), 
-                axis.text = element_blank(),
-                #               plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
-                #               plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,1,-2,2),"mm")) +
-                plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,2,-2,2),"mm")) +
-          guides(fill = guide_colorbar(barwidth = 10, barheight = 0.5, title.position="bottom")) +
-          geom_point(data = data.frame(coordPP,z.pred=rep(0,nrow(coordPP))), aes(x,y), color="black", size=0.2, alpha=0.3)
-        
-        if (horizontal)
-        {
-          current_plot = current_plot + ggtitle(letters[(k-1)*(length(barcode_insert_list)+1) + barcode_index])
-          tmp.plot[[k]][[barcode_index]] = current_plot
-        }
-        else if (vertical)
-        {
-          #current_plot = current_plot + ggtitle(letters[(barcode_index-1)*nb_topics+k])
-          tmp.plot[[barcode_index]][[k]] = current_plot
-        }
-        
-        #sauver l'objet en pdf
-        #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", tmp.plot)
-        
-        #Tu peux mettre plusieurs cartes (plusieurs tmp.plot) dans une liste et arranger la sortie sur plusieurs panels de la manière suivante (ici mettons que tu as 14 cartes et que tu veux les montrer sur 7 colonnes (et donc 2 lignes):
-        #         ggsave(filename = "Figchim.pdf", do.call("arrangeGrob", c(list.tmp.plot, ncol=7)), height = 8, width = 10)
-        
-        if ((barcode_index == length(barcode_insert_list)) && horizontal)
-        {
-          tmp.plot[[k]][[barcode_index+1]] = qplot(x, y, data = data_lidar_3topics[[k]], geom="raster", fill=layer) +
-            #lidar.plot[[k]] = qplot(x, y, data = data_lidar_3topics[[k]], geom="raster", fill=layer) +
-            #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", function(x) round(x,0))) + 
-            #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", scientific_format())) +
-            scale_fill_gradientn(colours=color.pal(7)) +
-            coord_equal() +
-            labs(fill=map_labels[k]) +  theme_minimal() + ggtitle(letters[(k-1)*(length(barcode_insert_list)+1) + barcode_index + 1]) +
-            scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
-            scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
-            theme(legend.position="bottom", legend.text=element_text(size=13), 
-                  legend.title=element_text(size=16), axis.title=element_blank(), 
-                  #           theme(legend.position="bottom", legend.text=element_text(size=11), 
-                  #                 legend.title=element_text(size=12), axis.title=element_blank(), 
-                  axis.text = element_blank(),
-                  plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,2,-2,2),"mm")) +
-            #                 plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
-            guides(fill = guide_colorbar(barwidth = 10, barheight = 0.5, title.position="bottom"))
-          # size = 14 and 15 for vertical 5 topics
-        } else if ((barcode_index == 1) && vertical)
-        {          
-          lidar.plot[[k]] = qplot(x, y, data = data_lidar_3topics[[k]], geom="raster", fill=layer) +
-            #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", function(x) round(x,0))) + 
-            #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", scientific_format())) +
-            scale_fill_gradientn(colours=color.pal(7)) +
-            labs(fill=map_labels[k]) +  theme_minimal() +
-            #ggtitle(letters[k+length(barcode_insert_list)*nb_topics]) +
-            scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
-            scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
-            theme(legend.position="bottom", legend.text=element_text(size=16), 
-                  legend.title=element_text(size=20), axis.title=element_blank(), 
-                  #           theme(legend.position="bottom", legend.text=element_text(size=11), 
-                  #                 legend.title=element_text(size=12), axis.title=element_blank(), 
-                  axis.text = element_blank(),
-                  plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,1,-2,2),"mm")) +
-            #                 plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
-            guides(fill = guide_colorbar(barwidth = 8, barheight = 0.5, title.position="bottom"))
-          # size = 14 and 15 for vertical 5 topics
-        }
-      }
-    }
-    # End of the barcode_insert loop:
-  }
+      #####################################################
+{
   
-  setwd("/Users/guilhemsommeria-klein/Desktop/These/Manuscrits/Paper2/Figures/")
-  if (vertical)
+  for (k in 1:nb_topics)
   {
-    if (one_plot)
+    k0 = topic_order[k]
+    
+    if (horizontal)
     {
-#       ggsave(filename = paste0("Kriged_topics_with_Lidar_bact-prot-fungi_ab-",occurrence_insert,remove_single_sites_insert,no_rare_insert,horizVert_insert,"_oneplot",discrete_insert,".pdf"),
-#              do.call("arrangeGrob", 
-#                                  c(tmp.plot, lidar.plot, ncol=3)),
-# #                                  c(tmp.plot, ncol=3)),
-# #                                    c(tmp.plot, ncol=1)),
-# #              height = 10/3*4/3*(2+1), width = 10)
-#               heights = c(rep(10/3*4/3*0.8,6),rep(10/3*4/3,6)))
-# #              height = 10/3*4/3, width = 10/3)
-      
-      #pdf(paste0("Kriged_topics_with_Lidar_bact-prot-fungi_ab-",occurrence_insert,remove_single_sites_insert,no_rare_insert,horizVert_insert,"_oneplot",discrete_insert,".pdf"))
-      #pdf(paste0("Kriged_topics_bact-prot-fungi_occ_noSingleSite_noRare",horizVert_insert,"_oneplot",discrete_insert,".pdf"))
-      pdf(paste0("Kriged_topics_arch-arth-nema-plath-anne_occ-ab",horizVert_insert,"_oneplot",discrete_insert,".pdf"))
-      #grid.arrange(grobs = c(tmp.plot, lidar.plot),ncol=3,heights = unit(c(10*4/3*0.7,10*4/3*0.7,10*4/3),"cm"), widths=unit(rep(10,3),"cm"))
-      # Figure 4 :
-      #grid.arrange(grobs = c(tmp.plot, lidar.plot),ncol=3,heights = c(10*4/3*0.72,10*4/3*0.72,10*4/3), width = 10)
-      grid.arrange(grobs = tmp.plot, ncol=3, width = 10, height = 10/3*4*4/3, layout_matrix = rbind(c(1,2,3),c(4,5,6),c(7,8,NA),c(9,10,NA)))
-      dev.off()
-    } else
+      if (barcode_index == 1)
+        tmp.plot[[k]] = list()
+    }
+    
+    current_plot = qplot(x, y, data=spatial_topicmix_kriged[[k0]], geom="raster", fill=z.pred) +
+      #tmp.plot[[k]] = qplot(x, y, spatial_topicmix_Blaise, geom="raster", fill=z.pred) +
+      #tmp.plot[[k]] = qplot(x, y, data=spatial_topicmix_kriged, geom="raster", fill=z.pred) +
+      #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", function(x) round(x,0))) + 
+      #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", scientific_format())) +
+      scale_fill_gradientn(colours=color.pal(7)) +
+      coord_equal() +
+      #labs(fill=paste("Assemblage",k,barcode_labels_list[barcode_index])) +
+      labs(fill=paste("Assemblage",k)) +
+      #labs(fill=paste(Assemblage_labels_list[k],"-",barcode_labels_list[barcode_index])) +
+      #labs(fill=Assemblage_labels_list[k]) +
+      theme_minimal() + 
+      scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
+      scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
+      theme(legend.position="bottom", legend.text=element_text(size=13), 
+            legend.title=element_text(size=25), axis.title=element_blank(), 
+            #           theme(legend.position="bottom", legend.text=element_text(size=11), 
+            #                 legend.title=element_text(size=12), axis.title=element_blank(), 
+            axis.text = element_blank(),
+            #               plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
+            #               plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,1,-2,2),"mm")) +
+            plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,2,-2,2),"mm")) +
+      guides(fill = guide_colorbar(barwidth = 10, barheight = 0.5, title.position="bottom")) +
+      geom_point(data = data.frame(coordPP,z.pred=rep(0,nrow(coordPP))), aes(x,y), color="black", size=0.2, alpha=0.3)
+    
+    if (horizontal)
     {
+      current_plot = current_plot + ggtitle(letters[(k-1)*(length(barcode_insert_list)+1) + barcode_index])
+      tmp.plot[[k]][[barcode_index]] = current_plot
+    }
+    else if (vertical)
+    {
+      #current_plot = current_plot + ggtitle(letters[(barcode_index-1)*nb_topics+k])
+      tmp.plot[[barcode_index]][[k]] = current_plot
+    }
+    
+    #sauver l'objet en pdf
+    #ggsave(filename = "Topic_ordered_by_site-normalized_abundance_composition_maps_kriged.pdf", tmp.plot)
+    
+    #Tu peux mettre plusieurs cartes (plusieurs tmp.plot) dans une liste et arranger la sortie sur plusieurs panels de la manière suivante (ici mettons que tu as 14 cartes et que tu veux les montrer sur 7 colonnes (et donc 2 lignes):
+    #         ggsave(filename = "Figchim.pdf", do.call("arrangeGrob", c(list.tmp.plot, ncol=7)), height = 8, width = 10)
+    
+    if ((barcode_index == length(barcode_insert_list)) && horizontal)
+    {
+      tmp.plot[[k]][[barcode_index+1]] = qplot(x, y, data = data_lidar_3topics[[k]], geom="raster", fill=layer) +
+        #lidar.plot[[k]] = qplot(x, y, data = data_lidar_3topics[[k]], geom="raster", fill=layer) +
+        #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", function(x) round(x,0))) + 
+        #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", scientific_format())) +
+        scale_fill_gradientn(colours=color.pal(7)) +
+        coord_equal() +
+        labs(fill=map_labels[k]) +  theme_minimal() + ggtitle(letters[(k-1)*(length(barcode_insert_list)+1) + barcode_index + 1]) +
+        scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
+        scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
+        theme(legend.position="bottom", legend.text=element_text(size=13), 
+              legend.title=element_text(size=16), axis.title=element_blank(), 
+              #           theme(legend.position="bottom", legend.text=element_text(size=11), 
+              #                 legend.title=element_text(size=12), axis.title=element_blank(), 
+              axis.text = element_blank(),
+              plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,2,-2,2),"mm")) +
+        #                 plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
+        guides(fill = guide_colorbar(barwidth = 10, barheight = 0.5, title.position="bottom"))
+      # size = 14 and 15 for vertical 5 topics
+    } else if ((barcode_index == 1) && vertical)
+    {          
+      lidar.plot[[k]] = qplot(x, y, data = data_lidar_3topics[[k]], geom="raster", fill=layer) +
+        #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", function(x) round(x,0))) + 
+        #scale_fill_gradientn(colours=color.pal(7), labels=trans_format("identity", scientific_format())) +
+        scale_fill_gradientn(colours=color.pal(7)) +
+        labs(fill=map_labels[k]) +  theme_minimal() +
+        #ggtitle(letters[k+length(barcode_insert_list)*nb_topics]) +
+        scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
+        scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
+        theme(legend.position="bottom", legend.text=element_text(size=16), 
+              legend.title=element_text(size=20), axis.title=element_blank(), 
+              #           theme(legend.position="bottom", legend.text=element_text(size=11), 
+              #                 legend.title=element_text(size=12), axis.title=element_blank(), 
+              axis.text = element_blank(),
+              plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,1,-2,2),"mm")) +
+        #                 plot.title=element_text(hjust=0), plot.margin=unit(c(0,1,-2,2),"mm")) +
+        guides(fill = guide_colorbar(barwidth = 8, barheight = 0.5, title.position="bottom"))
+      # size = 14 and 15 for vertical 5 topics
+    }
+  }
+}
+# End of the barcode_insert loop:
+  }
+
+setwd("/Users/guilhemsommeria-klein/Desktop/These/Manuscrits/Paper2/Figures/")
+if (vertical)
+{
+  if (one_plot)
+  {
+          ggsave(filename = paste0("Kriged_topics_bact-prot-fungi_optimalK-K3",remove_single_sites_insert,no_rare_insert,horizVert_insert,"_oneplot",discrete_insert,".pdf"),
+                 do.call("arrangeGrob", 
+                                     c(tmp.plot, ncol=3)),width=10,height=10/3*4/3*2)
+    #                                  c(tmp.plot, ncol=3)),
+    #                                    c(tmp.plot, ncol=1)),
+    #              height = 10/3*4/3*(2+1), width = 10)
+                  #heights = c(rep(10/3*4/3*0.8,6),rep(10/3*4/3,6)))
+    #              height = 10/3*4/3, width = 10/3)
+    
+    #pdf(paste0("Kriged_topics_bact-prot-fungi_optimalK",remove_single_sites_insert,no_rare_insert,horizVert_insert,"_oneplot",discrete_insert,".pdf"))
+    #pdf(paste0("Kriged_topics_with_Lidar_bact-prot-fungi_ab-occ",remove_single_sites_insert,no_rare_insert,horizVert_insert,"_oneplot",discrete_insert,".pdf"))
+    #pdf(paste0("Kriged_topics_bact-prot-fungi_occ_noSingleSite_noRare",horizVert_insert,"_oneplot",discrete_insert,".pdf"))
+    #pdf(paste0("Kriged_topics_arch-arth-nema-plath-anne_occ-ab",horizVert_insert,"_oneplot",discrete_insert,".pdf"))
+    #grid.arrange(grobs = c(tmp.plot, lidar.plot),ncol=3,heights = unit(c(10*4/3*0.7,10*4/3*0.7,10*4/3),"cm"), widths=unit(rep(10,3),"cm"))
+    #grid.arrange(grobs = as.list(tmp.plot), ncol=3)
+    # Figure 4 :
+    #grid.arrange(grobs = c(tmp.plot, lidar.plot),ncol=3,heights = c(10*4/3*0.72,10*4/3*0.72,10*4/3), width = 10)
+    #grid.arrange(grobs = tmp.plot, ncol=3, width = 10, height = 10/3*4*4/3, layout_matrix = rbind(c(1,2,3),c(4,5,6),c(7,8,NA),c(9,10,NA)))
+    #dev.off()
+  } else
+  {
     #     ggsave(filename = "Kriged_topics_with_Lidar_5barcodes_vertical.pdf", do.call("arrangeGrob", 
     #                 c(tmp.plot[[1]], tmp.plot[[2]], tmp.plot[[3]], tmp.plot[[4]], tmp.plot[[5]], lidar.plot, ncol=nb_topics)),
     #                 height = 10/3*4/3*(length(barcode_insert_list)+1), width = 10)
@@ -486,51 +512,51 @@ map_labels = c("Topography (m a.s.l.)","Wetness","Slope")
     #     ggsave(filename = "Kriged_topics_archaea-protists.pdf", do.call("arrangeGrob", 
     #             c(tmp.plot[[1]], tmp.plot[[2]], ncol=nb_topics)),
     #            height = 10/3*4/3*length(barcode_insert_list), width = 10)
-#       ggsave(filename = "Kriged_topics_with_Lidar_bacteria.pdf", do.call("arrangeGrob", 
-#                                                                        c(tmp.plot[[1]], lidar.plot, ncol=nb_topics)),
-#            height = 10/3*4/3*(length(barcode_insert_list)+1), width = 10)
-      ggsave(filename = "Kriged_topics_bacteria.pdf", do.call("arrangeGrob", 
-                                                              c(tmp.plot[[1]], ncol=nb_topics)),
-             height = 10/3*4/3*(length(barcode_insert_list)), width = 10)
+    #       ggsave(filename = "Kriged_topics_with_Lidar_bacteria.pdf", do.call("arrangeGrob", 
+    #                                                                        c(tmp.plot[[1]], lidar.plot, ncol=nb_topics)),
+    #            height = 10/3*4/3*(length(barcode_insert_list)+1), width = 10)
+    ggsave(filename = "Kriged_topics_bacteria.pdf", do.call("arrangeGrob", 
+                                                            c(tmp.plot[[1]], ncol=nb_topics)),
+           height = 10/3*4/3*(length(barcode_insert_list)), width = 10)
     #     ggsave(filename = "Kriged_topics_bacteria_labels.pdf", do.call("arrangeGrob", 
     #             c(tmp.plot[[1]], ncol=nb_topics)),
     #            height = 10/3*4/3*length(barcode_insert_list), width = 10)
     #     ggsave(filename = "Kriged_topics_arthropods.pdf", do.call("arrangeGrob", 
     #           c(tmp.plot[[1]], ncol=nb_topics)),
     #            height = 10/3*4/3*length(barcode_insert_list), width = 10)
-    }
-  } else if (horizontal)
-    #     ggsave(filename = paste0("Kriged_topics_with_Lidar_",length(barcode_insert_list),"barcodes_",horizVert_insert,"_SlopeMod.pdf"), do.call("arrangeGrob", 
-    #                                                               c(tmp.plot[[1]], tmp.plot[[2]], tmp.plot[[3]], lidar.plot, nrow=nb_topics)),
-    #            height = 10*4/3, width = 10*(length(barcode_insert_list)+1)/3)
-    ggsave(filename = paste0("Kriged_topics_with_Lidar_",length(barcode_insert_list),"barcodes",occurrence_insert,remove_single_sites_insert,no_rare_insert,horizVert_insert,".pdf"), do.call("arrangeGrob", 
-                                                                                                                                                    c(tmp.plot[[1]], tmp.plot[[2]], tmp.plot[[3]], nrow=nb_topics)),
-           height = 10*4/3, width = 10*length(barcode_insert_list)/3)
-  
+  }
+} else if (horizontal)
+  #     ggsave(filename = paste0("Kriged_topics_with_Lidar_",length(barcode_insert_list),"barcodes_",horizVert_insert,"_SlopeMod.pdf"), do.call("arrangeGrob", 
+  #                                                               c(tmp.plot[[1]], tmp.plot[[2]], tmp.plot[[3]], lidar.plot, nrow=nb_topics)),
+  #            height = 10*4/3, width = 10*(length(barcode_insert_list)+1)/3)
+  ggsave(filename = paste0("Kriged_topics_with_Lidar_",length(barcode_insert_list),"barcodes",occurrence_insert,remove_single_sites_insert,no_rare_insert,horizVert_insert,".pdf"), do.call("arrangeGrob", 
+                                                                                                                                                                                            c(tmp.plot[[1]], tmp.plot[[2]], tmp.plot[[3]], nrow=nb_topics)),
+         height = 10*4/3, width = 10*length(barcode_insert_list)/3)
+
 }
 ####################################################################################################
 ####################################################################################################
 if (stability)
 {
   
-#   barcode_insert_list = c("Bacteries_16S","Archees_16S","Protistes_18S","Champignons_ITS","Plantes_GH","Arthropodes_18S")
-#   barcode_labels_list = c("Bacteria 16S","Archaea 16S","Protists 18S","Fungi ITS","Plants trnL","Arthropods 18S")
+  #   barcode_insert_list = c("Bacteries_16S","Archees_16S","Protistes_18S","Champignons_ITS","Plantes_GH","Arthropodes_18S")
+  #   barcode_labels_list = c("Bacteria 16S","Archaea 16S","Protists 18S","Fungi ITS","Plants trnL","Arthropods 18S")
   
   # All barcodes :
-#   barcode_insert_list = c("Bacteries_16S","Archees_16S","Protistes_18S","Champignons_ITS","Glomeromycetes_ITS","Basidiomycetes_ITS","Ascomycetes_ITS","Plantes_GH","Arthropodes_18S","Nematodes_18S","PLatyhelminthes_18S","Annelides_18S")
-#   barcode_labels_list = c("Bacteria 16S","Archaea 16S","Protists 18S","Fungi ITS","Glomeromycota ITS","Basidiomycota ITS","Ascomycota ITS","Plants trnL","Arthropods 18S","Nematodes 18S","Platyhelminthes 18S","Annelids 18S")
+  #   barcode_insert_list = c("Bacteries_16S","Archees_16S","Protistes_18S","Champignons_ITS","Glomeromycetes_ITS","Basidiomycetes_ITS","Ascomycetes_ITS","Plantes_GH","Arthropodes_18S","Nematodes_18S","PLatyhelminthes_18S","Annelides_18S")
+  #   barcode_labels_list = c("Bacteria 16S","Archaea 16S","Protists 18S","Fungi ITS","Glomeromycota ITS","Basidiomycota ITS","Ascomycota ITS","Plants trnL","Arthropods 18S","Nematodes 18S","Platyhelminthes 18S","Annelids 18S")
   
-#     barcode_insert_list = c("Bacteries_16S","Protistes_18S","Champignons_ITS")
-#     barcode_labels_list = c("Bacteria","Protists","Fungi")
- 
-barcode_insert_list = c("Champignons_ITS","Bacteries_16S","Arthropodes_18S")
-barcode_labels_list = c("Fungi","Bacteria","Arthropods") 
-
-# barcode_insert_list = c("Champignons_ITS","Bacteries_16S")
-# barcode_labels_list = c("Fungi","Bacteria")  
+  #     barcode_insert_list = c("Bacteries_16S","Protistes_18S","Champignons_ITS")
+  #     barcode_labels_list = c("Bacteria","Protists","Fungi")
   
-#     barcode_insert_list = c("Bacteries_16S")
-#     barcode_labels_list = c("Bacteria")
+  barcode_insert_list = c("Champignons_ITS","Bacteries_16S","Arthropodes_18S")
+  barcode_labels_list = c("Fungi","Bacteria","Arthropods") 
+  
+  # barcode_insert_list = c("Champignons_ITS","Bacteries_16S")
+  # barcode_labels_list = c("Fungi","Bacteria")  
+  
+  #     barcode_insert_list = c("Bacteries_16S")
+  #     barcode_labels_list = c("Bacteria")
   
   nb_topics = 3
   nb_real = 100
@@ -615,9 +641,9 @@ barcode_labels_list = c("Fungi","Bacteria","Arthropods")
     load(filename)
     #Ordered_realizations = readRDS("Ordered_realizations.rds")
     data.skl = data.frame(x=seq(2,length_selected_real,1),y=KL_allRealPairs_w_rndzations[1,-1])
-#     if ((barcode_insert == "Bacteries_16S") && occurrence)
-#       data.skl.llh = data.frame(x=llh_differences_allRealPairs[1,c(-1,-ncol(llh_differences_allRealPairs))],y=KL_allRealPairs_w_rndzations[1,c(-1,-ncol(KL_allRealPairs_w_rndzations))])
-#     else
+    #     if ((barcode_insert == "Bacteries_16S") && occurrence)
+    #       data.skl.llh = data.frame(x=llh_differences_allRealPairs[1,c(-1,-ncol(llh_differences_allRealPairs))],y=KL_allRealPairs_w_rndzations[1,c(-1,-ncol(KL_allRealPairs_w_rndzations))])
+    #     else
     data.skl.llh = data.frame(x=llh_differences_allRealPairs[1,-1],y=KL_allRealPairs_w_rndzations[1,-1])
     data.dskl.llh = data.frame(x=llh_differences_allRealPairs[1,-1],y=DKL100_allRealPairs[1,-1])
     data.dskln.llh = data.frame(x=llh_differences_allRealPairs[1,-1],y=DKL100_allRealPairs[1,-1]/KL_allRealPairs_w_rndzations[-1,1])
@@ -650,12 +676,12 @@ barcode_labels_list = c("Fungi","Bacteria","Arthropods")
       #ylim(0,max(data.skl$y)) 
       # for bij samplewise:  
       ylim(0,4.5) + xlim(0,35000) 
-      # for MOTUwise:
-      #ylim(0,8)
-      #for !bij samplewise: 
-      #ylim(0,3.5)
-      #for bij samplewise occurrence:
-      #ylim(0,2.8) #+ xlim(0,3200)
+    # for MOTUwise:
+    #ylim(0,8)
+    #for !bij samplewise: 
+    #ylim(0,3.5)
+    #for bij samplewise occurrence:
+    #ylim(0,2.8) #+ xlim(0,3200)
     plot.dskl.llh[[barcode_index]] = qplot(x, y, data = data.dskl.llh, geom="point") +
       theme_bw() + ggtitle(paste(letters[barcode_index],"-",barcode_labels_list[barcode_index])) +
       ylim(min(0,min(data.dskl.llh$y)),max(data.dskl.llh$y))    
@@ -685,31 +711,31 @@ barcode_labels_list = c("Fungi","Bacteria","Arthropods")
                                                                           plot.title=element_text(hjust=0, size=12),
                                                                           plot.margin=unit(c(1,1,1,0),"mm")) 
     #if (!(barcode_insert == "Bacteries_16S") || !occurrence)
-      plot.skl.llh[[barcode_index]] = plot.skl.llh[[barcode_index]] + geom_smooth(method='lm',se=F,linetype="dashed",size=0.5)
-                                                                  
+    plot.skl.llh[[barcode_index]] = plot.skl.llh[[barcode_index]] + geom_smooth(method='lm',se=F,linetype="dashed",size=0.5)
+    
     plot.dskl.llh[[barcode_index]] = plot.dskl.llh[[barcode_index]] + theme(axis.title=element_text(size=11), 
                                                                             plot.title=element_text(hjust=0, size=12),
                                                                             plot.margin=unit(c(1,1,1,0),"mm"))
     plot.dskln.llh[[barcode_index]] = plot.dskln.llh[[barcode_index]] + theme(axis.title=element_text(size=18), 
-                                                                            plot.title=element_text(hjust=0, size=18),
-                                                                            plot.margin=unit(c(1,1,1,0),"mm"),
-                                                                            axis.text=element_text(size=14),
-                                                                            axis.line=element_line(size=0.8)) +
-                                                                      geom_smooth(method='lm',se=F,linetype="dashed",size=0.8)
+                                                                              plot.title=element_text(hjust=0, size=18),
+                                                                              plot.margin=unit(c(1,1,1,0),"mm"),
+                                                                              axis.text=element_text(size=14),
+                                                                              axis.line=element_line(size=0.8)) +
+      geom_smooth(method='lm',se=F,linetype="dashed",size=0.8)
     plot.pval.llh[[barcode_index]] = plot.pval.llh[[barcode_index]] + theme(axis.title=element_text(size=11), 
                                                                             plot.title=element_text(hjust=0, size=12),
                                                                             plot.margin=unit(c(1,1,1,0),"mm"))
     plot.ses.llh[[barcode_index]] = plot.ses.llh[[barcode_index]] + theme(axis.title=element_text(size=11), 
-                                                                            plot.title=element_text(hjust=0, size=12),
-                                                                            plot.margin=unit(c(1,1,1,0),"mm"))
+                                                                          plot.title=element_text(hjust=0, size=12),
+                                                                          plot.margin=unit(c(1,1,1,0),"mm"))
     
     plot.skl.all[[barcode_index]] = plot.skl.all[[barcode_index]] + theme(axis.title=element_text(size=11), 
                                                                           plot.title=element_text(hjust=0, size=12),
                                                                           plot.margin=unit(c(1,1,1,0),"mm"))
     plot.pval.all[[barcode_index]] = plot.pval.all[[barcode_index]] + theme(axis.title=element_text(size=11), 
-                                                                          plot.title=element_text(hjust=0, size=12),
-                                                                          plot.margin=unit(c(1,1,1,0),"mm"))
-  
+                                                                            plot.title=element_text(hjust=0, size=12),
+                                                                            plot.margin=unit(c(1,1,1,0),"mm"))
+    
     if (barcode_index == 1)
     {
       plot.skl[[barcode_index]] = plot.skl[[barcode_index]] + labs(x="Realizations\n sorted by decreasing likelihood", y="SKL to best realization")
@@ -753,43 +779,43 @@ barcode_labels_list = c("Fungi","Bacteria","Arthropods")
   }
   
   setwd("/Users/guilhemsommeria-klein/Desktop/These/Manuscrits/Paper2/Figures/")
-#   ggsave(filename = paste0("SKL_vs_rank",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
-#                                                                                              c(plot.skl, nrow=2)),
-#          height = 10*2/3, width = 10)
-#   ggsave(filename = paste0("SKL_vs_llh-diff_bact-prot-fungi",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,"_llh0-3200.pdf"), do.call("arrangeGrob", 
-#                                                                                                  c(plot.skl.llh, nrow=1)),
-#          height = 12/3, width = 12)
-#   ggsave(filename = paste0("SKL_vs_llh-diff_bact-prot-fungi",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,"_llh0-35000.pdf"), do.call("arrangeGrob", 
-#                                                                                                                                     c(plot.skl.llh, nrow=1)),
-#        height = 12/3, width = 12)
-#   ggsave(filename = paste0("SKL_vs_llh-diff_bact-prot-fungi",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
-#                                                                                                                                     c(plot.skl.llh, nrow=1)),
-#        height = 12/3, width = 12)
-#   ggsave(filename = paste0("DSKL_vs_llh-diff",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
-#                                                                                                   c(plot.dskl.llh, nrow=2)),
-#          height = 10*2/3, width = 10)
-#   ggsave(filename = paste0("p-value_vs_llh-diff",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
-#                                                                                                      c(plot.pval.llh, nrow=2)),
-#          height = 10*2/3, width = 10)
-#   ggsave(filename = paste0("SES_vs_llh-diff",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
-#                                                                                                                         c(plot.ses.llh, nrow=2)),
-#          height = 10*2/3, width = 10)
-# ggsave(filename = paste0("SES_vs_llh-diff_allBarcodes",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
-#                                                                                                                     c(plot.ses.llh, nrow=2)),
-#        height = 15/3, width = 15)
-# ggsave(filename = paste0("NormES_vs_llh-diff_allBarcodes_withLM",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
-#                                                                                                                                 c(plot.dskln.llh, nrow=2)),
-#        height = 15/3, width = 15)
-ggsave(filename = paste0("NormES_vs_llh-diff_fungi-restrictedBact-arth_withLM",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
-                                                                                                                                c(plot.dskln.llh, nrow=1)),
-       height = 15/3, width = 15)
-
-#   ggsave(filename = paste0("SKL_vs_llh-diff_allReal",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
-#                                                                                                                     c(plot.skl.all, nrow=2)),
-#        height = 10*2/3, width = 10)
-#   ggsave(filename = paste0("p-value_vs_llh-diff_allReal",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
-#                                                                                                                     c(plot.pval.all, nrow=2)),
-#        height = 10*2/3, width = 10)
+  #   ggsave(filename = paste0("SKL_vs_rank",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
+  #                                                                                              c(plot.skl, nrow=2)),
+  #          height = 10*2/3, width = 10)
+  #   ggsave(filename = paste0("SKL_vs_llh-diff_bact-prot-fungi",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,"_llh0-3200.pdf"), do.call("arrangeGrob", 
+  #                                                                                                  c(plot.skl.llh, nrow=1)),
+  #          height = 12/3, width = 12)
+  #   ggsave(filename = paste0("SKL_vs_llh-diff_bact-prot-fungi",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,"_llh0-35000.pdf"), do.call("arrangeGrob", 
+  #                                                                                                                                     c(plot.skl.llh, nrow=1)),
+  #        height = 12/3, width = 12)
+  #   ggsave(filename = paste0("SKL_vs_llh-diff_bact-prot-fungi",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
+  #                                                                                                                                     c(plot.skl.llh, nrow=1)),
+  #        height = 12/3, width = 12)
+  #   ggsave(filename = paste0("DSKL_vs_llh-diff",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
+  #                                                                                                   c(plot.dskl.llh, nrow=2)),
+  #          height = 10*2/3, width = 10)
+  #   ggsave(filename = paste0("p-value_vs_llh-diff",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
+  #                                                                                                      c(plot.pval.llh, nrow=2)),
+  #          height = 10*2/3, width = 10)
+  #   ggsave(filename = paste0("SES_vs_llh-diff",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
+  #                                                                                                                         c(plot.ses.llh, nrow=2)),
+  #          height = 10*2/3, width = 10)
+  # ggsave(filename = paste0("SES_vs_llh-diff_allBarcodes",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
+  #                                                                                                                     c(plot.ses.llh, nrow=2)),
+  #        height = 15/3, width = 15)
+  # ggsave(filename = paste0("NormES_vs_llh-diff_allBarcodes_withLM",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
+  #                                                                                                                                 c(plot.dskln.llh, nrow=2)),
+  #        height = 15/3, width = 15)
+  ggsave(filename = paste0("NormES_vs_llh-diff_fungi-restrictedBact-arth_withLM",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
+                                                                                                                                                          c(plot.dskln.llh, nrow=1)),
+         height = 15/3, width = 15)
+  
+  #   ggsave(filename = paste0("SKL_vs_llh-diff_allReal",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
+  #                                                                                                                     c(plot.skl.all, nrow=2)),
+  #        height = 10*2/3, width = 10)
+  #   ggsave(filename = paste0("p-value_vs_llh-diff_allReal",occurrence_insert,"_",MOTU_sample_insert,"_",bij_insert,".pdf"), do.call("arrangeGrob", 
+  #                                                                                                                     c(plot.pval.all, nrow=2)),
+  #        height = 10*2/3, width = 10)
   #dev.off()
   #   
   #   pdf("Topic_KL_difference_samplewise_between_real_averaged_w_randomizations_vs_llh_difference.pdf")  
@@ -861,39 +887,39 @@ if (size)
   diversity0 = log10(c(20162,1648,51,4101,378,126,1881,9855,1360))
   
   data.tmp = list()
-#   data.tmp[[1]] = data.frame(x=size,y=SKL_bij_samplewise)
-#   data.tmp[[2]] = data.frame(x=size,y=ES_bij_samplewise)
-#   data.tmp[[3]] = data.frame(x=size,y=SES_bij_samplewise)
-#   data.tmp[[4]] = data.frame(x=size,y=pval_bij_samplewise)
-#   data.tmp[[5]] = data.frame(x=size,y=SKL_bij_MOTUwise)
-#   data.tmp[[6]] = data.frame(x=size,y=ES_bij_MOTUwise)
-#   data.tmp[[7]] = data.frame(x=size,y=SES_bij_MOTUwise)
-#   data.tmp[[8]] = data.frame(x=size,y=pval_bij_MOTUwise)
-#   data.tmp[[9]] = data.frame(x=size,y=SKL_nobij_samplewise)
-#   data.tmp[[10]] = data.frame(x=size,y=ES_nobij_samplewise)
-#   data.tmp[[11]] = data.frame(x=size,y=SES_nobij_samplewise)
-#   data.tmp[[12]] = data.frame(x=size,y=pval_nobij_samplewise)
+  #   data.tmp[[1]] = data.frame(x=size,y=SKL_bij_samplewise)
+  #   data.tmp[[2]] = data.frame(x=size,y=ES_bij_samplewise)
+  #   data.tmp[[3]] = data.frame(x=size,y=SES_bij_samplewise)
+  #   data.tmp[[4]] = data.frame(x=size,y=pval_bij_samplewise)
+  #   data.tmp[[5]] = data.frame(x=size,y=SKL_bij_MOTUwise)
+  #   data.tmp[[6]] = data.frame(x=size,y=ES_bij_MOTUwise)
+  #   data.tmp[[7]] = data.frame(x=size,y=SES_bij_MOTUwise)
+  #   data.tmp[[8]] = data.frame(x=size,y=pval_bij_MOTUwise)
+  #   data.tmp[[9]] = data.frame(x=size,y=SKL_nobij_samplewise)
+  #   data.tmp[[10]] = data.frame(x=size,y=ES_nobij_samplewise)
+  #   data.tmp[[11]] = data.frame(x=size,y=SES_nobij_samplewise)
+  #   data.tmp[[12]] = data.frame(x=size,y=pval_nobij_samplewise)
   data.tmp[[1]] = data.frame(x=size,y=nES_bij_samplewise)
   data.tmp[[2]] = data.frame(x=size,y=nES_bij_MOTUwise)
   
   data.tmp1 = list()
-#   data.tmp1[[1]] = data.frame(x=size,y=SKL_bij_samplewise1)
-#   data.tmp1[[2]] = data.frame(x=size,y=ES_bij_samplewise1)
-#   data.tmp1[[3]] = data.frame(x=size,y=SES_bij_samplewise1)
-#   data.tmp1[[4]] = data.frame(x=size,y=pval_bij_samplewise1)
-#   data.tmp1[[5]] = data.frame(x=size,y=SKL_bij_MOTUwise1)
-#   data.tmp1[[6]] = data.frame(x=size,y=ES_bij_MOTUwise1)
-#   data.tmp1[[7]] = data.frame(x=size,y=SES_bij_MOTUwise1)
-#   data.tmp1[[8]] = data.frame(x=size,y=pval_bij_MOTUwise1)
-#   data.tmp1[[9]] = data.frame(x=size,y=SKL_nobij_samplewise1)
-#   data.tmp1[[10]] = data.frame(x=size,y=ES_nobij_samplewise1)
-#   data.tmp1[[11]] = data.frame(x=size,y=SES_nobij_samplewise1)
-#   data.tmp1[[12]] = data.frame(x=size,y=pval_nobij_samplewise1)
+  #   data.tmp1[[1]] = data.frame(x=size,y=SKL_bij_samplewise1)
+  #   data.tmp1[[2]] = data.frame(x=size,y=ES_bij_samplewise1)
+  #   data.tmp1[[3]] = data.frame(x=size,y=SES_bij_samplewise1)
+  #   data.tmp1[[4]] = data.frame(x=size,y=pval_bij_samplewise1)
+  #   data.tmp1[[5]] = data.frame(x=size,y=SKL_bij_MOTUwise1)
+  #   data.tmp1[[6]] = data.frame(x=size,y=ES_bij_MOTUwise1)
+  #   data.tmp1[[7]] = data.frame(x=size,y=SES_bij_MOTUwise1)
+  #   data.tmp1[[8]] = data.frame(x=size,y=pval_bij_MOTUwise1)
+  #   data.tmp1[[9]] = data.frame(x=size,y=SKL_nobij_samplewise1)
+  #   data.tmp1[[10]] = data.frame(x=size,y=ES_nobij_samplewise1)
+  #   data.tmp1[[11]] = data.frame(x=size,y=SES_nobij_samplewise1)
+  #   data.tmp1[[12]] = data.frame(x=size,y=pval_nobij_samplewise1)
   data.tmp1[[1]] = data.frame(x=size[-length(size)],y=nES_bij_samplewise1[-length(nES_bij_samplewise1)])
   data.tmp1[[2]] = data.frame(x=size[-length(size)],y=nES_bij_MOTUwise1[-length(nES_bij_MOTUwise1)])
   
-#   plot_labels = c(rep("One-to-one correpondence -\n spatial distribution",4),rep("One-to-one correspondence -\n MOTU composition",4),rep("K best correspondances -\n spatial distribution",4),
-#                   "Spatial similarity","Taxonomic similarity")
+  #   plot_labels = c(rep("One-to-one correpondence -\n spatial distribution",4),rep("One-to-one correspondence -\n MOTU composition",4),rep("K best correspondances -\n spatial distribution",4),
+  #                   "Spatial similarity","Taxonomic similarity")
   #y_labels = rep(c("SKL","ES","SES","p-value"),3)
   #y_labels = c(rep(c("SKL","ES","SES","Stability p-value"),3),"Spatial stability","Taxonomic stability")
   y_labels = c("Spatial stability","Taxonomic stability")
@@ -955,15 +981,15 @@ if (size)
     if (i == 1)
     {
       plot.size1[[i]] = plot.size1[[i]] + geom_text(mapping = NULL, stat = "identity",size=2, 
-                #hjust=0, nudge_x = 0.2,
-                nudge_y = c(0,-0.01,0,0.02,0,0,0,0.02), hjust=0, nudge_x = c(0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2),
-                parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) 
+                                                    #hjust=0, nudge_x = 0.2,
+                                                    nudge_y = c(0,-0.01,0,0.02,0,0,0,0.02), hjust=0, nudge_x = c(0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2),
+                                                    parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) 
     } else if (i == 2)
     {
       plot.size1[[i]] = plot.size1[[i]] + geom_text(mapping = NULL, stat = "identity",size=2, 
-                #hjust=0, nudge_x = 0.2,
-                nudge_y = c(0.01,0,0,0.01,0,0,0,0), hjust=0, nudge_x = c(0,0.2,0.2,0,0.2,0.2,0.2,0.2),
-                parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) 
+                                                    #hjust=0, nudge_x = 0.2,
+                                                    nudge_y = c(0.01,0,0,0.01,0,0,0,0), hjust=0, nudge_x = c(0,0.2,0.2,0,0.2,0.2,0.2,0.2),
+                                                    parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) 
     }
     #c("Bacteria","Protists","Annelids","Archaea","Nematodes","Platyhelminthes","Arthropods","Fungi","Plants")
     
@@ -1009,20 +1035,20 @@ if (size)
       labs(x="Number of OTUs (log10)", y=y_labels[i]) +
       xlim(min(diversity),5) +
       geom_smooth(method='lm') 
-      
+    
     
     if (i == 1)
     {
       plot.diversity1[[i]] = plot.diversity1[[i]] + geom_text(mapping = NULL, stat = "identity",size=2, 
-                                                    #hjust=0, nudge_x = 0.2,
-                                                    nudge_y = c(0,0,0,0,0,0,0,0), hjust=0, nudge_x = c(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1),
-                                                    parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) 
+                                                              #hjust=0, nudge_x = 0.2,
+                                                              nudge_y = c(0,0,0,0,0,0,0,0), hjust=0, nudge_x = c(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1),
+                                                              parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) 
     } else if (i == 2)
     {
       plot.diversity1[[i]] = plot.diversity1[[i]] + geom_text(mapping = NULL, stat = "identity",size=2, 
-                                                    #hjust=0, nudge_x = 0.2,
-                                                    nudge_y = c(0,0,0,0,0,0,0,0), hjust=0, nudge_x = c(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1),
-                                                    parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) 
+                                                              #hjust=0, nudge_x = 0.2,
+                                                              nudge_y = c(0,0,0,0,0,0,0,0), hjust=0, nudge_x = c(0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1),
+                                                              parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE) 
     }
     
     #c("Bacteria","Protists","Annelids","Archaea","Nematodes","Platyhelminthes","Arthropods","Fungi","Plants")
@@ -1043,14 +1069,14 @@ if (size)
   #          height = 10*3/4, width = 10)
   
   # Short version without "Best K values", ES and SES:
-#   ii = 1
-#   new_plot_labels = c(rep("Spatial distribution",2),rep("MOTU composition",2))
-#   for (i in c(1,4,5,8))
-#   {
-#     #     plot.diversity1[[i]] = plot.diversity1[[i]] + ggtitle(paste(letters[ii],"-",new_plot_labels[ii]))
-#     #     plot.size1[[i]] = plot.size1[[i]] + ggtitle(paste(letters[ii],"-",new_plot_labels[ii]))
-#     ii = ii+1
-#   }
+  #   ii = 1
+  #   new_plot_labels = c(rep("Spatial distribution",2),rep("MOTU composition",2))
+  #   for (i in c(1,4,5,8))
+  #   {
+  #     #     plot.diversity1[[i]] = plot.diversity1[[i]] + ggtitle(paste(letters[ii],"-",new_plot_labels[ii]))
+  #     #     plot.size1[[i]] = plot.size1[[i]] + ggtitle(paste(letters[ii],"-",new_plot_labels[ii]))
+  #     ii = ii+1
+  #   }
   
   #   ggsave(filename = "Stability_vs_diversity_SKL-pval_restricted_archaea.pdf", do.call("arrangeGrob", c(plot.diversity1[c(1,4,5,8)], nrow=2)),
   #        height = 10/2, width = 10/2)
@@ -1058,30 +1084,30 @@ if (size)
   #   ggsave(filename = "Stability_vs_size_SKL-pval_restricted_archaea_spatial-only.pdf", do.call("arrangeGrob", c(plot.size1[c(1,4)], nrow=1)),
   #        height = 10/4, width = 10/2)
   
-#   ggsave(filename = "Stability_vs_size_pval_restricted_archaea_spatial-only.pdf", do.call("arrangeGrob", c(plot.size1[4], nrow=1)),
-#          height = 10/4, width = 10/4)
-#   
-#   ggsave(filename = "Stability_vs_diversity_pval_restricted_archaea_spatial-only.pdf", do.call("arrangeGrob", c(plot.diversity1[4], nrow=1)),
-#          height = 10/4, width = 10/4)
-
-#   ggsave(filename = "Stability_vs_size_nES_restricted_bacteria_spatial.pdf", do.call("arrangeGrob", c(plot.size1[13], nrow=1)),
-#          height = 10/4, width = 2*10/4)
-#   ggsave(filename = "Stability_vs_size_nES_restricted_bacteria_spatial.pdf", do.call("arrangeGrob", c(plot.size1[13], nrow=1)),
-#        height = 10/4, width = 10/4)
-#   rsquared[[13]][2]
-#   ggsave(filename = "Stability_vs_size_nES_restricted_bacteria_taxo.pdf", do.call("arrangeGrob", c(plot.size1[14], nrow=1)),
-#        height = 10/4, width = 10/4)
-#   rsquared[[14]][2]
+  #   ggsave(filename = "Stability_vs_size_pval_restricted_archaea_spatial-only.pdf", do.call("arrangeGrob", c(plot.size1[4], nrow=1)),
+  #          height = 10/4, width = 10/4)
+  #   
+  #   ggsave(filename = "Stability_vs_diversity_pval_restricted_archaea_spatial-only.pdf", do.call("arrangeGrob", c(plot.diversity1[4], nrow=1)),
+  #          height = 10/4, width = 10/4)
+  
+  #   ggsave(filename = "Stability_vs_size_nES_restricted_bacteria_spatial.pdf", do.call("arrangeGrob", c(plot.size1[13], nrow=1)),
+  #          height = 10/4, width = 2*10/4)
+  #   ggsave(filename = "Stability_vs_size_nES_restricted_bacteria_spatial.pdf", do.call("arrangeGrob", c(plot.size1[13], nrow=1)),
+  #        height = 10/4, width = 10/4)
+  #   rsquared[[13]][2]
+  #   ggsave(filename = "Stability_vs_size_nES_restricted_bacteria_taxo.pdf", do.call("arrangeGrob", c(plot.size1[14], nrow=1)),
+  #        height = 10/4, width = 10/4)
+  #   rsquared[[14]][2]
   
   ggsave(filename = "Stability_vs_diversity_nES_restricted_bacteria_spatial-taxo_noplants.pdf", do.call("arrangeGrob", c(plot.diversity1[1], plot.diversity1[2], nrow=1)),
          height = 10/4, width = 2*10/4)
-#   ggsave(filename = "Stability_vs_diversity_nES_restricted_bacteria_spatial.pdf", do.call("arrangeGrob", c(plot.diversity1[13], nrow=1)),
-#        height = 10/4, width = 10/4)
-#   rsquared[[13]][4]  
-#   ggsave(filename = "Stability_vs_diversity_nES_restricted_bacteria_taxo.pdf", do.call("arrangeGrob", c(plot.diversity1[14], nrow=1)),
-#        height = 10/4, width = 10/4)
-#   rsquared[[14]][4]
-
+  #   ggsave(filename = "Stability_vs_diversity_nES_restricted_bacteria_spatial.pdf", do.call("arrangeGrob", c(plot.diversity1[13], nrow=1)),
+  #        height = 10/4, width = 10/4)
+  #   rsquared[[13]][4]  
+  #   ggsave(filename = "Stability_vs_diversity_nES_restricted_bacteria_taxo.pdf", do.call("arrangeGrob", c(plot.diversity1[14], nrow=1)),
+  #        height = 10/4, width = 10/4)
+  #   rsquared[[14]][4]
+  
   #   ggsave(filename = "Stability_vs_size_SKL-pval_restricted_archaea.pdf", do.call("arrangeGrob", c(plot.size1[c(1,4,5,8)], nrow=2)),
   #        height = 10/2, width = 10/2)
   
@@ -1111,8 +1137,8 @@ if (taxo_tree)
 { 
   library(ggplot2)
   library(ggdendro)
-#   barcode_insert_list = c("Champignons_ITS","Bacteries_16S","Arthropodes_18S")
-#   barcode_labels_list = c("Fungi","Bacteria","Arthropods") 
+  #   barcode_insert_list = c("Champignons_ITS","Bacteries_16S","Arthropodes_18S")
+  #   barcode_labels_list = c("Fungi","Bacteria","Arthropods") 
   
   barcode_insert_list = c("Bacteries_16S","Protistes_18S","Champignons_ITS")
   barcode_labels_list = c("Bacteria","Protists","Fungi")  
@@ -1132,7 +1158,7 @@ if (taxo_tree)
   taxotree.plot = list()
   barcode_index = 0
   upgma_Hellinger = list()   
-
+  
   for (barcode_insert in barcode_insert_list)
   {    
     barcode_index = barcode_index+1  
@@ -1150,86 +1176,86 @@ if (taxo_tree)
     #        Hellinger_topic_comparison_MOTUwise, Jaccard_topic_comparison_MOTUwise, 
     #        Beta.sim_topic_comparison_MOTUwise, diversity, file = "Topic_comparison_inBestReal.Rdata")
     
-#     documents1 = documents[,rev(sort_normal_topic$ix)]
-#     topic_compo1 = topic_compo[,rev(sort_normal_topic$ix)]
-#     colnames(documents1) = assemblage_names_vect
-#     colnames(topic_compo1) = assemblage_names_vect
-#     Corr_topic_comparison_samplewise = cor(documents1)
-#     Corr_topic_comparison_MOTUwise = cor(topic_compo1)
+    #     documents1 = documents[,rev(sort_normal_topic$ix)]
+    #     topic_compo1 = topic_compo[,rev(sort_normal_topic$ix)]
+    #     colnames(documents1) = assemblage_names_vect
+    #     colnames(topic_compo1) = assemblage_names_vect
+    #     Corr_topic_comparison_samplewise = cor(documents1)
+    #     Corr_topic_comparison_MOTUwise = cor(topic_compo1)
     
-#     Hellinger_topic_comparison_MOTUwise = 1/sqrt(2)*dist(t(sqrt(topic_compo1)), method = "euclidean", diag = FALSE, upper = FALSE)
-#     KL_topic_compo1 = KL_topic_compo[,rev(sort_normal_topic$ix)]
-#     #Hellinger_topic_comparison_MOTUwise1 = 1/sqrt(2)*dist(t(sqrt(KL_topic_compo1)), method = "euclidean", diag = FALSE, upper = FALSE)
-#     topic_compo1_bin = topic_compo1
-#     topic_compo1_bin[topic_compo1 < 1/sum(data2m)] = 0
-#     #Hellinger_topic_comparison_MOTUwise2 = 1/sqrt(2)*dist(t(sqrt(topic_compo1_bin)), method = "euclidean", diag = FALSE, upper = FALSE)
-#     Jaccard_topic_comparison_MOTUwise = vegan::designdist(t(topic_compo1_bin), "(b+c)/(a+b+c)", abcd=TRUE)
-#     Beta.sim_topic_comparison_MOTUwise = vegan::designdist(t(topic_compo1_bin), "pmin(b,c)/(pmin(b,c)+a)", abcd=TRUE)
-     
+    #     Hellinger_topic_comparison_MOTUwise = 1/sqrt(2)*dist(t(sqrt(topic_compo1)), method = "euclidean", diag = FALSE, upper = FALSE)
+    #     KL_topic_compo1 = KL_topic_compo[,rev(sort_normal_topic$ix)]
+    #     #Hellinger_topic_comparison_MOTUwise1 = 1/sqrt(2)*dist(t(sqrt(KL_topic_compo1)), method = "euclidean", diag = FALSE, upper = FALSE)
+    #     topic_compo1_bin = topic_compo1
+    #     topic_compo1_bin[topic_compo1 < 1/sum(data2m)] = 0
+    #     #Hellinger_topic_comparison_MOTUwise2 = 1/sqrt(2)*dist(t(sqrt(topic_compo1_bin)), method = "euclidean", diag = FALSE, upper = FALSE)
+    #     Jaccard_topic_comparison_MOTUwise = vegan::designdist(t(topic_compo1_bin), "(b+c)/(a+b+c)", abcd=TRUE)
+    #     Beta.sim_topic_comparison_MOTUwise = vegan::designdist(t(topic_compo1_bin), "pmin(b,c)/(pmin(b,c)+a)", abcd=TRUE)
+    
     # Code Antoine :
     #       upgma_Hellinger2 <- agnes(Hellinger_topic_comparison_MOTUwise2, diss =T, method = "average", keep.diss =F, keep.data =F)
     #       upgma_Hellinger1 <- agnes(Hellinger_topic_comparison_MOTUwise1, diss =T, method = "average", keep.diss =F, keep.data =F)
     # method = "average" : UPGMA
     upgma_Hellinger[[barcode_index]] = agnes(Hellinger_topic_comparison_MOTUwise, diss =T, method = "average", keep.diss =F, keep.data =F)
-#     upgma_Jaccard[[barcode_index]] = agnes(Jaccard_topic_comparison_MOTUwise, diss =T, method = "average", keep.diss =F, keep.data =F)
-#     upgma_Beta.sim[[barcode_index]] = agnes(Beta.sim_topic_comparison_MOTUwise, diss =T, method = "average", keep.diss =F, keep.data =F)
+    #     upgma_Jaccard[[barcode_index]] = agnes(Jaccard_topic_comparison_MOTUwise, diss =T, method = "average", keep.diss =F, keep.data =F)
+    #     upgma_Beta.sim[[barcode_index]] = agnes(Beta.sim_topic_comparison_MOTUwise, diss =T, method = "average", keep.diss =F, keep.data =F)
     
-#     upgma_data.frame = dendro_data(upgma_Hellinger)
-# #     upgma_data.frame = dendro_data(upgma_Jaccard)
-# #     upgma_data.frame = dendro_data(upgma_Beta.sim)
-# 
-#     taxotree.plot[[barcode_index]] = ggplot() +
-#     geom_segment(data = upgma_data.frame$segments, 
-#                aes(x = x, y = y, xend = xend, yend = yend)) + 
-#     geom_text(data = upgma_data.frame$labels, 
-#             aes(x = x, y = y, label = label), size = 3, vjust = 1) +
-# #     geom_text(data = upgma_data.frame$leaf_labels, 
-# #             aes(x = x, y = y, label = label), size = 3, vjust = 1) +
-#     theme_dendro() 
+    #     upgma_data.frame = dendro_data(upgma_Hellinger)
+    # #     upgma_data.frame = dendro_data(upgma_Jaccard)
+    # #     upgma_data.frame = dendro_data(upgma_Beta.sim)
+    # 
+    #     taxotree.plot[[barcode_index]] = ggplot() +
+    #     geom_segment(data = upgma_data.frame$segments, 
+    #                aes(x = x, y = y, xend = xend, yend = yend)) + 
+    #     geom_text(data = upgma_data.frame$labels, 
+    #             aes(x = x, y = y, label = label), size = 3, vjust = 1) +
+    # #     geom_text(data = upgma_data.frame$leaf_labels, 
+    # #             aes(x = x, y = y, label = label), size = 3, vjust = 1) +
+    #     theme_dendro() 
     #theme(plot.margin=unit(c(0,2,0,2),"mm"))
-
-#     geom_raster(data = spatial_topicmix_kriged_all_topics_colors, aes(x, y), 
-#               fill=rgb(spatial_topicmix_kriged_all_topics_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_colors[,3:5]))), inherit.aes = F) +
+    
+    #     geom_raster(data = spatial_topicmix_kriged_all_topics_colors, aes(x, y), 
+    #               fill=rgb(spatial_topicmix_kriged_all_topics_colors[,3:5]/max(255,max(spatial_topicmix_kriged_all_topics_colors[,3:5]))), inherit.aes = F) +
     #geom_raster() +
-#     coord_equal() + theme_minimal() +
-#     labs(fill=barcode_labels_list[barcode_index]) + ggtitle(letters[barcode_index]) +
-#     #labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
-#     theme(legend.position="bottom", legend.text=element_text(size=13), 
-#         legend.title=element_text(size=16), axis.title=element_blank(), 
-#         axis.text = element_blank(),
-#         #               plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,1,-2,2),"mm")) +
-#         plot.title=element_text(hjust=0,size=10), plot.margin=unit(c(2,-10,0,-10),"mm")) +
-#     guides(fill = guide_colorbar(barwidth = 8, barheight = 0.5, title.position="bottom")) +
-#     scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
-#     scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
-#     geom_point(data = data.frame(coordPP,z.pred=rep(0,nrow(coordPP))), aes(x,y), color="black", size=0.1, alpha=0.3, inherit.aes = F)
+    #     coord_equal() + theme_minimal() +
+    #     labs(fill=barcode_labels_list[barcode_index]) + ggtitle(letters[barcode_index]) +
+    #     #labs(fill=paste0("Assemblage ",k)) + ggtitle(letters[k]) +
+    #     theme(legend.position="bottom", legend.text=element_text(size=13), 
+    #         legend.title=element_text(size=16), axis.title=element_blank(), 
+    #         axis.text = element_blank(),
+    #         #               plot.title=element_text(hjust=0,size=16), plot.margin=unit(c(0,1,-2,2),"mm")) +
+    #         plot.title=element_text(hjust=0,size=10), plot.margin=unit(c(2,-10,0,-10),"mm")) +
+    #     guides(fill = guide_colorbar(barwidth = 8, barheight = 0.5, title.position="bottom")) +
+    #     scale_y_continuous(limits=c(5,395), expand = c(0,0)) +
+    #     scale_x_continuous(limits=c(5,295), expand = c(0,0)) + 
+    #     geom_point(data = data.frame(coordPP,z.pred=rep(0,nrow(coordPP))), aes(x,y), color="black", size=0.1, alpha=0.3, inherit.aes = F)
   }
-
-setwd("/Users/guilhemsommeria-klein/Desktop/These/Manuscrits/Paper2/Figures/")
-
-pdf("UPGMA_Helinger_bact-prot-fungi.pdf")
-#grid.arrange(grobs = taxotree.plot, ncol=3, height = 1, width = 3)
-grid.arrange(grobs = taxotree.plot, ncol=3, height = 1, width = 3)
-# par(mfrow = c(1,3))
-# for (barcode_index in 1:3)
-#   plot(upgma_Hellinger[[barcode_index]], which.plots=2, ann=F)
-dev.off()
-
-#     pdf("Hierarchical_clustering_of_topics_Hellinger.pdf")
-#     plot(upgma_Hellinger, which.plots=2, ann=F)
-#     title("Average Hellinger")
-#     dev.off()
-#     
-#     pdf("Hierarchical_clustering_of_topics_Jaccard.pdf")
-#     plot(upgma_Jaccard, which.plots=2, ann=F)
-#     title("Average Jaccard")
-#     dev.off()
-#     
-#     pdf("Hierarchical_clustering_of_topics_beta.sim.pdf")
-#     plot(upgma_Beta.sim, which.plots=2, ann=F)
-#     title("Average beta.sim")
-#     dev.off()
-
+  
+  setwd("/Users/guilhemsommeria-klein/Desktop/These/Manuscrits/Paper2/Figures/")
+  
+  pdf("UPGMA_Helinger_bact-prot-fungi.pdf")
+  #grid.arrange(grobs = taxotree.plot, ncol=3, height = 1, width = 3)
+  grid.arrange(grobs = taxotree.plot, ncol=3, height = 1, width = 3)
+  # par(mfrow = c(1,3))
+  # for (barcode_index in 1:3)
+  #   plot(upgma_Hellinger[[barcode_index]], which.plots=2, ann=F)
+  dev.off()
+  
+  #     pdf("Hierarchical_clustering_of_topics_Hellinger.pdf")
+  #     plot(upgma_Hellinger, which.plots=2, ann=F)
+  #     title("Average Hellinger")
+  #     dev.off()
+  #     
+  #     pdf("Hierarchical_clustering_of_topics_Jaccard.pdf")
+  #     plot(upgma_Jaccard, which.plots=2, ann=F)
+  #     title("Average Jaccard")
+  #     dev.off()
+  #     
+  #     pdf("Hierarchical_clustering_of_topics_beta.sim.pdf")
+  #     plot(upgma_Beta.sim, which.plots=2, ann=F)
+  #     title("Average beta.sim")
+  #     dev.off()
+  
 }
 
 
