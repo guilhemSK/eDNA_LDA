@@ -1,0 +1,307 @@
+# Parameter setting and documentation for LDA_main_v5.R
+
+# This software is run by calling in a terminal:
+# Rscript --vanilla LDA_main_v5.R LDA_parameters.R /path.to.code.directory
+# where /path.to.code.directory is the path to the directory containing the code and the functions its calls.
+
+# Alternatively, LDA_main_v5.R can be directly sourced from R or Rstudio after commenting out lines 31 to 36 and setting manually:  
+# parameter_file = "LDA_parameters.R"
+# code_insert = "/path.to.code.directory"
+
+# This software aims at facilitating the application of LDA decomposition to metabarcoding data - or more generally to biodiversity data - in a spatial context, as demonstrated in Sommeria-Klein et al. (submitted). It handles data preprocessing, postprocessing, and outputting, and makes use of package topicmodels (Grün and Hornik 2011) for LDA decomposition.
+# It can be used in two ways:
+# - for mpar = 1, it compares model performance between different numbers of assemblages;  
+# - for mpar = 0, it assesses the robustness of the decomposition for a given number of assemblages by comparing several runs of the algorithm, and generates a spatial representation of the output (among other things; cf. options below).
+mpar = 0
+# Options for mpar = 1:
+elbow_aic = 1
+cross_validation = 0
+random_folds = 1
+fold_size = 10
+
+###########################
+# Input: community matrix #
+###########################
+# This software takes as an input the a text file containing abundance data for all taxa/OTUs (rows) in all sites/samples (columns), i.e. a "community matrix".
+# The first line should contain sample names. Separators may be semi-colons (.csv) or blank spaces (.txt).
+# Name of the data file:
+data_file = "data.txt" #"data.txt"
+# Path to the data directory:
+local_data_path = "./Test_data_protists_PP"
+# Alternatively, a Rdata file named "data2m.Rdata" may be provided. 
+# Name of the taxonomic group or dataset uner study, for inclusion in the output (optional):
+data_name = "Protistes PP"
+
+######################
+# Data preprocessing #
+######################
+# If occurrence = 1, the data are treated as occurrence data instead of abundance data:
+# (This has no effect if the community matrix already consists solely of 0 and 1.)
+occurrence = 1
+# Number of sites an OTU should ocuppy to be retained in the data:
+# (if nb_occupied_sites_threshold = 1, all OTUs with non-zero abundance are retained)
+nb_occupied_sites_threshold = 1
+# If no_rare = 1, all OTUs with less reads than the number of sites are removed from the data:
+no_rare = 0
+
+##################################
+# Number of assemblages (topics) #
+# Number of realizations         #  
+##################################
+# Number of assemblages/topics in the decomposition:
+# (For mpar = 1, nb_topics is a vector containing the different assemblage numbers to be compared;
+# for mpar = 0, it is the number of assemblages.)
+nb_topics = 3
+#nb_topics = c(2,3,4,5,6,7,8,9,10,11,13,15)
+# Number of realizations for assessing the stability of the LDA decomposition:
+# (e.g. nb_real = 3 for mpar = 1; nb_real = 100 for mpar = 0)
+nb_real = 20
+
+#######################
+# Inference algorithm #
+#######################
+# Should the Variational Expectation-Maximization algorithm of Blei et al. 2003 or
+# the Gibbs sampling algorithm of Phan et al. (2008) be used for LDA computation?  
+# Both are called via the R package "topicmodels" (cf. Grün and Hornik 2011, "topicmodels: an R package for fitting topic models"):
+Rtopicmodels_VEM = 1
+Rtopicmodels_Gibbs = 0
+ValleExtendedLDA_Gibbs = 0
+# hdp = 0  #Not implemented
+# Tolerance threshold for the EM step and the variational step in the VEM algorithm:
+# (Computational speed and the robustness of the parameter estimates are mostly driven by the EM step.) 
+em_tol = 10^-4
+var_tol = 10^-6
+# Parameters in the Gibbs sampling algorithm:
+# (delta is the concentration parameter for the taxonomic composition of assemblages,
+# nb_iter is the maximal number of iterations, the likelihood is sampled every llh_keep iteration to monitor the convergence of the likelihood)
+#delta = 0.1
+nb_iter = 1000
+llh_keep = 1
+best = 0
+# If best = 0, thin must be equal to nb_iter, and burnin has no influence (only the last iteration of the chain is kept)
+thin = 25
+burnin = 2000
+# Concentration parameter alpha for the distribution of assemblages over sites/samples
+# (in the VEM algorithm, it is the starting value for estimating alpha; in the Gibbs sampling algorithmn, it is a fixed parameter value):
+alpha = 0.1
+delta = 0.1
+# alpha = 50/nb_topics
+randomInit = 1
+seededInit = 0
+
+#######################
+# Calculation options #
+#######################
+# Once LDA decomposition has been computed on a dataset for a given set of parameters, it is saved in the data directory for future use.
+# Set local_existingresult = 1 to perform only the postprocessing part using a previously computed LDA decomposition
+# (for local_existingresult = 0, any previous LDA computation is overwritten):
+local_existingresult = 0
+# For large datasets, LDA decomposition can be computationally intensive, and is best performed on a cluster. 
+# Set cluster_existingresult = 1 to perform only the postprocessing part using a previously computed LDA decomposition stored on a cluster.
+# The previously computed result is first copied to the local data directory.
+# A sshfs connection to the cluster should have been established beforehand; the path to the data directory on the cluster is given by cluster_data_path. 
+# (cluster_existingresult = 1 is mutually exclusive with local_existingresult = 1)
+cluster_existingresult = 0
+cluster_data_path = "/cluster.sshfs.mounting.point.on.local.computer/path.to.data.directory.on.cluster"
+# For large datasets and many realizations of the algorithm, memory use during postprocessing may be an issue.
+# Set low_memory = 1 to call functions LDA_best_real_lowMemory_fun and LDA_realization_comparison_lowMemory_fun
+# instead of LDA_best_real_fun and LDA_realization_comparison_fun,
+# which use less memory at the expense of computational speed:
+low_memory = 0
+
+
+#############################################
+########### POSTPROCESSING OPTIONS:##########
+#############################################
+
+# The postprocessing part consists in a number of computations aimed at interpreting the LDA results.
+# They can be performed indepentently or all at the same time depending on the selected options.
+# They can also be performed for all nb_real realizations or only on a subset of them given by Selected_real.
+# In Selected_real, realization are ordered by their likelihood value (realization 1 has the highest likelihood),
+# and Selected_real should start at 1.
+Selected_real = 1:nb_real
+# Whether assemblages in two realizations should be matched to each other using bipartite max-matching through the Hungarian algorithm (maxmatching = 1)
+# or in a greedy fashion by matching the most similar pairs first (greedymatching = 1)
+maxmatching = 1
+greedymatching = 0
+
+############################################
+# Optional input: taxonomic reference file #
+############################################
+# If a taxonomic reference file is provided for taxa/OTUs in the data directory, the taxonomic composition of assemblages is outputted.
+# The taxonomic reference file taxo_ref_file should consist of 4 columns, containing in this order for all taxa/OTUs:
+# sequence number, assigned scientific name, taxonomic rank of the assignment, and assignment score.
+# Taxa/OTUs should be in the same order as in data_file.
+# The first line should contain the column titles. Separators may be semi-colons (.csv) or blank spaces (.txt).
+taxo_ref_file = "taxo_ref.txt"
+# Alternatively, a Rdata file named "taxo_ref.Rdata" may be provided. 
+
+#########################################
+# Specifying the spatial sampling scheme #
+#########################################
+# To compare realizations using spatial randomizations, and to output a spatial representation of the result,
+# a spatial sampling scheme should be specified. 
+# Set grid = 1 if the sites/samples are arranged on a regular square grid (some may be missing).
+# Set geographic = 1 if the cartesian coordinates of samples are available (they then need to be provided below).
+# The two options may be combined. Default values are given for the data from Zinger et al. 2017.
+grid = 1
+geographic = 0
+# If grid =1, byRow indicates whether samples are listed row by row (byRow = 1) or column by column (byRow = 0) in data_file:
+byRow = 1
+# If geographic = 1, the data directory should contain the 2-column text file coord_file, 
+# containing the UTM coordinates of all samples in the same order as in the community matrix file.
+# The first column should contain eastings and the second northings, without column titles.
+# Separators may be semi-colons (.csv) or blank spaces (.txt).
+# (This file is not used for geographic = 0.)
+coord_file = "coord.txt"
+# If grid = 1 and geographic = 0, the dimensions of the grid must be provided:
+# (This is not needed if grid = 1 and geographic = 1.)
+nrow_grid = 39
+ncol_grid = 29
+# In metabarcoding data, data are often missing for some samples, typically because PCR amplification failed to yield enough DNA.
+# If samples are named after their position on the grid (e.g., numbers for rows and letters for columns),
+# missing samples can be detected automatically based on sample names and grid dimensions.
+# If grid = 1 and geographic = 0 and some samples are missing,
+# the vector Sample_name_endings should contain the ordered list of symbols by which sample names normally end when no sample is missing.
+# Sample_name_endings should repeat itself for each row if byRow = 1 (in which case it represents column names),
+# and for each column if byRow = 0 (in which case it represents row names):
+Sample_name_endings = c("7","8","9","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z")
+# If filling = 1, the missing samples detected based on Sample_name_endings
+# are filled by sampling with replacement from the neighbouring samples that are not missing: 
+# (filling = 1 only applies to grid = 1 and geographic = 0)
+filling = 1
+
+#######################
+# Simulated test data #
+#######################
+# testdata = 1 is to be chosen if a simulated community matrix is provided as an input for benchmarking purposes.
+# A simulated community matrix can be for instance generated using the script Topic_modeling_testdata_generation.R in the supplementary material of Sommeria-Klein et al. (submitted).
+# testdata = 1 is mutually exclusive with grid = 1 and geographic = 1. 
+testdata = 0
+# If testdata = 1, the data directory should contain a file "data2m_testdata.Rdata" containing the simulated community matrix, 
+# as well as a "true_documents.Rdata" file containing the proportion of each simulated assemblage in each sample.
+# Moreover, the following options are requested to compute the goodless-of-fit between the LDA-retrieved assemblages and the "true" (simulated) assemblages:
+# (nb_rndzations_true_documents is the number of randomizations in computing the normalized KL divergence between the simulated and LDA-retrieved assemlages,
+# and true_nb_topics is the number of simulated assemblages.)
+nb_rndzations_true_documents = 10000
+true_nb_topics = 5
+# All other options apply normally, except for spatial representation and comparison to environmental variables.
+
+########################
+# Stability assessment #
+########################
+# If realization_comparison = 1, different realizations of the LDA decomposition are compared to assess its stability:
+realization_comparison = 1
+# If MOTUwise = 1, realizations are compared with respect to the taxonomic/OTU composition of their assemblages;
+# if samplewise = 1, realizations are compared with respect to their spatial distribution over sites/samples.
+# Samplewise = 1 involves computing spatial randomizations, and is only available for grid = 1 and geographic = 0.
+# For testdata = 1, MOTUwise = 1 is not implemented (it would require loading true_topic_compo).
+samplewise = 1
+MOTUwise = 0
+# nb_rndzations gives th number of randomizations performed when computing the normalized symmetrized KL divergence between the assemblages of to decompositions:
+nb_rndzations = 1000
+
+#########################################################
+# Comparison of assemblages within the best realization #
+#########################################################
+# If best_real_comparison = 1, assemblages are compared to each other within the best realization:
+best_real_comparison = 1
+# Number of randomization in comparing the assemblages to each other:
+nb_rndzations_best_real = 10000
+
+##########################
+# Spatial representation #
+##########################
+# If spatial_plot = 1, a spatial representation of the assemblages is generated for the realizations specified in plotted_real:
+# (except in the case grid = 0 and geographic = 0.)
+spatial_plot = 1
+plotted_real = 1:3
+# If grid = 1, the spatial distribution of assemblages is interpolated between sampled locations using ordinary kriging. 
+# The variable "grain" sets the number of pixels between two nearest sampled locations on the grid (i.e. the resolution of the spatial representation):
+grain = 5
+# If geographic = 1, the spatial representation uses a geographic map as a background, that needs to be provided as a shape file.
+# Earth map layers can be downloaded at http://www.naturalearthdata.com/downloads/.
+# Path to the directory containing all shape files:
+background_map_path = "/path.to.maps.directory"
+# Each shape file .shp needs to be contained in a folder of the same name,
+# along with all the other files required for reading it (.dbf, .shx ...)
+# Shape file encoding the background map:
+background_map_file = "World_car" #or "ne_50m_ocean"
+# Optional shape file for adding rivers:
+river_file = "ne_50m_rivers_lake_centerlines"
+# If grid = 1 and geographic = 1, optional land shape file for extruding sea/lake areas from the kriged surface:
+land_file = "ne_10m_land"
+
+####################################################################
+# Comparison of assemblage distribution to environmental variables #
+####################################################################
+# If abiotic_variables = 1, the correlation between the spatial distribution of each assemblage in the best realization and
+# the environmental variables provided by file abiotic_file in directory abiotic_data_path is computed.
+# The file must contain one environmental variable per column, with titles in the first line,
+# and samples must follow the same order as in data_file.
+# Separators can be semi-colons (.csv) or blank spaces (.txt).
+abiotic_variables = 0
+abiotic_data_path = "./Test_data_protists_PP"
+abiotic_file = "Environmental_variables.csv"
+# For grid = 1 and geographic = 0, nb_abiotic_rndzations spatial randomizations are performed to assess the significance of the correlation:
+nb_abiotic_rndzations = 10000
+# If pca_abiotic = 1, the PCA axes of the provided environmental variables are used instead of the raw data to compute correlations: 
+pca_abiotic = 0
+
+####################
+# Loading packages #
+####################
+
+if (ValleExtendedLDA_Gibbs)
+{
+    # funtions Valle_lda.presence.absence_fun.R, Valle_get.theta_fun.R and aux1.cpp from Valle et al. 2018 Global Change Biology should be first downloaded to the directory
+    library(Rcpp)
+    sourceCpp('./aux1.cpp')
+}
+# To use color2D.matplot function :
+library(plotrix)
+# To use errbar function :
+library(Hmisc)
+# To use dudi.pca function :
+library(ade4)
+# To use rainbow_hcl function :
+library(colorspace)
+#library(lattice)
+# To compute KL divergence using KL.plugin:
+library(entropy)
+# To perform kriging:
+library(kriging)
+# To plot the kriged maps:
+library(ggplot2)
+library(gridExtra)
+library(scales)
+library(gstat)
+# To call grid.newpage()
+library(grid)
+# To plot shapes using readOGR
+if (spatial_plot)
+{
+    library(rgdal)
+    library(sp)
+    library(rgeos)
+    library(maptools)
+    library(marmap)
+    #library(gpclib,lib.loc=lib_path)
+}
+# To use raster manipulating functions:
+#library(raster,lib.loc=lib_path)
+# To use coltorgb:
+library(grDevices)
+# To load results:
+library(topicmodels)
+# To use the agnes function (hierarchical clustering):
+library(cluster)
+# To use the cophenetic function (cophenetic distance on a clustering tree):
+library(stats)
+# To use fread:
+library(data.table)
+# To use maxmatching
+if (maxmatching)
+library(maxmatching)
+if (best_real_comparison)
+library(vegan)
