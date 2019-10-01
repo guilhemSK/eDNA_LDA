@@ -8,7 +8,7 @@
 # parameter_file = "LDA_parameters.R"
 # code_insert = "/path.to.code.directory"
 
-# This software aims at facilitating the application of LDA decomposition to metabarcoding data - or more generally to biodiversity data - in a spatial context, as demonstrated in Sommeria-Klein et al. (submitted). It handles data preprocessing, postprocessing, and outputting, and makes use of package topicmodels (Grün and Hornik 2011) for LDA decomposition.
+# This software aims at facilitating the application of LDA decomposition to metabarcoding data - or more generally to biodiversity data - in a spatial context, as demonstrated in 'Latent Dirichlet Allocation reveals spatial and taxonomic structure in a DNA-based census of soil biodiversity from a tropical forest', Sommeria-Klein et al. It handles data preprocessing, postprocessing, and outputting, and makes use of package topicmodels (Grün and Hornik 2011) for LDA decomposition.
 # It can be used in two ways:
 # - for mpar = 1, it compares model performance between different numbers of assemblages;  
 # - for mpar = 0, it assesses the robustness of the decomposition for a given number of assemblages by comparing several runs of the algorithm, and generates a spatial representation of the output (among other things; cf. options below).
