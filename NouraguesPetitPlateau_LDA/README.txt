@@ -1,0 +1,3 @@
+R code associated with the submitted manuscript 'Latent Dirichlet Allocation reveals spatial and taxonomic structure in a DNA-based census of soil biodiversity from a tropical forest'.
+
+The NouraguesPetitPlateau_LDA folder contains various scripts that were used to obtain the results and figures presented in the manuscript, and that are provided without modification as an addition to the main code.
