@@ -272,19 +272,19 @@ if (kriged_topics)
   
   # Occ. vs. ab. K=3:
   ###################
-  nb_topics_vect = rep(3,6)
-  inverted_red_green = c(F,T,F,F,F,T)
-  occurrence_vect = c(0,0,0,1,1,1)
-  color.pal = colorRampPalette(c("#00007F", "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000"), space = "Lab")
+  # nb_topics_vect = rep(3,6)
+  # inverted_red_green = c(F,T,F,F,F,T)
+  # occurrence_vect = c(0,0,0,1,1,1)
+  # color.pal = colorRampPalette(c("#00007F", "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000"), space = "Lab")
   
   # nb_topics_vect = c(5,2,4)
   
   # Optimal K vs. K = 3 occ.:
   ######################
-  # nb_topics_vect = c(3,3,3,5,2,4)
-  # inverted_red_green = c(F,F,T,F,F,F)
-  # occurrence_vect = c(1,1,1,1,1,1)
-  # color.pal = colorRampPalette(c("blue","cyan","green","#FF7F00","red"))
+  nb_topics_vect = c(3,3,3,5,2,4)
+  inverted_red_green = c(F,F,T,F,F,F)
+  occurrence_vect = c(1,1,1,1,1,1)
+  color.pal = colorRampPalette(c("blue","cyan","green","#FF7F00","red"))
   
   nb_real = 100
   em_tol = 10^-7
@@ -314,8 +314,9 @@ if (kriged_topics)
   }
   
   if (legend_bar)
+  {
     legend_bar_insert = "_withLegend"
-  else
+  } else
     legend_bar_insert = ""
   
   data_insert = "Donnees_PetitPlateau"  
@@ -601,19 +602,19 @@ if (kriged_topics)
     {
       # Figure 4:
       #Old version:
-      #grid.arrange(grobs = c(tmp.plot, lidar.plot),ncol=3,heights = c(10*4/3*0.72,10*4/3*0.72,10*4/3), width = 10)
+      # grid.arrange(grobs = c(tmp.plot, lidar.plot),ncol=3,heights = c(10*4/3*0.72,10*4/3*0.72,10*4/3), width = 10)
       # ggsave(filename = paste0(figure_folder,"/Kriged_topics_with_Lidar_bact-prot-fungi18S_occ-ab",horizVert_insert,"_oneplot",discrete_insert,".pdf"),
       #        do.call("arrangeGrob",c(tmp.plot,lidar.plot,ncol=3,nrow=3)),width=5/2*3,height=5/2*3*4/3)
       
       # Occ. vs ab. figure, new version:
-      plot = grid.arrange(grobs = c(tmp.plot,lidar.plot), heights = c(1,1,ifelse(raw_lidar || pca_axes && legend_bar,1.26,1)), nrow = 3, layout_matrix = matrix(1:9,nrow=3,byrow=T))
-      ggsave(filename = paste0(figure_folder,"/Kriged_topics_with_Lidar_bact-prot-fungi18S_occ-ab",horizVert_insert,"_oneplot",pca_insert,discrete_insert,legend_bar_insert,".pdf"),
-             plot=plot,width=ifelse(raw_lidar || pca_axes && legend_bar,7.5,8.5),height=11)
+      # plot = grid.arrange(grobs = c(tmp.plot,lidar.plot), heights = c(1,1,ifelse(raw_lidar || pca_axes && legend_bar,1.26,1)), nrow = 3, layout_matrix = matrix(1:9,nrow=3,byrow=T))
+      # ggsave(filename = paste0(figure_folder,"/Kriged_topics_with_Lidar_bact-prot-fungi18S_occ-ab",horizVert_insert,"_oneplot",pca_insert,discrete_insert,legend_bar_insert,".pdf"),
+      #        plot=plot,width=ifelse(raw_lidar || pca_axes && legend_bar,7.5,8.5),height=11)
       
       # Optimal K figure:
-      # plot = grid.arrange(grobs = tmp.plot, nrow = 2, layout_matrix = matrix(1:6,nrow=2,byrow=T))
-      # ggsave(filename = paste0(figure_folder,"/Kriged_topics_optimalK_bact-prot-fungi18S_occ-ab",horizVert_insert,"_oneplot",pca_insert,discrete_insert,".pdf"),
-      #        plot=plot,width=7.5,height=6.748)
+      plot = grid.arrange(grobs = tmp.plot, nrow = 2, layout_matrix = matrix(1:6,nrow=2,byrow=T))
+      ggsave(filename = paste0(figure_folder,"/Kriged_topics_optimalK_bact-prot-fungi18S_occ-ab",horizVert_insert,"_oneplot",pca_insert,discrete_insert,".pdf"),
+             plot=plot,width=7.5,height=6.748)
       
       # Fig S3:
       #grid.arrange(grobs = tmp.plot, ncol=3, width = 10, height = 10/3*4*4/3, layout_matrix = rbind(c(1,2,3),c(4,5,6),c(7,8,NA),c(9,10,NA)))

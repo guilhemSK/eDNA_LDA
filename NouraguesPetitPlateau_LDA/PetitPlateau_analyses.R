@@ -1288,10 +1288,12 @@ if (maps && test_plots)
 
   #######################
   # 15t prevalence plots:
-  pdf(paste0(figure_folder,"/15t_prevalence_barplot_allGroups.pdf"),height=7*0.9)
-  par(mfrow = c(2,3))
+  pdf(paste0(figure_folder,"/15t_prevalence_barplot_allGroups.pdf"),height=7*0.9*3/2)
+  par(mfrow = c(3,3))
+  #bottom left top right
+  par(mar=c(1.5,4.5,4.5,2.4))
   ii_taxon = 0
-  for (taxon in taxo_vect[-1])
+  for (taxon in taxo_vect)
   {
     ii_taxon = ii_taxon+1
     data.folder_name = paste0("/Users/guilhemsommeria-klein/Desktop/Serveur_Bioclust.data/Donnees_PetitPlateau/",taxon,"/Rtopicmodels_LDA_VEM_nb_topics15_nb_real10_em_tol1e-07_var_tol1e-08_best_keep/")
@@ -1300,7 +1302,7 @@ if (maps && test_plots)
     Ordered_realizations = readRDS(paste0(data.folder_name,"Ordered_realizations.rds"))
     documents = Result[[Ordered_realizations$ix[1]]]@gamma
     par(cex.lab=1.7,cex.main=1.7,cex.axis=1.4,lwd=2)
-    barplot(sort(apply(documents,2,mean),decreasing=T),space=0.5,ylab=ifelse(ii_taxon == 1,"Assemblage relative prevalence",""),xlab=ifelse(ii_taxon == 1,"Assemblages",""),border=NA,col="grey")
+    barplot(sort(apply(documents,2,mean),decreasing=T),space=0.5,ylab=ifelse(ii_taxon == 1,"Assemblage prevalence",""),xlab=ifelse(ii_taxon == 1,"Assemblages",""),border=NA,col="grey")
     title(paste(LETTERS[which(taxo_vect == taxon)],"-",taxo_names[which(taxo_vect == taxon)]))
     # abline(h = 1, lty = 2)
   }

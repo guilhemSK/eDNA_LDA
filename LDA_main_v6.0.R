@@ -2,16 +2,17 @@
 
 # See LDA_parameters_file.R for options and documentation
 
-# This code is run by calling in a terminal:
-# Rscript --vanilla LDA_main_v5.R LDA_parameters.R /path.to.code.directory
-# where /path.to.code.directory is the path to the directory containing the code and the functions its calls.
+# This software is run by calling in a terminal
+# from the directory containing LDA_main and all the functions its calls:
+# Rscript --vanilla LDA_main_v6.0.R /path.to.data LDA_parameters.R
 
-# Alternatively, this code can be directly sourced from R or Rstudio after commenting out lines 31 to 36 below and setting manually:  
+# Alternatively, LDA_main_v6.0.R can be directly sourced from R or Rstudio 
+# after commenting out lines 32 to 37 below and setting manually:  
 # parameter_file = "LDA_parameters.R"
-# code_insert = "/path.to.code.directory"
+# local_data_path = "/path.to.data"
 
 # Depending on the options chosen in LDA_parameters.R,
-# this code calls the following functions stored in /path.to.code.directory:
+# this code calls the following functions:
 # LDA_realization_comparison_fun.R
 # LDA_abiotic_variables_fun.R
 # LDA_best_real_fun.R
@@ -30,19 +31,19 @@
 #######################################
 args = commandArgs(trailingOnly = T)
 
-parameter_file = args[1]
-code_insert = args[2]
+local_data_path = args[1]
+parameter_file = args[2]
 if (!is.null(args[3]))
   process_index = as.numeric(args[3])+1
 #########################################
 
-if (strsplit(code_insert,split="",fixed=T)[[1]][1] == ".")
-  code_insert = paste0(getwd(),paste0(strsplit(code_insert,split="",fixed=T)[[1]][-1],collapse = ""))
-
-source(paste0(code_insert,"/",parameter_file))  
+code_insert = getwd()
 
 if (strsplit(local_data_path,split="",fixed=T)[[1]][1] == ".")
   local_data_path = paste0(getwd(),paste0(strsplit(local_data_path,split="",fixed=T)[[1]][-1],collapse = ""))
+
+source(paste0(local_data_path,"/",parameter_file))  
+
 if (strsplit(abiotic_data_path,split="",fixed=T)[[1]][1] == ".")
   abiotic_data_path = paste0(getwd(),paste0(strsplit(abiotic_data_path,split="",fixed=T)[[1]][-1],collapse = ""))
 
@@ -84,8 +85,10 @@ if (mpar)
   {
     model_selection_insert = "_post-predictive-cross-valid"
     real_fold_insert = "_fold_size"
+    if (!partitioning)
+      partitioning_insert = paste0("_overlapping-folds",nb_real,"real")
     if (!random_folds)
-      random_folds_insert = "_non-random_folds"
+      random_folds_insert = "_blocks"
   }
 } else
 {
@@ -97,8 +100,8 @@ if (mpar)
     alpha_insert = paste0("_alpha",alpha)
 }
 
-if (best == 2 && !(Rtopicmodels_Gibbs || ValleExtendedLDA_Gibbs))
-  stop("Posterior log-likelihood sampling (best = 2) only applies to Gibbs sampling.")
+if (best != 2 && (Rtopicmodels_Gibbs || ValleExtendedLDA_Gibbs))
+  warning("Gibbs samplings should only run with best = 2 (approximate maximum a posteriori).")
 
 if (Rtopicmodels_Gibbs)
 {
@@ -114,7 +117,13 @@ if (Rtopicmodels_Gibbs)
     } else
       best_insert = ""
   } else
-    best_insert = paste0("_thin",thin,"_burnin",burnin)
+  {
+    if (best != 0)
+    {
+      best_insert = paste0("_thin",thin,"_burnin",burnin)
+    } else
+      best_insert = ""
+  }
 } else if (Rtopicmodels_VEM) 
 {
   filename_insert = "Rtopicmodels_LDA_VEM"
@@ -177,7 +186,7 @@ if (samplewise)
 # Loading data #
 ################
 
-setwd(local_data_path)
+# setwd(local_data_path)
 
 cat("Loading original data ...\n")
 
@@ -186,53 +195,56 @@ cat("Loading original data ...\n")
 # e.g. if they result from splitting a taxonomic group based on taxonomic assignments.
 if (testdata)
 {
-  load("data2m_testdata.Rdata")
-  load("true_documents.Rdata")
+  load(paste0(local_data_path,"/data2m_testdata.Rdata"))
+  load(paste0(local_data_path,"/true_documents.Rdata"))
   true_documents = true_norm_documents
   # true_topic_compo not available
-} else if (file.exists("data2m.Rdata"))
+} else if (file.exists(paste0(local_data_path,"/data2m.Rdata")))
 {
-  load("data2m.Rdata")
+  load(paste0(local_data_path,"/data2m.Rdata"))
 } else 
 {
+  data_file = paste0(local_data_path,"/",data_file)
   if (low_memory)
   {
     if (strsplit(data_file,split=".",fixed=T)[[1]][length(strsplit(data_file,split=".",fixed=T)[[1]])] == "csv")
-      data2m = fread(data_file, colClasses="numeric", sep=";", header = T)
+      data2m = fread(data_file, colClasses="numeric", sep=",", header = T, row.names = 1)
     else
-      data2m = fread(data_file, colClasses="numeric", sep=" ", header = T)
+      data2m = fread(data_file, colClasses="numeric", sep="\t", header = T, row.names = 1)
   } else
   {
     if (strsplit(data_file,split=".",fixed=T)[[1]][length(strsplit(data_file,split=".",fixed=T)[[1]])] == "csv")
-      data2m = read.table(data_file, colClasses="numeric", sep=";", header = T)
+      data2m = read.table(data_file, colClasses="numeric", sep=",", header = T, row.names = 1)
     else 
-      data2m = read.table(data_file, colClasses="numeric", sep=" ", header = T)
+      data2m = read.table(data_file, colClasses="numeric", sep="\t", header = T, row.names = 1)
   }
 }
 
-if (file.exists("taxo_ref.Rdata"))
+if (file.exists(paste0(local_data_path,"/taxo_ref.Rdata")))
 {
-  load("taxo_ref.Rdata")
+  load(paste0(local_data_path,"/taxo_ref.Rdata"))
 } else if (!testdata && exists("taxo_ref_file"))
 {
+  taxo_ref_file = paste0(local_data_path,"/",taxo_ref_file)
   if (strsplit(taxo_ref_file,split=".",fixed=T)[[1]][length(strsplit(taxo_ref_file,split=".",fixed=T)[[1]])] == "csv")
-    taxo_ref = read.table(taxo_ref_file, colClasses="vector", sep=";", header = F)
+    taxo_ref = read.table(taxo_ref_file, colClasses="vector", sep=",", header = T, row.names = 1)
   else
-    taxo_ref = read.table(taxo_ref_file, colClasses="vector", sep=" ", header = F)
+    taxo_ref = read.table(taxo_ref_file, colClasses="vector", sep="\t", header = T, row.names = 1)
 }
 
 if (geographic)
 {
-  if (file.exists("coord.Rdata"))
+  if (file.exists(paste0(local_data_path,"/coord.Rdata")))
   {
-    load("coord.Rdata")
+    load(paste0(local_data_path,"/coord.Rdata"))
   } else
   {
-    # coord_file contains the easting (first column) and northing (second column) of all samples, without titles
+    coord_file = paste0(local_data_path,"/",coord_file)
+    # coord_file contains the eastings (first column) and northings (second column) of all samples, without titles
     if (strsplit(coord_file,split=".",fixed=T)[[1]][length(strsplit(coord_file,split=".",fixed=T)[[1]])] == "csv")
-      coord = read.table(coord_file, colClasses="numeric", sep=";", col.names = c("x","y"), header = F)
+      coord = read.table(coord_file, colClasses="numeric", sep=";", col.names = c("x","y"), header = T, row.names = 1)
     else
-      coord = read.table(coord_file, colClasses="numeric", sep=" ", col.names = c("x","y"), header = F)
+      coord = read.table(coord_file, colClasses="numeric", sep="\t", col.names = c("x","y"), header = T, row.names = 1)
   }
   # the coordinates are multiplied by the grain for spatial representation with kriging between samples
   if (grid)
@@ -279,21 +291,21 @@ if (mpar)
   if (Rtopicmodels_Gibbs)
   {
     local_subdirname = paste0(local_dirname,filename_insert,alpha_insert,"_delta",format(delta,digits=3),"_nb_topics",nb_topics_range[1],
-                              "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,"_nb_iter",nb_iter,best_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),random_folds_insert,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,"/")
+                              "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,partitioning_insert,random_folds_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),"_nb_iter",nb_iter,best_insert,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,"/")
     if (cluster_existingresult)
       cluster_subdirname = paste0(cluster_dirname,filename_insert,alpha_insert,"_delta",format(delta,digits=3),"_nb_topics",nb_topics_range[1],
-                                  "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,"_nb_iter",nb_iter,best_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),random_folds_insert,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,"/")
+                                  "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,partitioning_insert,random_folds_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),"_nb_iter",nb_iter,best_insert,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,"/")
     filename = paste0(filename_insert,alpha_insert,"_delta",format(delta,digits=3),"_nb_topics",nb_topics_range[1],
-                      "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,"_nb_iter",nb_iter,best_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),random_folds_insert,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,".Rdata")  
+                      "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,partitioning_insert,random_folds_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),"_nb_iter",nb_iter,best_insert,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,".Rdata")  
   } else if (Rtopicmodels_VEM)
   {
     local_subdirname = paste0(local_dirname,filename_insert,alpha_insert,"_nb_topics",nb_topics_range[1],
-                              "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),random_folds_insert,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,"/")
+                              "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,partitioning_insert,random_folds_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,"/")
     if (cluster_existingresult)
       cluster_subdirname = paste0(cluster_dirname,filename_insert,alpha_insert,"_nb_topics",nb_topics_range[1],
-                                  "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),random_folds_insert,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,"/")
+                                  "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,partitioning_insert,random_folds_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,"/")
     filename = paste0(filename_insert,alpha_insert,"_nb_topics",nb_topics_range[1],
-                      "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),random_folds_insert,"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,".Rdata")
+                      "-",nb_topics_range[length(nb_topics_range)],model_selection_insert,partitioning_insert,random_folds_insert,real_fold_insert,ifelse(cross_validation,fold_size,nb_real),"_em_tol",em_tol,"_var_tol",var_tol,occurrence_insert,remove_single_sites_insert,no_rare_insert,init_insert,".Rdata")
   }
 } else if (!mpar)
 {
@@ -320,7 +332,6 @@ if (mpar)
     local_subdirname = paste0(local_dirname,filename_insert,"hdp-faster_alpha",alpha,"_gamma",gamma,"_eta",eta,"_maxiter",maxiter,"_norep",occurrence_insert,remove_single_sites_insert,no_rare_insert,"/")
     if (!file.exists(local_subdirname))
       dir.create(local_subdirname)
-    setwd(local_subdirname) 
   }
 }
 
@@ -335,7 +346,7 @@ if (grid && !geographic)
   if (missing)
   {
     # Detecting the positions of missing samples only if it has not been previously done
-    if (!file.exists("Missing_positions_indices.Rdata"))
+    if (!file.exists(paste0(local_data_path,"/Missing_positions_indices.Rdata")))
     {
       source(paste0(code_insert,"/LDA_detecting_missing_samples_fun.R"))
       if (byRow)
@@ -366,7 +377,8 @@ if (grid && !geographic)
 if (grid && !geographic && missing && filling)
 {
   # Filling missing samples only if it has not been previously done
-  if (!file.exists("data2m_filled.Rdata") && !(cluster_existingresult && file.exists(paste0(cluster_subdirname,"data2m_filled.Rdata"))))
+  if (!file.exists(paste0(local_data_path,"/data2m_filled.Rdata")) &&
+      !(cluster_existingresult && file.exists(paste0(cluster_subdirname,"data2m_filled.Rdata"))))
   {
     if (all(Missing_positions_indices==0))
       cat("No missing sample.\n")
@@ -378,17 +390,17 @@ if (grid && !geographic && missing && filling)
       
       data2m = LDA_filling_missing_samples_fun(Missing_positions_indices,data2m,nrow_grid,ncol_grid,byRow)
       # Missing_positions_indices = rep(0,length(Missing_positions_indices))
-      save(data2m,file="data2m_filled.Rdata")
+      save(data2m,file=paste0(local_data_path,"/data2m_filled.Rdata"))
     }
-  } else if (!file.exists("data2m_filled.Rdata") && cluster_existingresult && file.exists(paste0(cluster_subdirname,"data2m_filled.Rdata")))
+  } else if (!file.exists(paste0(local_data_path,"/data2m_filled.Rdata")) && cluster_existingresult && file.exists(paste0(cluster_subdirname,"data2m_filled.Rdata")))
   {
     # Because filling the missing samples involves random numbers, it should not be performed a second time independently
     # if it has already been performed on the cluster (for cluster_existingresult = 1): 
     command = paste0("cp ",cluster_subdirname,"data2m_filled.Rdata"," ",local_subdirname,"data2m_filled.Rdata")
     system(command, intern=TRUE)
-    load("data2m_filled.Rdata")
+    load(paste0(local_data_path,"/data2m_filled.Rdata"))
   } else if (file.exists("data2m_filled.Rdata"))
-    load("data2m_filled.Rdata")
+    load(paste0(local_data_path,"/data2m_filled.Rdata"))
   missing = 0
 }
 
@@ -526,6 +538,7 @@ if (length(which(colSums(data2m)==0)) != 0)
 nb_terms = nrow(data2m)
 nb_doc = ncol(data2m)
 sum_data2m = sum(data2m)
+# Saving sample names:
 colnames_data2m = colnames(data2m)
 
 if (!local_computation)
@@ -533,21 +546,66 @@ if (!local_computation)
 
 if (mpar && cross_validation)
 {
-  nb_real = nb_doc %/% fold_size
-  if (nb_doc %% fold_size > fold_size/2)
+  # Generating folds of hold-out samples for cross-validation.
+  # The folds are generated once for all and reused for each K value.
+  if (partitioning)
   {
-    split_factor = c(unlist(lapply(1:nb_real,rep,fold_size)),rep(nb_real+1,nb_doc %% fold_size))
-    nb_real = nb_real+1
+    # Partitioning the samples into folds of "fold_size" samples.
+    # The number of folds ("nb_real") depends on the number of samples and on fold size.
+    # If the number of samples cannot be exactly divided by fold size, one fold will contain a smaller or larger number of samples.
+    if (fold_size < 1)
+      stop("fold_size should be larger than 1 for partitioning = TRUE.")
+    nb_real = nb_doc %/% fold_size
+    if (nb_doc %% fold_size > fold_size/2)
+    {
+      split_factor = c(unlist(lapply(1:nb_real,rep,fold_size)),rep(nb_real+1,nb_doc %% fold_size))
+      nb_real = nb_real+1
+    } else
+    {
+      split_factor = c(unlist(lapply(1:nb_real,rep,fold_size)),rep(nb_real,nb_doc %% fold_size))
+    }
+    cat("Generating",nb_real,"folds of",fold_size,"samples out of",nb_doc,"samples by exact partitioning.\n")
+    # If random_folds=F, samples are partitioned into folds following their original order in the data ("block cross-validation"),
+    # otherwise they are shuffled.
+    if (random_folds)
+      split_factor = sample(split_factor,length(split_factor))
+    # Generating the folds:
+    folds = split(1:nb_doc,split_factor)
+    if (nb_doc != length(split_factor) || nb_real != length(folds))
+      stop("Error while generating folds.")
   } else
   {
-    split_factor = c(unlist(lapply(1:nb_real,rep,fold_size)),rep(nb_real,nb_doc %% fold_size))
+    # Generating nb_real overlapping folds by independently partitioning the samples in two for each realization.
+    if (fold_size > 0.5)
+      stop("fold_size should be lower than 0.5 for partitioning = FALSE.")
+    abs_fold_size = round(fold_size*nb_doc)
+    cat("Generating",nb_real,"independent folds of",abs_fold_size,"samples out of",nb_doc,"samples.\n")
+    folds = list()
+    # If random_folds=F, samples are partitioned into folds following their original order in the data ("block cross-validation"),
+    # otherwise they are shuffled.
+    if (random_folds)
+    {
+      # Picking abs_fold_size randomly chosen samples for the fold.
+      for (r in 1:nb_real)
+        folds[[r]] = sample(1:nb_doc,abs_fold_size)
+    } else
+    {
+      # Picking abs_fold_size contiguous samples for the fold, starting from a random index for each realization.
+      for (r in 1:nb_real)
+      {
+        start_fold = sample(1:nb_doc,1)
+        if (start_fold + abs_fold_size - 1 > nb_doc)
+        {
+          # Leaving the samples (abs_fold_size - (nb_doc - start_fold)):(start_fold-1) out of the fold:
+          folds[[r]] = c(1:(abs_fold_size - (nb_doc - start_fold + 1)),
+                         start_fold:nb_doc)
+        } else 
+        {
+          folds[[r]] = start_fold:(start_fold + abs_fold_size - 1)
+        }
+      }
+    }
   }
-  cat("Generating",nb_real,fold_size,"-sample folds out of",nb_doc,"samples.\n")
-  if (random_folds)
-    split_factor = sample(split_factor,length(split_factor))
-  folds = split(1:nb_doc,split_factor)
-  if (nb_doc != length(split_factor) || nb_real != length(folds))
-    stop("Error while generating folds.")
 }
 
 ####################################
@@ -561,13 +619,13 @@ if (cluster_existingresult)
   # system(command, intern=TRUE)
   cat("Loading LDA decomposition from file:\n",filename,"\n")
   load(paste0(cluster_subdirname,filename))
-  if (best == 2 && !mpar)
+  if (Rtopicmodels_Gibbs && best == 2 && !mpar)
     sampled_logLiks = readRDS(paste0(cluster_subdirname,"posterior_sampled_logLiks.rds"))
 } else if (local_existingresult)
 {
   cat("Loading LDA decomposition from file:\n",filename,"\n")
   load(filename)
-  if (best == 2 && !mpar)
+  if (Rtopicmodels_Gibbs && best == 2 && !mpar)
     sampled_logLiks = readRDS("posterior_sampled_logLiks.rds")
 } else if (local_computation)
   cat("Results will be saved in file:\n",filename,"\n")
@@ -583,7 +641,7 @@ if (mpar)
     # Result_mpar = list()
     if (cross_validation)
       perplexity_mpar = matrix(nrow = nb_real, ncol = mpar_range, dimnames = list(paste0("real",1:nb_real),paste0(nb_topics_range,"assemblages")), data = 0)
-    if (best == 2 && elbow_aic)
+    if (Rtopicmodels_Gibbs && best == 2 && elbow_aic)
       sampled_logLiks_mpar = list()
   }
   
@@ -710,7 +768,7 @@ for (par_index in 1:mpar_range)
         }
         
         # Intermediate results are saved for each parameter value:
-        save(nb_topics_range,perplexity_mpar,split_factor,folds,file="perplexity.Rdata")
+        save(nb_topics_range,perplexity_mpar,folds,file="perplexity.Rdata")
         # Progress.text gives information about the progress of the computation:
         write(paste0(par_index,"/",mpar_range),file="Progress.txt",ncolumns=1,append=T)
       }
@@ -869,7 +927,7 @@ for (par_index in 1:mpar_range)
         
         if (cross_validation)
         {
-          save(nb_topics_range,perplexity_mpar,split_factor,folds,file="perplexity.Rdata")
+          save(nb_topics_range,perplexity_mpar,folds,file="perplexity.Rdata")
           write(paste0(par_index,"/",mpar_range),file="Progress.txt",ncolumns=1,append=T)
         }
       }
@@ -940,7 +998,7 @@ for (par_index in 1:mpar_range)
         LLH_final_real1[j] = Result[[j]]$llk[nb_iter]
     }
     # Realizations are ordered from the highest likelihood (best realization) to the lowest
-    if (best == 2)
+    if (Rtopicmodels_Gibbs && best == 2)
     {
       Ordered_realizations = sort.int(abs(LLH_final_real1 - mean(LLH_final_real1)),index.return = T)
       HighestLlh_ordered_realizations = vector(length = nb_real,mode = "numeric")
@@ -1320,9 +1378,9 @@ if (!mpar)
       
       setwd(abiotic_data_path)
       if (strsplit(abiotic_file,split=".",fixed=T)[[1]][length(strsplit(abiotic_file,split=".",fixed=T)[[1]])] == "csv")
-        data_abiotic = read.table(abiotic_file, sep=";", colClasses="numeric", header = T)
+        data_abiotic = read.table(abiotic_file, sep=",", colClasses="numeric", header = T)
       else
-        data_abiotic = read.table(abiotic_file, sep=" ", colClasses="numeric", header = T)
+        data_abiotic = read.table(abiotic_file, sep="\t", colClasses="numeric", header = T, row.names = 1)
       colnames_abiotic = colnames(data_abiotic)
       ncol0 = ncol(data_abiotic)
       
@@ -1658,12 +1716,12 @@ if (!mpar)
     
     if (Rtopicmodels_Gibbs && best == 2)
     {
-      if (local_computation)
-        saveRDS(sampled_logLiks,file="sampled_logLiks.rds")
-      else if (local_existingresult)
-        sampled_logLiks = readRDS("sampled_logLiks.rds")
-      else if (cluster_existingresult)
-        sampled_logLiks = readRDS(paste0(cluster_subdirname,"sampled_logLiks.rds"))
+      # if (local_computation)
+      #   saveRDS(sampled_logLiks,file="sampled_logLiks.rds")
+      # else if (local_existingresult)
+      #   sampled_logLiks = readRDS("sampled_logLiks.rds")
+      # else if (cluster_existingresult)
+      #   sampled_logLiks = readRDS(paste0(cluster_subdirname,"sampled_logLiks.rds"))
  
       pdf("Sampled_posterior_hist.pdf")
       par(mar=c(5.1,5.1,4.1,2.1))
@@ -1705,13 +1763,13 @@ if (!mpar)
     #   dir.create(subsubsubdirname)
     # setwd(subsubsubdirname) 
     
-    if ((grid || geographic) && !testdata)
+    if (!testdata)
     {
-      if (spatial_plot && any(plotted_real == j_select))
+      if ((grid || geographic) && spatial_plot && any(plotted_real == j_select))
       {
         cat("Plotting spatial composition maps ...\n") 
         
-        source(paste0(code_insert,"/LDA_spatial_maps_fun_v4.R"))
+        source(paste0(code_insert,"/LDA_spatial_maps_fun_v4.1.R"))
         
         if (geographic && j_select == plotted_real[1])
         {
@@ -1754,7 +1812,7 @@ if (!mpar)
             bat = NA
         }
         
-        LDA_spatial_maps_result = LDA_spatial_maps_fun(grid,geographic,oneplot = 1,
+        LDA_spatial_maps_result = LDA_spatial_maps_fun(grid,geographic,oneplot,
                                                        documents,coord,coord0,
                                                        backgroundGgplot,riversGgplot,land,bat,
                                                        outputdirname = subsubdirname,
@@ -1767,47 +1825,60 @@ if (!mpar)
         
         if (!(file.exists("Spatial_topicmix_kriged.rds")))
           saveRDS(spatial_topicmix_kriged,file="Spatial_topicmix_kriged.rds")
+      
+        assemblage_proportions = do.call("rbind", lapply(spatial_topicmix_kriged, function(g) g$z.pred))
+        dimnames(assemblage_proportions) = list(paste("Assemblage",1:nb_topics),colnames_data2m)
+        saveRDS(assemblage_proportions,file = "assemblage_proportions.rds")
         
-        if (grid)
+        if (grid || geographic)
         {
           tmp.plot = LDA_spatial_maps_result$tmp.plot
-          tmp.one.plot = LDA_spatial_maps_result$tmp.one.plot
-          tmp.one.plot.discrete = LDA_spatial_maps_result$tmp.one.plot.discrete
           
           ggsave(filename = "Spatial_distribution_maps_kriged.pdf", do.call("arrangeGrob", c(tmp.plot, ncol=min(nb_topics,4))), height = 10/min(nb_topics,4)*((nb_topics-1)%/%4 + 1)*4/3, width = 10)
-          ggsave(filename = "Spatial_distribution_maps_kriged_oneplot.pdf",  do.call("arrangeGrob", list(tmp.one.plot, tmp.one.plot.discrete, ncol=2)), height = 10/2*4/3, width = 10)
-          
+          if (oneplot)
+          {
+            tmp.one.plot = LDA_spatial_maps_result$tmp.one.plot
+            tmp.one.plot.discrete = LDA_spatial_maps_result$tmp.one.plot.discrete
+            ggsave(filename = "Spatial_distribution_maps_kriged_oneplot.pdf",  do.call("arrangeGrob", list(tmp.one.plot, tmp.one.plot.discrete, ncol=2)), height = 10/2*4/3, width = 10)
+          }
+            
           # pdf("Spatial_distribution_maps_kriged_onebyone.pdf")
           # for (k in 1:nb_topics)
           #   print(tmp.plot[[k]])
           # dev.off()
         } 
       }
-    } else if (!grid && !geographic)
-    {
-      pdf("Samples_composition.pdf")
-      par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-      #bottom left top right
-      #par(mar=c(5.1,4.1,4.1,2.1)
-      par(mar=c(15.1,10.1,4.1,4.1))
-      plot(documents[,1],col=terrain.colors(nb_topics)[1],type="p",ann=F,yaxt="n",xaxt="n")
-      axis(2, ylim=c(0,1), col='black')
-      axis(1, at=1:length(colnames_data2m), labels = F)
-      text(1:length(colnames_data2m), par("usr")[3], srt = 45, adj = c(1.05,1.75), labels = colnames_data2m, xpd = TRUE, cex=1.1)
-      for (k in 2:nb_topics)
-        lines(documents[,k],col=terrain.colors(nb_topics)[k],type="p")
-      title(ylab="Samples composition")
-      title(paste("Distribution of the ",nb_topics,"\nassemblages",sep=""),cex.main=1.7)
-      dev.off()
       
-      pdf("Samples_composition_barplot.pdf")
-      par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-      #bottom left top right
-      #par(mar=c(5.1,4.1,4.1,2.1)
-      par(mar=c(15.1,10.1,4.1,4.1))
-      barplot(t(documents),col=terrain.colors(nb_topics),names.arg=colnames_data2m,ylim=c(0,1),ann=F,las=3)
-      title(ylab="Samples composition",main=paste("Distribution of the ",nb_topics,"\nassemblages",sep=""))
-      dev.off()
+        # pdf("Samples_composition.pdf")
+        # par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
+        # #bottom left top right
+        # #par(mar=c(5.1,4.1,4.1,2.1)
+        # par(mar=c(15.1,10.1,4.1,4.1))
+        # plot(documents[,1],col=terrain.colors(nb_topics)[1],type="p",ann=F,yaxt="n",xaxt="n")
+        # axis(2, ylim=c(0,1), col='black')
+        # axis(1, at=1:length(colnames_data2m), labels = F)
+        # text(1:length(colnames_data2m), par("usr")[3], srt = 45, adj = c(1.05,1.75), labels = colnames_data2m, xpd = TRUE, cex=1.1)
+        # for (k in 2:nb_topics)
+        #   lines(documents[,k],col=terrain.colors(nb_topics)[k],type="p")
+        # title(ylab="Samples composition")
+        # title(paste("Distribution of the ",nb_topics,"\nassemblages",sep=""),cex.main=1.7)
+        # dev.off()
+        
+        if (nb_topics < 6)
+        {
+          col = terrain.colors(nb_topics)
+        } else
+          col = colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", "yellow", "#FF7F00", "red", "#7F0000"),space = "Lab")(nb_topics)
+        
+        pdf("Samples_composition_barplot.pdf")
+        par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=1)
+        #bottom left top right
+        #par(mar=c(5.1,4.1,4.1,2.1)
+        par(mar=c(15.1,10.1,4.1,4.1))
+        barplot(t(documents),col=col[sample(1:nb_topics,nb_topics)],names.arg=colnames_data2m,ylim=c(0,1),ann=F,las=3,cex.names=0.5)
+        title(ylab="Samples composition",main=paste("Distribution of the ",nb_topics,"\nassemblages",sep=""))
+        dev.off()
+  
     } else if (testdata)
     {
       pdf("Assemblage_distribution_in_samples.pdf")
@@ -1869,10 +1940,23 @@ if (!mpar)
       dir.create(realization_comparison_dirname)
     setwd(realization_comparison_dirname)
     
+    nES = t(DKL100_allRealPairs)[lower.tri(DKL100_allRealPairs,diag=F)]/KL_allRealPairs_w_rndzations[lower.tri(KL_allRealPairs_w_rndzations,diag=F)]
+    nES_byTopic = list()
+    for (k in 1:nb_topics)
+      nES_byTopic[[k]] = t(DKL100_allRealPairs_byTopic[[k]])[lower.tri(DKL100_allRealPairs_byTopic[[k]],diag=F)]/t(KL_allRealPairs_randomized_byTopic[[k]])[lower.tri(KL_allRealPairs_randomized_byTopic[[k]],diag=F)]
+    
     # Comparing realizations averaged over topics:
-    save(Correlation_allRealPairs,KL_allRealPairs_w_rndzations,KL_allRealPairs,DKL100_allRealPairs,llh_differences_allRealPairs,p_value_allRealPairs,
+    save(nES,
+         Correlation_allRealPairs,
+         KL_allRealPairs,
+         llh_differences_allRealPairs,
+         p_value_allRealPairs,
          file = paste0("Similarity_allRealPairs_",MOTU_sample_insert,".Rdata"))
-    save(Correlation_allRealPairs_byTopic,Correlation_allRealPairs_byTopic,KL_allRealPairs_byTopic,KL_allRealPairs_randomized_byTopic,DKL100_allRealPairs_byTopic,
+    
+    save(nES_byTopic,
+         Correlation_allRealPairs_byTopic,
+         KL_allRealPairs_byTopic,
+         llh_differences_allRealPairs,
          p_value_allRealPairs_byTopic,
          #Topic_correspondence_to_best_real,
          file = paste0("Similarity_allRealPairs_byTopic_",MOTU_sample_insert,".Rdata"))
@@ -1889,11 +1973,10 @@ if (!mpar)
     
     write(paste("Mean sKL distance =",mean(KL_allRealPairs[which(!is.na(KL_allRealPairs))]),"\n"),file=Stability_file,append=T)
     
-    nES = t(DKL100_allRealPairs)[lower.tri(DKL100_allRealPairs,diag=F)]/KL_allRealPairs_w_rndzations[lower.tri(KL_allRealPairs_w_rndzations,diag=F)]
     write(paste("Mean normalized sKL distance difference (Similarity) for",nb_rndzations,"randomizations per assemblage =",mean(nES),"\n"),file=Stability_file,append=T)
     
     # Intercept of nES = f(llh) : 
-    fitted_llh = abs(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real])
+    fitted_llh = llh_differences_allRealPairs[1,2:length_selected_real]
     fit_llh = lm(nES[1:length(fitted_llh)] ~ fitted_llh)
     write(paste("Similarity = f(llh difference) intercept =",fit_llh$coefficient[1],"\n"),file=Stability_file,append=T)  
     
@@ -1941,7 +2024,7 @@ if (!mpar)
       }
       
       # fit of nES = f(llh) :
-      fitted_llh = abs(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real])
+      fitted_llh = llh_differences_allRealPairs[1,2:length_selected_real]
       fit_llh = lm(DKL100_allRealPairs_byTopic[[k0]][1,-1]/KL_allRealPairs_randomized_byTopic[[k0]][1,-1] ~ fitted_llh)
       
       # fitted_perplexity = perplexity1[Ordered_realizations$ix[1]]-perplexity1[Ordered_realizations$ix[2:length_selected_real]]
@@ -1989,10 +2072,6 @@ if (!mpar)
          xlab = "Loglikelihood difference", ylab = "Similarity")
     dev.off()
     
-    nES_byTopic = list()
-    for (k in 1:nb_topics)
-      nES_byTopic[[k]] = t(DKL100_allRealPairs_byTopic[[k]])[lower.tri(DKL100_allRealPairs_byTopic[[k]],diag=F)]/t(KL_allRealPairs_randomized_byTopic[[k]])[lower.tri(KL_allRealPairs_randomized_byTopic[[k]],diag=F)]
-    
     pdf(paste0("Similarity_toBestReal_byTopic_",MOTU_sample_insert,"_vs_llh-diff.pdf"))  
     for (k in 1:nb_topics)
     {
@@ -2001,7 +2080,7 @@ if (!mpar)
       par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
       # par(mar = c(bottom, left, top, right))
       par(mar = c(5, 5, 4, 3) + 0.1)
-      plot(abs(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real]),nES_byTopic[[k0]][1:(length_selected_real-1)],
+      plot(llh_differences_allRealPairs[1,2:length_selected_real],nES_byTopic[[k0]][1:(length_selected_real-1)],
            type="p", main = paste("Averaged sKL distance\n assemblage", k),
            xlab = "Loglikelihood difference with best realization", ylab = "Similarity to best realization")
     }
@@ -2011,7 +2090,7 @@ if (!mpar)
     par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
     # par(mar = c(bottom, left, top, right))
     par(mar = c(5, 5, 4, 3) + 0.1)
-    plot(abs(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real]),nES[1:(length_selected_real-1)],type="p",
+    plot(llh_differences_allRealPairs[1,2:length_selected_real],nES[1:(length_selected_real-1)],type="p",
          xlab = "Loglikelihood difference with best realization", ylab = "Similarity to best realization")
     dev.off()
     
@@ -2025,7 +2104,7 @@ if (!mpar)
     
     pdf(paste0("Correlation_toBestReal_",MOTU_sample_insert,"_vs_llh-diff.pdf"))  
     par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
-    plot(abs(Ordered_realizations$x[1]-Ordered_realizations$x[2:length_selected_real]),Correlation_allRealPairs[1,-1],type="p",
+    plot(llh_differences_allRealPairs[1,2:length_selected_real],Correlation_allRealPairs[1,-1],type="p",
          xlab = "Loglikelihood difference with best realization", ylab = "Correlation coefficient with best realization")
     dev.off()
     
