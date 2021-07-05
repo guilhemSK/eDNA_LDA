@@ -228,13 +228,19 @@ LDA_spatial_maps_fun <- function(grid,geographic,oneplot,
       if (!UnlimitedPointsPerStation && !SurDCMperStation)
       {
         # Plotting each topic separately as a color gradient from blue (absent) to red (100% abundance)
-        tmp.plot[[k]] = ggplot(data = backgroundGgplot) +
-          geom_path(aes(x=long, y=lat, group=group), color = "black", size = 0.3, inherit.aes=T) +
-          geom_point(data = spatial_topicmix_kriged[[k]], aes(x,y,colour=z.pred), size=0.7, alpha=1, inherit.aes = F) +
+        if (!is.na(backgroundGgplot))
+        {
+          tmp.plot[[k]] = ggplot(data = backgroundGgplot) +
+                          geom_path(aes(x=long, y=lat, group=group), color = "black", size = 0.3, inherit.aes=T)
+        } else
+          tmp.plot[[k]] = ggplot(data = spatial_topicmix_kriged[[k]])
+        
+        tmp.plot[[k]] =  tmp.plot[[k]] +
+          geom_point(data = spatial_topicmix_kriged[[k]], aes(x,y,colour=z.pred), size=2, alpha=1, inherit.aes = F) +
           scale_colour_gradientn(colours = c("darkblue","firebrick2"), space = "Lab") +
           coord_equal() +
-          scale_y_continuous(limits=range(coord$y), expand = c(0,0)) +
-          scale_x_continuous(limits=range(coord$x), expand = c(0,0)) +
+          # scale_y_continuous(limits=range(coord$y), expand = c(0,0)) +
+          # scale_x_continuous(limits=range(coord$x), expand = c(0,0)) +
           labs(fill=legend_labels[k]) +  theme_minimal() + ggtitle(letters[k]) +
           theme(legend.position="bottom", legend.text=element_text(size=7), 
                 legend.title=element_text(size=8), axis.title=element_blank(), 

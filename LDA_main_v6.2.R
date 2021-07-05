@@ -7,7 +7,7 @@
 # Rscript --vanilla LDA_main_v6.0.R /path.to.data LDA_parameters.R
 
 # Alternatively, LDA_main_v6.0.R can be directly sourced from R or Rstudio 
-# after commenting out lines 32 to 37 below and setting manually:  
+# after commenting out lines 33 to 39 below and setting manually:  
 # parameter_file = "LDA_parameters.R"
 # local_data_path = "/path.to.data"
 
@@ -28,6 +28,7 @@
 # Loading parameters #
 ######################
 
+# This version asks for data_path instead of code_insert as argument and seeks parameter_file there
 #######################################
 args = commandArgs(trailingOnly = T)
 
@@ -77,6 +78,7 @@ if (mpar)
     alpha_insert = paste0("_alpha",alpha)
 
   random_folds_insert = ""
+  partitioning_insert = ""
   if (elbow_aic)
   {
     model_selection_insert = "_elbow-AIC"
@@ -1823,12 +1825,12 @@ if (!mpar)
         
         spatial_topicmix_kriged = LDA_spatial_maps_result$spatial_topicmix_kriged
         
-        if (!(file.exists("Spatial_topicmix_kriged.rds")))
-          saveRDS(spatial_topicmix_kriged,file="Spatial_topicmix_kriged.rds")
+        # if (!(file.exists("Spatial_topicmix_kriged.rds")))
+        saveRDS(spatial_topicmix_kriged,file="Spatial_topicmix_kriged.rds")
       
-        assemblage_proportions = do.call("rbind", lapply(spatial_topicmix_kriged, function(g) g$z.pred))
-        dimnames(assemblage_proportions) = list(paste("Assemblage",1:nb_topics),colnames_data2m)
-        saveRDS(assemblage_proportions,file = "assemblage_proportions.rds")
+        # assemblage_proportions = do.call("rbind", lapply(spatial_topicmix_kriged, function(g) g$z.pred))
+        # dimnames(assemblage_proportions) = list(paste("Assemblage",1:nb_topics),colnames_data2m)
+        # saveRDS(assemblage_proportions,file = "assemblage_proportions.rds")
         
         if (grid || geographic)
         {
@@ -1847,6 +1849,16 @@ if (!mpar)
           #   print(tmp.plot[[k]])
           # dev.off()
         } 
+      } else if (grid || geographic)
+      {
+        spatial_topicmix_kriged = vector(length=nb_topics,mode="list")
+        for (k in 1:nb_topics)
+        {
+          spatial_topicmix_kriged[[k]] = data.frame(x=coord$x,y=coord$y,z.pred=documents[,k])
+          rownames(spatial_topicmix_kriged[[k]]) = rownames(coord)
+        }
+        # if (!(file.exists("Spatial_topicmix_kriged.rds")))
+        saveRDS(spatial_topicmix_kriged,file="Spatial_topicmix_kriged.rds")
       }
       
         # pdf("Samples_composition.pdf")
