@@ -1,5 +1,4 @@
-library(data.table)
-
+# Specify absolute paths to data and saved results:
 #####################
 # Data folder path:
 data_folder = "/Users/guilhemsommeria-klein/Desktop/Post-doc_ENS/Donnees_Tara"
@@ -9,8 +8,13 @@ data_folder_workspace2 = "/Users/guilhemsommeria-klein/Desktop/Serveur_Bioclust.
 data_folder_workspace3 = "/Users/guilhemsommeria-klein/Desktop/Serveur_Bioclust.kingdoms.workspace3/Donnees_Tara"
 # Path to cluster data folder - data:
 data_folder_workspace0 = "/Users/guilhemsommeria-klein/Desktop/Serveur_Bioclust.data/Donnees_Tara"
+# Path to saved results:
+code_folder = "/Users/guilhemsommeria-klein/Desktop/Code/Projects/eDNA_LDA"
+results_folder = paste0(code_folder,"/Tara_LDA/Saved_results")
 #####################
 
+# General option panel:
+#####################
 old_data = 0
 data_Federico = 1
 data_V4 = 0
@@ -86,6 +90,9 @@ relative_abiotic_dissimilarity_per_OTU = 0
 plot_a.biotic = 1
 
 endemic_ubiquist = 0
+####################
+
+library(data.table)
 
 if (data_Federico)
 {
@@ -147,9 +154,11 @@ if (!noArcticNoBiomark && !noCoastalArcticNoBiomark && !ArcticOnly)
   Arctic_insert = "/NorthAtlantic"
 }
 
+# Specify absolute path to figure folder:
 ######################
-# Figure folder path
+# Figure folder path:
 figure_path = "/Users/guilhemsommeria-klein/Desktop/Manuscrits/Tara/Figures"
+# Marker-specific figure folder path:
 figure_folder = paste0(figure_path,"/Gibbs",Arctic_insert,"/",substr(short_marker,1,nchar(short_marker)-1))
 ######################
 
@@ -444,7 +453,7 @@ if (split_byStation || all_data_coord || split_byStationByDepth_CompleteSizeRang
                                      header = F,
                                      row.names = 1)
     rownames(additional_taxo_ref) = substr(rownames(additional_taxo_ref),10,nchar(rownames(additional_taxo_ref)))
-    taxo_groups_v9 = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    taxo_groups_v9 = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     taxo_group_psb0 = vector(length = nrow(taxo_ref) + nrow(additional_taxo_ref), mode = "character")
     for (i in 1:nrow(taxo_ref))
     {
@@ -896,10 +905,10 @@ if (split_byStation)
   # saveRDS(taxo_groups_modif,paste0("/Users/guilhemsommeria-klein/Desktop/Serveur_Bioclust/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   # saveRDS(taxo_groups,paste0("/Users/guilhemsommeria-klein/Desktop/Serveur_Bioclust/taxo_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   # saveRDS(diversity,paste0("/Users/guilhemsommeria-klein/Desktop/Serveur_Bioclust/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  # saveRDS(taxo_groups_modif,paste0(data_folder,"/",short_marker,"taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  saveRDS(taxo_groups_modif,paste0(data_folder,"/",short_marker,"taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"),version=2)
-  # saveRDS(diversity,paste0(data_folder,"/",short_marker,"diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  saveRDS(diversity,paste0(data_folder,"/",short_marker,"diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"),version=2)
+  # saveRDS(taxo_groups_modif,paste0(results_folder,"/",short_marker,"taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  saveRDS(taxo_groups_modif,paste0(results_folder,"/",short_marker,"taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"),version=2)
+  # saveRDS(diversity,paste0(results_folder,"/",short_marker,"diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  saveRDS(diversity,paste0(results_folder,"/",short_marker,"diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"),version=2)
   
   data2m = data2m0
   taxo_ref = taxo_ref0
@@ -1006,7 +1015,7 @@ if (data_Federico)
 # }
 
 # Testing the output on server:
-# taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs.rds"))
+# taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs.rds"))
 # taxo_groups_ok = vector(length = length(taxo_groups), mode = "numeric")
 # k = 0
 # for (taxon in taxo_groups)
@@ -1021,8 +1030,8 @@ if (group_rarefaction)
 {
   if (data_Federico)
   {
-    taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100
   }
   
@@ -1435,22 +1444,22 @@ if (group_rarefaction)
     remove(data2m0)
     remove(taxo_ref0)
   }
-  saveRDS(tot_reads,file=paste0(data_folder,"/",short_marker,"Total.read.numbers.rds"),version=2)
-  saveRDS(list(diversity.104,diversity.105,diversity.106),file=paste0(data_folder,"/Rarefied_diversity.104.105.106.rds"),version=2)
-  saveRDS(list(nb.reads_200,diversity.200),file=paste0(data_folder,"/",short_marker,"Total.read.numbers.200_diversity.200.rds"),version=2)
-  saveRDS(list(nb.reads_250,diversity.250),file=paste0(data_folder,"/",short_marker,"Total.read.numbers.250_diversity.250.rds"),version=2)
-  saveRDS(list(nb.reads_300,diversity.300),file=paste0(data_folder,"/",short_marker,"Total.read.numbers.300_diversity.300.rds"),version=2)
-  saveRDS(list(nb.reads_350,diversity.350),file=paste0(data_folder,"/",short_marker,"Total.read.numbers.350_diversity.350.rds"),version=2)
-  saveRDS(list(nb.reads_500,diversity.500),file=paste0(data_folder,"/",short_marker,"Total.read.numbers.500_diversity.500.rds"),version=2)
-  saveRDS(list(nb.reads_1000,diversity.1000),file=paste0(data_folder,"/",short_marker,"Total.read.numbers.1000_diversity.1000.rds"),version=2)
+  saveRDS(tot_reads,file=paste0(results_folder,"/",short_marker,"Total.read.numbers.rds"),version=2)
+  saveRDS(list(diversity.104,diversity.105,diversity.106),file=paste0(results_folder,"/Rarefied_diversity.104.105.106.rds"),version=2)
+  saveRDS(list(nb.reads_200,diversity.200),file=paste0(results_folder,"/",short_marker,"Total.read.numbers.200_diversity.200.rds"),version=2)
+  saveRDS(list(nb.reads_250,diversity.250),file=paste0(results_folder,"/",short_marker,"Total.read.numbers.250_diversity.250.rds"),version=2)
+  saveRDS(list(nb.reads_300,diversity.300),file=paste0(results_folder,"/",short_marker,"Total.read.numbers.300_diversity.300.rds"),version=2)
+  saveRDS(list(nb.reads_350,diversity.350),file=paste0(results_folder,"/",short_marker,"Total.read.numbers.350_diversity.350.rds"),version=2)
+  saveRDS(list(nb.reads_500,diversity.500),file=paste0(results_folder,"/",short_marker,"Total.read.numbers.500_diversity.500.rds"),version=2)
+  saveRDS(list(nb.reads_1000,diversity.1000),file=paste0(results_folder,"/",short_marker,"Total.read.numbers.1000_diversity.1000.rds"),version=2)
   saveRDS(list(mean_prevalence,mean_prevalence.200,mean_prevalence.250,mean_prevalence.300,mean_prevalence.350,mean_prevalence.500,mean_prevalence.1000),
-          file=paste0(data_folder,"/",short_marker,"mean_OTU.prevalence.200.250.300.350.500.1000.rds"),version=2)
+          file=paste0(results_folder,"/",short_marker,"mean_OTU.prevalence.200.250.300.350.500.1000.rds"),version=2)
   saveRDS(list(median_prevalence,median_prevalence.200,median_prevalence.250,median_prevalence.300,median_prevalence.350,median_prevalence.500,median_prevalence.1000),
-          file=paste0(data_folder,"/",short_marker,"median_OTU.prevalence.200.250.300.350.500.1000.rds"),version=2)
+          file=paste0(results_folder,"/",short_marker,"median_OTU.prevalence.200.250.300.350.500.1000.rds"),version=2)
   saveRDS(list(mean_prevalence.250.random,mean_prevalence.350.random),
-          file=paste0(data_folder,"/",short_marker,"mean_OTU.prevalence.250.350.random.rds"),version=2)
+          file=paste0(results_folder,"/",short_marker,"mean_OTU.prevalence.250.350.random.rds"),version=2)
   saveRDS(list(median_prevalence.250.random,median_prevalence.350.random),
-          file=paste0(data_folder,"/",short_marker,"median_OTU.prevalence.250.350.random.rds"),version=2)
+          file=paste0(results_folder,"/",short_marker,"median_OTU.prevalence.250.350.random.rds"),version=2)
   
   #################
   data.folder_name = paste0(data_folder,"/",marker,"_TARA_CompleteSizeRange_byStationByDepth_AllTaxa",noArcticNoBiomark_insert,noLagoon_insert)
@@ -1535,7 +1544,7 @@ if (diversity_maps)
   backgroundPoints = fortify(background, region="id")
   backgroundGgplot = merge(backgroundPoints, background@data, by="id") 
   
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   increasing_llh = readRDS(paste0(data_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   alpha_best_real = readRDS(paste0(data_folder,"/alpha_best_real_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
@@ -1631,8 +1640,7 @@ if (diversity_maps)
       guides(colour = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
   }
   
-  setwd(figure_folder)
-  pdf("Diversity_maps_byGroup_selected.pdf")
+  pdf(paste0(figure_folder,"/Diversity_maps_byGroup_selected.pdf"))
   for (k in 1:length(taxo_groups[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh]))
     #for (k in 1:2)
     print(tmp.plot[[k]])
@@ -1651,7 +1659,7 @@ if (data_Federico && function_plots)
   
   taxo_groups_OTUs = taxo_ref$taxogroup2
   
-  # taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs.rds"))
+  # taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs.rds"))
   taxo_groups = levels(as.factor(taxo_groups_OTUs))[sort.int(table(as.factor(taxo_groups_OTUs)),index.return = T,decreasing = T)$ix]
   
   functions_OTUs = taxo_ref$Function
@@ -1669,7 +1677,7 @@ if (data_Federico && function_plots)
     }
   }
   
-  pdf("Function_proportion_per_group_CompleteSizeRange_byStationByDepth_noArcticNoBiomark.pdf")
+  pdf(figure_folder,"/Function_proportion_per_group_CompleteSizeRange_byStationByDepth_noArcticNoBiomark.pdf")
   par(mar=c(5.1,5.1,4.1,2.1))
   for (j in 1:length(functions))
   {
@@ -1683,7 +1691,7 @@ if (data_Federico && function_plots)
   plot_div_threshold = 500
   function_barplot = function_proportions[which(diversity>plot_div_threshold),]*log10(diversity[which(diversity>plot_div_threshold)])
   colours = rainbow_hcl(length(functions))[sample(1:length(functions),length(functions))]
-  pdf(paste0("Diversity_>",plot_div_threshold,"OTUs_CompleteSizeRange_byStationByDepth_noArcticNoBiomark.pdf"))
+  pdf(paste0(figure_folder,"/Diversity_>",plot_div_threshold,"OTUs_CompleteSizeRange_byStationByDepth_noArcticNoBiomark.pdf"))
   par(mar=c(7.1,4.1,4.1,2.1))
   x= barplot(t(function_barplot), space = 1, col = colours, 
              legend.text = T, xaxt="n", args.legend = list(bty = "n", x= length(diversity[which(diversity>plot_div_threshold)])*3-35, y=5, cex= 0.7))
@@ -1697,7 +1705,7 @@ if (data_Federico && function_plots)
   plot_div_threshold = 1
   function_barplot = function_proportions[which(diversity>plot_div_threshold),]*log10(diversity[which(diversity>plot_div_threshold)])
   colours = rainbow_hcl(length(functions))[sample(1:length(functions),length(functions))]
-  pdf(paste0("Diversity_>",plot_div_threshold,"OTUs_CompleteSizeRange_byStationByDepth_noArcticNoBiomark.pdf"))
+  pdf(paste0(figure_folder,"/Diversity_>",plot_div_threshold,"OTUs_CompleteSizeRange_byStationByDepth_noArcticNoBiomark.pdf"))
   par(mar=c(7.1,4.1,4.1,0.1))
   x= barplot(t(function_barplot), space = 1, col = colours, 
              legend.text = T, xaxt="n", args.legend = list(bty = "n", x= length(diversity[which(diversity>plot_div_threshold)])*2, y=5, cex= 0.7))
@@ -1817,7 +1825,7 @@ if (data_Federico && function_plots)
     plot_div_threshold = 500
     function_barplot = functionalTags_proportions_matrix[which(diversity>plot_div_threshold),]*log10(diversity[which(diversity>plot_div_threshold)])
     colours = rainbow_hcl(length(functionalTags_vector))[sample(1:length(functionalTags_vector),length(functionalTags_vector))]
-    pdf(paste0(fun_insert,"_>",plot_div_threshold,"OTUs_CompleteSizeRange_byStationByDepth_noArcticNoBiomark.pdf"))
+    pdf(paste0(figure_folder,"/",fun_insert,"_>",plot_div_threshold,"OTUs_CompleteSizeRange_byStationByDepth_noArcticNoBiomark.pdf"))
     par(mar=c(7.1,4.1,4.1,2.1))
     x = barplot(t(function_barplot), space = 1, col = colours, 
                 legend.text = T, xaxt="n", args.legend = list(bty = "n", x= length(diversity[which(diversity>plot_div_threshold)])*3-35, y=5, cex= 0.7))
@@ -1827,7 +1835,7 @@ if (data_Federico && function_plots)
     dev.off()
     ########
     
-    pdf(paste0(fun_insert,"_function_proportion_per_group_CompleteSizeRange_byStationByDepth_noArcticNoBiomark.pdf"))
+    pdf(paste0(figure_folder,"/",fun_insert,"_function_proportion_per_group_CompleteSizeRange_byStationByDepth_noArcticNoBiomark.pdf"))
     par(mar=c(5.1,5.1,4.1,2.1))
     for (j in 1:length(functionalTags_vector))
     {
@@ -1876,7 +1884,7 @@ if (mean_group_size)
   load(paste0(foldername,"/taxo_ref.Rdata"))
   taxo_groups_OTUs = taxo_ref$taxogroup2
   
-  # taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_2plusOTUs.rds"))
+  # taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_2plusOTUs.rds"))
   taxo_groups = levels(as.factor(taxo_groups_OTUs))[sort.int(table(as.factor(taxo_groups_OTUs)),index.return = T,decreasing = T)$ix]
   
   mean_sizes = c(mean(c(mean(c(0.8,3)),mean(c(0.8,5)))),mean(c(mean(c(3,20)),mean(c(5,20)))),mean(c(20,180)),mean(c(180,2000)))
@@ -2017,14 +2025,10 @@ if (mean_group_size)
   }
   
   ###############################
-  setwd(paste0(data_folder,"/"))
-  
-  save(read_abundance,size_absoluteAbund,size_relativeAbund,sd_size_absoluteAbund,sd_size_relativeAbund,n.four.fractions,p.four.fractions,file=paste0("group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"0.Rdata"))
+  save(read_abundance,size_absoluteAbund,size_relativeAbund,sd_size_absoluteAbund,sd_size_relativeAbund,n.four.fractions,p.four.fractions,file=paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"0.Rdata"))
   # save(read_abundance,size_absoluteAbund,size_relativeAbund,sd_size_absoluteAbund,sd_size_relativeAbund,file=paste0("group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_0.8inf.Rdata"))
   # save(read_abundance,size_absoluteAbund,size_relativeAbund,sd_size_absoluteAbund,sd_size_relativeAbund,file=paste0("group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_NoSmallSizeFraction.Rdata"))
   # save(read_abundance,size_absoluteAbund,size_relativeAbund,sd_size_absoluteAbund,sd_size_relativeAbund,file=paste0("group_sizes_byStationByDepth_",div_threshold,"plusOTUs_ArcticOnly",noLagoon_insert,"_No0.8inf.Rdata"))
-  
-  setwd(figure_folder)
   
   library(ggplot2)
   library(gridExtra)
@@ -2097,10 +2101,10 @@ if (mean_group_size)
               hjust=0, nudge_x = 2,
               parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
   
-  ggsave(filename = paste0("Mean_size_of_taxo_groups_vs_size_rank_",div_threshold,"plusOTUs.pdf"), do.call("arrangeGrob", c(list(plot.size_relativeAbund, plot.size_absoluteAbund), nrow=1)),
+  ggsave(filename = paste0(figure_folder,"/Mean_size_of_taxo_groups_vs_size_rank_",div_threshold,"plusOTUs.pdf"), do.call("arrangeGrob", c(list(plot.size_relativeAbund, plot.size_absoluteAbund), nrow=1)),
          height = 10/4, width = 2*10/4)
   
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds")) 
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds")) 
   
   #plot.size_absoluteAbund = qplot(x = x, y = y, data=data.frame(x=1:length(size_absoluteAbund),y=log10(sort(size_absoluteAbund,decreasing=T))), label=taxo_groups[sort.int(size_absoluteAbund,decreasing=T,index=T)$ix], geom="point") +
   #plot.size_absoluteAbund = qplot(x = x, y = y, data=data.frame(x=log10(read_abundance),y=size_absoluteAbund), label=taxo_groups[sort.int(size_absoluteAbund,decreasing=T,index=T)$ix], geom="point") +
@@ -2169,7 +2173,7 @@ if (mean_group_size)
   #           hjust=0, nudge_x = 2,
   #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
   
-  ggsave(filename = paste0("Size_log_vs_log_diversity_ggplot.pdf"), do.call("arrangeGrob", c(list(plot.size_relativeAbund_diversity, plot.size_absoluteAbund_diversity), nrow=1)),
+  ggsave(filename = paste0(figure_folder,"/Size_log_vs_log_diversity_ggplot.pdf"), do.call("arrangeGrob", c(list(plot.size_relativeAbund_diversity, plot.size_absoluteAbund_diversity), nrow=1)),
          height = 10/4, width = 2*10/4)
   
   # pdf("Mean_size_vs_log10_diversity.pdf")
@@ -2209,9 +2213,9 @@ if (mean_travel_time_connectivity)
       exchanged_particle_matrix[exchanged_particle_matrix < particle_thres] = NaN
   }
   
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  optimalK = readRDS(paste0(data_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  optimalK = readRDS(paste0(results_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   i_taxon = 0
   if (travel_time_per_assemblage)
@@ -2586,55 +2590,53 @@ if (mean_travel_time_connectivity)
   {
     if (particle_thres == 0)
     {
-      saveRDS(prop_within_topic_vect,paste0(data_folder,"/Connectivity_nbExchangedParticles_meanPerAssemblage_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      saveRDS(prop_within_topic_vect,paste0(results_folder,"/Connectivity_nbExchangedParticles_meanPerAssemblage_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     } else if (particle_thres == 10 || particle_thres == 1000)
     {
-      saveRDS(prop_within_topic_vect,paste0(data_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerAssemblage_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      saveRDS(prop_within_topic_vect,paste0(results_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerAssemblage_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     } else
-      saveRDS(prop_within_topic_vect,paste0(data_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerAssemblage_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      saveRDS(prop_within_topic_vect,paste0(results_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerAssemblage_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   }
   if (travel_time_per_OTU)
   {
     if (particle_thres == 0)
     {
-      saveRDS(list(prop_within_OTU_vect,prop_within_OTU_null,prop_within_OTU_allOTUs),paste0(data_folder,"/Connectivity_nbExchangedParticles_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-      # saveRDS(prop_within_OTU_allOTUs,paste0(data_folder,"/Connectivity_nbExchangedParticles_allOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      saveRDS(list(prop_within_OTU_vect,prop_within_OTU_null,prop_within_OTU_allOTUs),paste0(results_folder,"/Connectivity_nbExchangedParticles_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      # saveRDS(prop_within_OTU_allOTUs,paste0(results_folder,"/Connectivity_nbExchangedParticles_allOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     } else if (particle_thres == 10 || particle_thres == 1000)
     {
       if (!expTmin)
         saveRDS(list(prop_within_OTU_vect,prop_within_OTU_null,prop_within_OTU_allOTUs),
-              paste0(data_folder,"/Connectivity_",travel_time_threshold,"yearTminThres_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+              paste0(results_folder,"/Connectivity_",travel_time_threshold,"yearTminThres_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
       else 
         saveRDS(list(prop_within_OTU_vect,prop_within_OTU_null,prop_within_OTU_allOTUs),
-                paste0(data_folder,"/Connectivity_expTmin_",travel_time_threshold,"yearTminThres_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+                paste0(results_folder,"/Connectivity_expTmin_",travel_time_threshold,"yearTminThres_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     } else
       saveRDS(list(prop_within_OTU_vect,prop_within_OTU_null,prop_within_OTU_allOTUs),
-              paste0(data_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+              paste0(results_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   }
-  # saveRDS(prop_within_OTU_allOTUs,paste0(data_folder,"/Connectivity_2yearTminProportion_allOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  # saveRDS(occupancy_perOTU,paste0(data_folder,"/Occupancy_allOTus_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  
-  setwd(figure_folder)
+  # saveRDS(prop_within_OTU_allOTUs,paste0(results_folder,"/Connectivity_2yearTminProportion_allOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # saveRDS(occupancy_perOTU,paste0(results_folder,"/Occupancy_allOTus_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   library(ggplot2)
   library(gridExtra)
   
-  # increasing_llh = readRDS(paste0(data_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  # alpha_best_real = readRDS(paste0(data_folder,"/alpha_best_real_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # increasing_llh = readRDS(paste0(results_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # alpha_best_real = readRDS(paste0(results_folder,"/alpha_best_real_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   # selected_groups = !(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh
-  selected_groups = readRDS(paste0(data_folder,"/selected_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  selected_groups = readRDS(paste0(results_folder,"/selected_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   # Plotting the correlation coefficient with body size as a function of the threshold used:
   #########################################################################################
   # All stations:
-  selected_groups = readRDS(paste0(data_folder,"/selected_groups_2plusOTUs_noLagoon.rds"))
+  selected_groups = readRDS(paste0(results_folder,"/selected_groups_2plusOTUs_noLagoon.rds"))
   sd_prop_within_OTU_vect = vector(length = length(c(100,300,400,500,600,700,800,900,1001,1100,1200,1400,1600,1800)), mode = "numeric")
   for (i_part in 1:length(c(100,300,400,500,600,700,800,900,1001,1100,1200,1400,1600,1800)))
   {
     nb_part = c(100,300,400,500,600,700,800,900,1001,1100,1200,1400,1600,1800)[i_part]
-    sd_prop_within_OTU_vect[i_part] = sd(readRDS(paste0(data_folder,"/Connectivity_",nb_part,"particlesThres_meanPerOTU_2plusOTUs_noLagoon.rds"))[[1]][selected_groups],na.rm=T)
+    sd_prop_within_OTU_vect[i_part] = sd(readRDS(paste0(results_folder,"/Connectivity_",nb_part,"particlesThres_meanPerOTU_2plusOTUs_noLagoon.rds"))[[1]][selected_groups],na.rm=T)
   }
-  pdf("Adj_R2_vs_particle_thres_OTU_connectivity_noLagoon.pdf")
+  pdf(paste0(figure_folder,"/Adj_R2_vs_particle_thres_OTU_connectivity_noLagoon.pdf"))
   par(mar = c(4,5,1,1))
   #par(cex.lab = 1.5, cex.axis = 1.5)
   par(cex = 1.5)
@@ -2645,15 +2647,15 @@ if (mean_travel_time_connectivity)
   title(xlab = "Number of particle threshold", ylab = "Adj. R2 between mean OTU connectivity\n and body size across groups")
   dev.off()
   
-  selected_groups = readRDS(paste0(data_folder,"/selected_groups_2plusOTUs_noLagoon.rds"))
+  selected_groups = readRDS(paste0(results_folder,"/selected_groups_2plusOTUs_noLagoon.rds"))
   sd_prop_within_OTU_vect = vector(length = length(c(0.5,0.75,1,1.25,1.5,2,3,4,5,6,7,8,9,10,15)), mode = "numeric")
   for (i_t_min in 1:length(c(0.5,0.75,1,1.25,1.5,2,3,4,5,6,7,8,9,10,15)))
   {
     t_min = c(0.5,0.75,1,1.25,1.5,2,3,4,5,6,7,8,9,10,15)[i_t_min]
-    sd_prop_within_OTU_vect[i_t_min] = sd(readRDS(paste0(data_folder,"/Connectivity_",t_min,"yearTminThres_10particlesThres_meanPerOTU_2plusOTUs_noLagoon.rds"))[[1]][selected_groups],na.rm=T)
+    sd_prop_within_OTU_vect[i_t_min] = sd(readRDS(paste0(results_folder,"/Connectivity_",t_min,"yearTminThres_10particlesThres_meanPerOTU_2plusOTUs_noLagoon.rds"))[[1]][selected_groups],na.rm=T)
   }  
   # All stations - time threshold:
-  pdf("Adj_R2_vs_tmin_thres_OTU_connectivity_10particlesThres_noLagoon.pdf")
+  pdf(paste0(figure_folder,"/Adj_R2_vs_tmin_thres_OTU_connectivity_10particlesThres_noLagoon.pdf"))
   par(mar = c(4,5,1,1))
   #par(cex.lab = 1.5, cex.axis = 1.5)
   par(cex = 1.5)
@@ -2666,14 +2668,14 @@ if (mean_travel_time_connectivity)
   
   ##############
   # Arctic only:
-  selected_groups = readRDS(paste0(data_folder,"/selected_groups_2plusOTUs_ArcticOnly_noLagoon.rds"))
+  selected_groups = readRDS(paste0(results_folder,"/selected_groups_2plusOTUs_ArcticOnly_noLagoon.rds"))
   sd_prop_within_OTU_vect = vector(length = length(c(100,1001,1500,1625,1700,1750,2000,2500,5000)), mode = "numeric")
   for (i_part in 1:length(c(100,1001,1500,1625,1700,1750,2000,2500,5000)))
   {
     nb_part = c(100,1001,1500,1625,1700,1750,2000,2500,5000)[i_part]
-    sd_prop_within_OTU_vect[i_part] = sd(readRDS(paste0(data_folder,"/Connectivity_",nb_part,"particlesThres_meanPerOTU_2plusOTUs_ArcticOnly_noLagoon.rds"))[[1]][selected_groups],na.rm=T)
+    sd_prop_within_OTU_vect[i_part] = sd(readRDS(paste0(results_folder,"/Connectivity_",nb_part,"particlesThres_meanPerOTU_2plusOTUs_ArcticOnly_noLagoon.rds"))[[1]][selected_groups],na.rm=T)
   }
-  pdf("Adj_R2_vs_particle_thres_OTU_connectivity_ArcticOnly_noLagoon.pdf")
+  pdf(paste0(figure_folder,"/Adj_R2_vs_particle_thres_OTU_connectivity_ArcticOnly_noLagoon.pdf"))
   par(mar = c(4,5,1,1))
   #par(cex.lab = 1.5, cex.axis = 1.5)
   par(cex = 1.5)
@@ -2684,15 +2686,15 @@ if (mean_travel_time_connectivity)
   title(xlab = "Number of particle threshold", ylab = "Adj. R2 between mean OTU connectivity\n and body size across groups")
   dev.off()
   
-  selected_groups = readRDS(paste0(data_folder,"/selected_groups_2plusOTUs_ArcticOnly_noLagoon.rds"))
+  selected_groups = readRDS(paste0(results_folder,"/selected_groups_2plusOTUs_ArcticOnly_noLagoon.rds"))
   sd_prop_within_OTU_vect = vector(length = length(c(0.5,1,1.5,2,4,10)), mode = "numeric")
   for (i_t_min in 1:length(c(0.5,1,1.5,2,4,10)))
   {
     t_min = c(0.5,1,1.5,2,4,10)[i_t_min]
-    sd_prop_within_OTU_vect[i_t_min] = sd(readRDS(paste0(data_folder,"/Connectivity_",t_min,"yearTminThres_10particlesThres_meanPerOTU_2plusOTUs_ArcticOnly_noLagoon.rds"))[[1]][selected_groups],na.rm=T)
+    sd_prop_within_OTU_vect[i_t_min] = sd(readRDS(paste0(results_folder,"/Connectivity_",t_min,"yearTminThres_10particlesThres_meanPerOTU_2plusOTUs_ArcticOnly_noLagoon.rds"))[[1]][selected_groups],na.rm=T)
   }  
   # Arctic only - time threshold:
-  pdf("Adj_R2_vs_tmin_thres_OTU_connectivity_10particlesThres_ArcticOnly_noLagoon.pdf")
+  pdf(paste0(figure_folder,"/Adj_R2_vs_tmin_thres_OTU_connectivity_10particlesThres_ArcticOnly_noLagoon.pdf"))
   par(mar = c(4,5,1,1))
   #par(cex.lab = 1.5, cex.axis = 1.5)
   par(cex = 1.5)
@@ -2704,7 +2706,7 @@ if (mean_travel_time_connectivity)
   
   ######################
   # Non-Arctic stations:
-  pdf("Adj_R2_vs_particle_thres_OTU_connectivity_noArcticNoBiomark_noLagoon.pdf")
+  pdf(paste0(figure_folder,"/Adj_R2_vs_particle_thres_OTU_connectivity_noArcticNoBiomark_noLagoon.pdf"))
   par(mar = c(4,5,1,1))
   #par(cex.lab = 1.5, cex.axis = 1.5)
   par(cex = 1.5)
@@ -2714,7 +2716,7 @@ if (mean_travel_time_connectivity)
   dev.off()
   
   # Non-Arctic stations - time threshold:
-  pdf("Adj_R2_vs_tmin_thres_OTU_connectivity_10particlesThres_noArcticNoBiomark_noLagoon.pdf")
+  pdf(paste0(figure_folder,"/Adj_R2_vs_tmin_thres_OTU_connectivity_10particlesThres_noArcticNoBiomark_noLagoon.pdf"))
   par(mar = c(4,5,1,1))
   #par(cex.lab = 1.5, cex.axis = 1.5)
   par(cex = 1.5)
@@ -2732,7 +2734,7 @@ if (mean_travel_time_connectivity)
   #########################
   # Travel time comparison:
   #########################
-  prop_within_OTU_vect0 = readRDS(paste0(data_folder,"/Connectivity_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+  prop_within_OTU_vect0 = readRDS(paste0(results_folder,"/Connectivity_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
   
   plot.thres.connectivity.vs.expTmin.connectivity = ggplot(data=data.frame(x=1-prop_within_OTU_vect0[selected_groups],y=prop_within_OTU_vect[selected_groups])) +
     geom_point(aes(x,y)) +
@@ -2769,7 +2771,7 @@ if (mean_travel_time_connectivity)
     #           hjust=0, 
     #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
     
-    ggsave(filename = "Travel_time_prop_vs_diversity_log10_ggplot.pdf", do.call("arrangeGrob", c(list(plot.traveltime_log_diversity), nrow=1)),
+    ggsave(filename = paste0(figure_folder,"/Travel_time_prop_vs_diversity_log10_ggplot.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_diversity), nrow=1)),
            height = 1.5*10/4, width = 1.5*10/4)
     
     plot.traveltime_log_diversity = qplot(x = x, y = y, data=data.frame(x=log10(as.vector(diversity)[1:61]),y=prop_within_topic_vect[1:61]), label=taxo_groups[1:61], geom="point") +
@@ -2791,15 +2793,15 @@ if (mean_travel_time_connectivity)
     #           hjust=0, 
     #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
     
-    ggsave(filename = "Travel_time_prop_vs_diversity_log10_ggplot_61first.pdf", do.call("arrangeGrob", c(list(plot.traveltime_log_diversity), nrow=1)),
+    ggsave(filename = paste0(figure_folder,"/Travel_time_prop_vs_diversity_log10_ggplot_61first.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_diversity), nrow=1)),
            height = 1.5*10/4, width = 1.5*10/4)
     
-    pdf("Travel_time_connectivity_byAssemblage_hist.pdf")
+    pdf(paste0(figure_folder,"/Travel_time_connectivity_byAssemblage_hist.pdf"))
     hist(unlist(lapply(taxon_metrics,function(g) g$`Mean_prop_within_assemblage`)), ann = F)
     title(xlab = "Travel time connectivity per assemblage", ylab = "Frequency", cex.lab = 1.3)
     dev.off()
     
-    pdf("Travel_time_connectivity_byAssemblage_hist_61first.pdf")
+    pdf(paste0(figure_folder,"/Travel_time_connectivity_byAssemblage_hist_61first.pdf"))
     hist(unlist(lapply(taxon_metrics,function(g) g$`Mean_prop_within_assemblage`))[1:sum(optimalK[1:61])], ann = F)
     title(xlab = "Travel time connectivity per assemblage", ylab = "Frequency", cex.lab = 1.3)
     dev.off()
@@ -2811,7 +2813,7 @@ if (mean_travel_time_connectivity)
     
     # pdf(paste0("Travel_time_connectivity_byOTU_",travel_time_threshold,"years_",particle_thres,"particlesThres_hist.pdf"))
     # pdf(paste0("Travel_time_connectivity_byOTU_",travel_time_threshold,"years_hist.pdf"))
-    pdf(paste0("Connectivity_byOTU_",particle_thres,"particlesThres",noArcticNoBiomark_insert,"_hist.pdf"))
+    pdf(paste0(figure_folder,"/Connectivity_byOTU_",particle_thres,"particlesThres",noArcticNoBiomark_insert,"_hist.pdf"))
     # pdf(paste0("Connectivity_byOTU_",travel_time_threshold,"yearTminThres_",particle_thres,"particlesThres",noArcticNoBiomark_insert,"_hist.pdf"))
     hist(unlist(prop_within_OTU_allOTUs), ann = F)
     abline(v = prop_within_OTU_null, lty=2)
@@ -2821,7 +2823,7 @@ if (mean_travel_time_connectivity)
     
     if (particle_thres == 0)
     {
-      pdf(paste0("Particle_nb_connectivity_byOTU_hist",noArcticNoBiomark_insert,"1.pdf"))
+      pdf(paste0(figure_folder,"/Particle_nb_connectivity_byOTU_hist",noArcticNoBiomark_insert,"1.pdf"))
       # hist(unlist(prop_within_OTU_allOTUs)/prop_within_OTU_null, ann = F)
       # abline(v = 1, lty=2)
       # title(xlab = "Mean relative number of exchanged particles per OTU", ylab = "Frequency", cex.lab = 1.3)
@@ -2856,7 +2858,7 @@ if (mean_travel_time_connectivity)
     #           hjust=0, 
     #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
     
-    ggsave(filename = paste0("Travel_time_connectivity_byOTU_",travel_time_threshold,"years_",particle_thres,"particlesThres_vs_OTU_occupancy_ggplot.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_allOTUs_occupancy), nrow=1)),
+    ggsave(filename = paste0(figure_folder,"/Travel_time_connectivity_byOTU_",travel_time_threshold,"years_",particle_thres,"particlesThres_vs_OTU_occupancy_ggplot.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_allOTUs_occupancy), nrow=1)),
            height = 1.5*10/4, width = 1.5*10/4)
     
     plot.traveltime_log_diversity = qplot(x = x, y = y, data=data.frame(x=log10(as.vector(diversity)),y=prop_within_OTU_vect), label=taxo_groups, geom="point") +
@@ -2879,7 +2881,7 @@ if (mean_travel_time_connectivity)
     #           hjust=0, 
     #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
     
-    ggsave(filename = paste0("Travel_time_prop_OTU_",travel_time_threshold,"years_",particle_thres,"particlesThres_vs_diversity_log10_ggplot.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_diversity), nrow=1)),
+    ggsave(filename = paste0(figure_folder,"/Travel_time_prop_OTU_",travel_time_threshold,"years_",particle_thres,"particlesThres_vs_diversity_log10_ggplot.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_diversity), nrow=1)),
            height = 1.5*10/4, width = 1.5*10/4)
     
     plot.traveltime_log_diversity = qplot(x = x, y = y, data=data.frame(x=log10(as.vector(diversity))[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh]
@@ -2903,26 +2905,26 @@ if (mean_travel_time_connectivity)
     #           hjust=0, 
     #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
     
-    ggsave(filename = paste0("Travel_time_prop_OTU_",travel_time_threshold,"years_",particle_thres,"particlesThres_vs_diversity_log10_ggplot_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_diversity), nrow=1)),
+    ggsave(filename = paste0(figure_folder,"/Travel_time_prop_OTU_",travel_time_threshold,"years_",particle_thres,"particlesThres_vs_diversity_log10_ggplot_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_diversity), nrow=1)),
            height = 1.5*10/4, width = 1.5*10/4)
     
     # summary(lm(log10(as.vector(diversity))[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh] ~ prop_within_OTU_vect[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh]))
     
     ############################
-    dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     # dominant_function_simplified  = dominant_function
     # dominant_function_simplified[dominant_function == "copepoda" & "other metazoa" & "pteropoda"] = "Metazoa"
     functions = c("copepoda","endophotosymbiont","gelatineous_carnivores_filterers","other metazoa","parasite","phagotroph","photohost","phototroph","pteropoda","unknown")
     ten_colors = c("cadetblue",NA,"darkblue","dodgerblue1","darkgoldenrod1","firebrick2","darkgreen","chartreuse2","dodgerblue1","deeppink1")
     
-    # prop_within_OTU_vect_2yr = readRDS(paste0(data_folder,"/Connectivity_2yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    # prop_within_OTU_vect_1.5yr = readRDS(paste0(data_folder,"/Connectivity_1.5yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # prop_within_OTU_vect_2yr = readRDS(paste0(results_folder,"/Connectivity_2yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # prop_within_OTU_vect_1.5yr = readRDS(paste0(results_folder,"/Connectivity_1.5yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     # travel_time_threshold = max_travel_time_matrix
-    prop_within_OTU_vect_1000particles = readRDS(paste0(data_folder,"/Connectivity_1000particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    prop_within_OTU_vect_1000particles = readRDS(paste0(results_folder,"/Connectivity_1000particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     names(prop_within_OTU_vect_1000particles) = taxo_groups
-    prop_within_OTU_vect_particle_nb = readRDS(paste0(data_folder,"/Connectivity_nbExchangedParticles_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    prop_within_OTU_vect_particle_nb = readRDS(paste0(results_folder,"/Connectivity_nbExchangedParticles_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
     names(prop_within_OTU_vect_particle_nb) = taxo_groups
-    taxo_groups_Arctic = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noLagoon_insert,".rds"))
+    taxo_groups_Arctic = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noLagoon_insert,".rds"))
     
     # plot.traveltime_log_size = qplot(x = x, y = y, colour = dominant_function[selected_groups], data=data.frame(x=prop_within_OTU_vect_2yr[selected_groups], y=prop_within_OTU_vect_phys[selected_groups]), geom="point") +
     # plot.traveltime_log_size = qplot(x = x, y = y, colour = dominant_function[selected_groups], data=data.frame(x=prop_within_OTU_vect_2yr[selected_groups], y=prop_within_OTU_vect_1.5yr[selected_groups]), geom="point") +
@@ -2958,35 +2960,35 @@ if (mean_travel_time_connectivity)
     
     # ggsave(filename = paste0("Travel_time_prop_OTU_",travel_time_threshold,"yearTminProportion_vs_2yearTminProportion_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_functionColors_selected.pdf"), 
     # ggsave(filename = paste0("Travel_time_prop_OTU_1.5yearTminProportion_vs_2yearTminProportion_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_functionColors_selected.pdf"),
-    ggsave(filename = paste0("Particle_nb_connectivity_vs_travel_time_prop_OTU_1000particlesThres_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_functionColors_selected.pdf"),
+    ggsave(filename = paste0(figure_folder,"/Particle_nb_connectivity_vs_travel_time_prop_OTU_1000particlesThres_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_functionColors_selected.pdf"),
            do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)), height = 1.5*4, width = 1.5*4)
     
     ############################
-    # prop_within_OTU_vect_noArctic = readRDS(paste0(data_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerOTU_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
-    # prop_within_OTU_vect_noArctic = readRDS(paste0(data_folder,"/Connectivity_nbExchangedParticles_meanPerOTU_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
-    prop_within_OTU_vect_noArctic = readRDS(paste0(data_folder,"/Connectivity_1000particlesThres_meanPerOTU_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
-    taxo_groups_noArctic = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+    # prop_within_OTU_vect_noArctic = readRDS(paste0(results_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerOTU_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+    # prop_within_OTU_vect_noArctic = readRDS(paste0(results_folder,"/Connectivity_nbExchangedParticles_meanPerOTU_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+    prop_within_OTU_vect_noArctic = readRDS(paste0(results_folder,"/Connectivity_1000particlesThres_meanPerOTU_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+    taxo_groups_noArctic = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
     names(prop_within_OTU_vect_noArctic) = taxo_groups_noArctic
     
-    # prop_within_OTU_vect_Arctic = readRDS(paste0(data_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerOTU_2plusOTUs",noLagoon_insert,".rds"))
-    prop_within_OTU_vect_Arctic = readRDS(paste0(data_folder,"/Connectivity_nbExchangedParticles_meanPerOTU_2plusOTUs",noLagoon_insert,".rds"))[[1]]
-    prop_within_OTU_vect_ArcticOnly = readRDS(paste0(data_folder,"/Connectivity_nbExchangedParticles_meanPerOTU_2plusOTUs_ArcticOnly",noLagoon_insert,".rds"))[[1]]
-    taxo_groups_Arctic = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noLagoon_insert,".rds"))
+    # prop_within_OTU_vect_Arctic = readRDS(paste0(results_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerOTU_2plusOTUs",noLagoon_insert,".rds"))
+    prop_within_OTU_vect_Arctic = readRDS(paste0(results_folder,"/Connectivity_nbExchangedParticles_meanPerOTU_2plusOTUs",noLagoon_insert,".rds"))[[1]]
+    prop_within_OTU_vect_ArcticOnly = readRDS(paste0(results_folder,"/Connectivity_nbExchangedParticles_meanPerOTU_2plusOTUs_ArcticOnly",noLagoon_insert,".rds"))[[1]]
+    taxo_groups_Arctic = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noLagoon_insert,".rds"))
     names(prop_within_OTU_vect_Arctic) = taxo_groups_Arctic
-    taxo_groups_ArcticOnly = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs_ArcticOnly",noLagoon_insert,".rds"))
+    taxo_groups_ArcticOnly = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs_ArcticOnly",noLagoon_insert,".rds"))
     names(prop_within_OTU_vect_ArcticOnly) = taxo_groups_ArcticOnly
     
-    prop_within_OTU_vect_Arctic = readRDS(paste0(data_folder,"/Connectivity_1000particlesThres_meanPerOTU_2plusOTUs",noLagoon_insert,".rds"))
-    prop_within_OTU_vect_ArcticOnly = readRDS(paste0(data_folder,"/Connectivity_1000particlesThres_meanPerOTU_2plusOTUs_ArcticOnly",noLagoon_insert,".rds"))
-    taxo_groups_Arctic = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noLagoon_insert,".rds"))
+    prop_within_OTU_vect_Arctic = readRDS(paste0(results_folder,"/Connectivity_1000particlesThres_meanPerOTU_2plusOTUs",noLagoon_insert,".rds"))
+    prop_within_OTU_vect_ArcticOnly = readRDS(paste0(results_folder,"/Connectivity_1000particlesThres_meanPerOTU_2plusOTUs_ArcticOnly",noLagoon_insert,".rds"))
+    taxo_groups_Arctic = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noLagoon_insert,".rds"))
     names(prop_within_OTU_vect_Arctic) = taxo_groups_Arctic
-    taxo_groups_ArcticOnly = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs_ArcticOnly",noLagoon_insert,".rds"))
+    taxo_groups_ArcticOnly = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs_ArcticOnly",noLagoon_insert,".rds"))
     names(prop_within_OTU_vect_ArcticOnly) = taxo_groups_ArcticOnly
     
-    increasing_llh_Arctic = readRDS(paste0(data_folder,"/Increasing_llh_2plusOTUs",noLagoon_insert,".rds"))
-    alpha_best_real_Arctic = readRDS(paste0(data_folder,"/alpha_best_real_2plusOTUs",noLagoon_insert,".rds"))
+    increasing_llh_Arctic = readRDS(paste0(results_folder,"/Increasing_llh_2plusOTUs",noLagoon_insert,".rds"))
+    alpha_best_real_Arctic = readRDS(paste0(results_folder,"/alpha_best_real_2plusOTUs",noLagoon_insert,".rds"))
     selected_groups_Arctic = !(taxo_groups_Arctic %in% groups_to_remove) & alpha_best_real_Arctic<1 & increasing_llh_Arctic
-    dominant_function_Arctic = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noLagoon_insert,".rds"))
+    dominant_function_Arctic = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noLagoon_insert,".rds"))
     
     plot.traveltime_log_size = qplot(x = x, y = y, colour = dominant_function_Arctic[selected_groups_Arctic], 
                                      data=data.frame(x=prop_within_OTU_vect_noArctic[taxo_groups_Arctic[selected_groups_Arctic]], 
@@ -3024,7 +3026,7 @@ if (mean_travel_time_connectivity)
     #        do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),height = 1.5*4, width = 1.5*4)
     # ggsave(filename = paste0("Particle_nb_connectivity_Arctic_vs_noArctic_ggplot_",div_threshold,"plusOTUs_functionColors_selected.pdf"),
     #        do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),height = 1.5*4, width = 1.5*4)
-    ggsave(filename = paste0("Particle_nb_prop_OTU_1000particlesThres_ArcticOnly_vs_noArctic_ggplot_",div_threshold,"plusOTUs_functionColors_selected.pdf"),
+    ggsave(filename = paste0(figure_folder,"/Particle_nb_prop_OTU_1000particlesThres_ArcticOnly_vs_noArctic_ggplot_",div_threshold,"plusOTUs_functionColors_selected.pdf"),
            do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),height = 1.5*4, width = 1.5*4)
     # ggsave(filename = paste0("Particle_nb_connectivity_ArcticOnly_vs_noArctic_ggplot_",div_threshold,"plusOTUs_functionColors_selected.pdf"), 
     #        do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),height = 1.5*4, width = 1.5*4)
@@ -3032,9 +3034,9 @@ if (mean_travel_time_connectivity)
   
   if (travel_time_vs_size)
   {
-    load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
-    # load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,".Rdata")) 
-    # taxo_groups_noArctic = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+    load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
+    # load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,".Rdata")) 
+    # taxo_groups_noArctic = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
     # names(size_absoluteAbund) = taxo_groups_noArctic
     
     if (travel_time_per_assemblage)
@@ -3060,7 +3062,7 @@ if (mean_travel_time_connectivity)
       #           hjust=0, 
       #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
       
-      ggsave(filename = "Travel_time_prop_vs_size_log10_ggplot_selected.pdf", do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
+      ggsave(filename = paste0(figure_folder,"/Travel_time_prop_vs_size_log10_ggplot_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
              height = 1.5*10/4, width = 1.5*10/4)
       
       plot.traveltime_log_size = qplot(x = x, y = y, data=data.frame(x=log10(size_absoluteAbund[1:61]),y=prop_within_topic_vect[1:61]), label=taxo_groups[1:61], geom="point") +
@@ -3083,7 +3085,7 @@ if (mean_travel_time_connectivity)
       #           hjust=0, 
       #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
       
-      ggsave(filename = "Travel_time_prop_vs_size_log10_ggplot_61first.pdf", do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
+      ggsave(filename = paste0(figure_folder,"/Travel_time_prop_vs_size_log10_ggplot_61first.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
              height = 1.5*10/4, width = 1.5*10/4)
     }
     
@@ -3103,7 +3105,7 @@ if (mean_travel_time_connectivity)
           geom_smooth(method='lm') +
           geom_hline(yintercept = 1, linetype = "dashed")
         
-        ggsave(filename = paste0("Particle_nb_OTU_connectivity_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
+        ggsave(filename = paste0(figure_folder,"/Particle_nb_OTU_connectivity_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
                height = 1.5*10/4, width = 1.5*10/4)
       } else if (particle_thres > 0)
       {
@@ -3131,28 +3133,28 @@ if (mean_travel_time_connectivity)
         
         if (travel_time_threshold != 10 && travel_time_threshold != 1000)
         {
-          ggsave(filename = paste0("Travel_time_prop_OTU_",particle_thres,"particlesThres_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
+          ggsave(filename = paste0(figure_folder,"/Travel_time_prop_OTU_",particle_thres,"particlesThres_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
                  height = 1.5*10/4, width = 1.5*10/4)
         } else
-          ggsave(filename = paste0("Travel_time_prop_OTU_",travel_time_threshold,"yearTminThres_",particle_thres,"particlesThres_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"),
+          ggsave(filename = paste0(figure_folder,"/Travel_time_prop_OTU_",travel_time_threshold,"yearTminThres_",particle_thres,"particlesThres_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"),
                  do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
                  height = 1.5*10/4, width = 1.5*10/4)
       }
       
       # summary(lm(log10(size_absoluteAbund) ~prop_within_OTU_vect))
       
-      taxo_groups_allData = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noLagoon_insert,".rds"))
-      increasing_llh_allData = readRDS(paste0(data_folder,"/Increasing_llh_2plusOTUs",noLagoon_insert,".rds"))
-      alpha_best_real_allData = readRDS(paste0(data_folder,"/alpha_best_real_2plusOTUs",noLagoon_insert,".rds"))
+      taxo_groups_allData = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noLagoon_insert,".rds"))
+      increasing_llh_allData = readRDS(paste0(results_folder,"/Increasing_llh_2plusOTUs",noLagoon_insert,".rds"))
+      alpha_best_real_allData = readRDS(paste0(results_folder,"/alpha_best_real_2plusOTUs",noLagoon_insert,".rds"))
       selected_groups_allData = !(taxo_groups_allData %in% groups_to_remove) & alpha_best_real_allData<1 & increasing_llh_allData
-      load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noLagoon_insert,".Rdata")) 
+      load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noLagoon_insert,".Rdata")) 
       size_absoluteAbund_allData = size_absoluteAbund
       
-      taxo_groups_noArctic = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
-      increasing_llh_noArctic = readRDS(paste0(data_folder,"/Increasing_llh_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
-      alpha_best_real_noArctic = readRDS(paste0(data_folder,"/alpha_best_real_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+      taxo_groups_noArctic = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+      increasing_llh_noArctic = readRDS(paste0(results_folder,"/Increasing_llh_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+      alpha_best_real_noArctic = readRDS(paste0(results_folder,"/alpha_best_real_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
       selected_groups_noArctic = !(taxo_groups_noArctic %in% groups_to_remove) & alpha_best_real_noArctic<1 & increasing_llh_noArctic
-      load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,".Rdata")) 
+      load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,".Rdata")) 
       size_absoluteAbund_noArctic = size_absoluteAbund
       
       # plot.traveltime_log_size = qplot(x = x, y = y, data=data.frame(x=log10(size_absoluteAbund)[selected_groups],y=prop_within_OTU_vect[selected_groups]), geom="point") +
@@ -3180,7 +3182,7 @@ if (mean_travel_time_connectivity)
       
       # ggsave(filename = paste0("Travel_time_prop_OTU_",travel_time_threshold,"yearTminProportion_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
       #        height = 1.5*10/3, width = 1.5*10/3)
-      ggsave(filename = paste0("Travel_time_prop_OTU_",particle_thres,"particlesThres_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
+      ggsave(filename = paste0(figure_folder,"/Travel_time_prop_OTU_",particle_thres,"particlesThres_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
              height = 1.5*10/3, width = 1.5*10/3)
       
       # summary(lm(log10(size_absoluteAbund)[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh] ~ prop_within_OTU_vect[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh]))
@@ -3190,7 +3192,7 @@ if (mean_travel_time_connectivity)
       # foldername = paste0(data_folder,"/18S_V9_TARA_CompleteSizeRange_byStationByDepth_AllTaxa",noArcticNoBiomark_insert,noLagoon_insert)
       # load(paste0(foldername,"/taxo_ref.Rdata"))
       # taxo_groups_OTUs = taxo_ref$taxogroup2
-      # # taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs.rds"))
+      # # taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs.rds"))
       # taxo_groups_nomodif = levels(as.factor(taxo_groups_OTUs))[sort.int(table(as.factor(taxo_groups_OTUs)),index.return = T,decreasing = T)$ix]
       # 
       # functions_OTUs = taxo_ref$Function
@@ -3217,10 +3219,10 @@ if (mean_travel_time_connectivity)
       #     dominant_function[group_index] = sample(functions[function_proportions == max(function_proportions)],1)
       #   }
       # }
-      # saveRDS(dominant_function,paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      # saveRDS(dominant_function,paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
       ############################
       
-      dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
       # dominant_function_simplified  = dominant_function
       # dominant_function_simplified[dominant_function == "copepoda" & "other metazoa" & "pteropoda"] = "Metazoa"
       functions = c("copepoda","endophotosymbiont","gelatineous_carnivores_filterers","other metazoa","parasite","phagotroph","photohost","phototroph","pteropoda","unknown")
@@ -3252,7 +3254,7 @@ if (mean_travel_time_connectivity)
       #           hjust=0, 
       #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
       
-      ggsave(filename = paste0("Travel_time_prop_OTU_",travel_time_threshold,"yearTminProportion_",particle_thres,"particlesThres_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_functionColors_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
+      ggsave(filename = paste0(figure_folder,"/Travel_time_prop_OTU_",travel_time_threshold,"yearTminProportion_",particle_thres,"particlesThres_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_functionColors_selected.pdf"), do.call("arrangeGrob", c(list(plot.traveltime_log_size), nrow=1)),
              height = 1.5*4, width = 1.5*4)
     }
   }
@@ -3282,7 +3284,7 @@ if (mean_travel_time_connectivity)
       #           hjust=0, 
       #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
       
-      ggsave(filename = "Travel_time_prop_vs_stability_ggplot_selected.pdf", do.call("arrangeGrob", c(list(plot.traveltime_stability), nrow=1)),
+      ggsave(filename = figure_folder,"/Travel_time_prop_vs_stability_ggplot_selected.pdf", do.call("arrangeGrob", c(list(plot.traveltime_stability), nrow=1)),
              height = 1.5*10/4, width = 1.5*10/4)
     }
   }
@@ -3290,10 +3292,10 @@ if (mean_travel_time_connectivity)
 
 if (optimalK_comput)
 {
-  taxo_groups = readRDS(paste0(data_folder,"/",short_marker,"taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  diversity = readRDS(paste0(data_folder,"/",short_marker,"diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds")) 
-  # alpha_best_real = readRDS(paste0(data_folder,"/alpha_best_real_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  # increasing_llh = readRDS(paste0(data_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/",short_marker,"taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/",short_marker,"diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds")) 
+  # alpha_best_real = readRDS(paste0(results_folder,"/alpha_best_real_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # increasing_llh = readRDS(paste0(results_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   # selected_groups = !(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh
   selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100
@@ -3301,7 +3303,7 @@ if (optimalK_comput)
   data.folder_name = paste0(data_folder,"/",marker,"_TARA_CompleteSizeRange_byStationByDepth_AllTAxa",noArcticNoBiomark_insert,noLagoon_insert)
   load(paste0(data.folder_name,"/coord.Rdata"))
   
-  tot_reads = readRDS(paste0(data_folder,"/Total.read.numbers.rds"))
+  tot_reads = readRDS(paste0(results_folder,"/Total.read.numbers.rds"))
   
   # Loading multi-K comparison to local computer:
   # for (taxon in taxo_groups)
@@ -3436,14 +3438,14 @@ if (optimalK_comput)
   {
     if (is.null(reals))
     {
-      optimalK_min.crossValid = readRDS(paste0(data_folder,"/",short_marker,
+      optimalK_min.crossValid = readRDS(paste0(results_folder,"/",short_marker,
                                                if (!is.null(raref) && raref == "random.group.div") paste0(raref,"_")
                                                else if (!is.null(raref)) paste0(paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)],collapse=""),"_") 
                                                else "",
                                                "optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin_mpar1,
                                                "_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     } else
-      optimalK_min.crossValid = readRDS(paste0(data_folder,"/",short_marker,
+      optimalK_min.crossValid = readRDS(paste0(results_folder,"/",short_marker,
                                                if (!is.null(raref)) paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)],collapse="") else "",
                                                if (!is.null(reals)) paste0(".1-",reals) else "", 
                                                "_optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin_mpar1,
@@ -3462,7 +3464,7 @@ if (optimalK_comput)
   }
   if (optimalK_assemblage_prevalence)
   {
-    # optimalK_min.crossValid = readRDS(paste0(data_folder,"/optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds2-35t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs_noLagoon.rds"))[,1]
+    # optimalK_min.crossValid = readRDS(paste0(results_folder,"/optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds2-35t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs_noLagoon.rds"))[,1]
     plot.prevalence = list()
     plot.prevalence.SUR = vector(length = length(taxo_groups)+1, mode="list")
     plot.occurrence = list()
@@ -4770,19 +4772,19 @@ if (optimalK_comput)
   
   if (optimalK_mpar)
   {
-    saveRDS(optimalK,paste0(data_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    saveRDS(increasing_llh,paste0(data_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(optimalK,paste0(results_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(increasing_llh,paste0(results_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   }
   
   if (optimalK_100r)
   {
-    saveRDS(optimalK100r,paste0(data_folder,"/OptimalK_100r_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    saveRDS(increasing_llh100r,paste0(data_folder,"/Increasing_llh_100r_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    saveRDS(optimalK100r_max,paste0(data_folder,"/OptimalK_100rBest_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    saveRDS(increasing_llh100r_max,paste0(data_folder,"/Increasing_llh_100rBest_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(optimalK100r,paste0(results_folder,"/OptimalK_100r_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(increasing_llh100r,paste0(results_folder,"/Increasing_llh_100r_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(optimalK100r_max,paste0(results_folder,"/OptimalK_100rBest_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(increasing_llh100r_max,paste0(results_folder,"/Increasing_llh_100rBest_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     selected_groups_100r = !(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh100r
-    saveRDS(selected_groups_100r,paste0(data_folder,"/selected_groups_100r_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(selected_groups_100r,paste0(results_folder,"/selected_groups_100r_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   }
   
   # setwd(figure_folder)
@@ -4797,7 +4799,7 @@ if (optimalK_comput)
   if (optimalK_mpar_prevalence.perplexity)
   {
     saveRDS(optimalK_prevalence.min.crossValid,
-            paste0(data_folder,"/",short_marker,
+            paste0(results_folder,"/",short_marker,
                    if (!is.null(raref) && raref == "random.group.div") raref
                    else if (!is.null(raref)) paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)],collapse="") 
                    else "",
@@ -4808,8 +4810,8 @@ if (optimalK_comput)
   
   if (optimalK_assemblage_prevalence)
   {
-    # saveRDS(list(optimalK_prevalence.min.crossValid.allTaxa,optimalK_prevalence.min.crossValid),paste0(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs",fold_size,"sampleFolds",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    saveRDS(list(optimalK_prevalence.min.crossValid1.allTaxa,optimalK_prevalence.min.crossValid1),paste0(data_folder,"/optimalK_prevalenceSUR-DCM.min.crossValid_Gibbs",fold_size,"sampleFolds",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # saveRDS(list(optimalK_prevalence.min.crossValid.allTaxa,optimalK_prevalence.min.crossValid),paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs",fold_size,"sampleFolds",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(list(optimalK_prevalence.min.crossValid1.allTaxa,optimalK_prevalence.min.crossValid1),paste0(results_folder,"/optimalK_prevalenceSUR-DCM.min.crossValid_Gibbs",fold_size,"sampleFolds",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     spl = split(plot.prevalence[c(T,selected_groups) & !is.na(plot.prevalence)],
                 (seq_along(plot.prevalence[c(T,selected_groups) & !is.na(plot.prevalence)])-1) %/% 20)
@@ -4849,7 +4851,7 @@ if (optimalK_comput)
   
   if (optimalK_mpar_posteriorLlh)
   {
-    saveRDS(optimalK_sd.max.llh,paste0(data_folder,"/optimalK_sd.max.llh_Gibbs",nb_real,"r",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(optimalK_sd.max.llh,paste0(results_folder,"/optimalK_sd.max.llh_Gibbs",nb_real,"r",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     # spl = split(plot.posteriorLlh.cor.optimalK[!(taxo_groups %in% groups_to_remove) & diversity > 100][-1], (seq_along(plot.posteriorLlh.cor.optimalK[!(taxo_groups %in% groups_to_remove) & diversity > 100][-1])-1) %/% 20)
     # ppl = lapply(spl, function(g) marrangeGrob(grobs = g, nrow = 4, ncol = 5, layout_matrix = matrix(data=1:20,nrow=4,byrow=T)))
@@ -4923,7 +4925,7 @@ if (optimalK_comput)
     if (is.null(reals))
     {
       saveRDS(optimalK_min.crossValid[,1],
-              paste0(data_folder,"/",short_marker,
+              paste0(results_folder,"/",short_marker,
                      if (!is.null(raref) && raref == "random.group.div") paste0(raref,"_")
                      else if (!is.null(raref)) paste0(paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)],collapse=""),"_") 
                      else "",
@@ -4932,14 +4934,14 @@ if (optimalK_comput)
               version=2)
     } else
       saveRDS(optimalK_min.crossValid,
-              paste0(data_folder,"/",short_marker,
+              paste0(results_folder,"/",short_marker,
                      if (!is.null(raref)) paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)],collapse="") else "",
                      if (!is.null(reals)) paste0(".1-",reals) else "", 
                      "_optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin_mpar1,
                      "_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"),
               version=2)
     
-    # saveRDS(optimalK_min.crossValid,paste0(data_folder,"/optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin,"_averageOverSamples_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # saveRDS(optimalK_min.crossValid,paste0(results_folder,"/optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds",topic_range,"t_iter",nb_iter,"thin",thin,"burnin",burnin,"_averageOverSamples_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     # spl = split(plot.perplexity.cor.optimalK, (seq_along(plot.perplexity.cor.optimalK)-1) %/% 20)
     # ppl = lapply(spl, function(g) marrangeGrob(grobs = g, nrow = 4, ncol = 5, layout_matrix = matrix(data=1:20,nrow=4,byrow=T)))
@@ -5078,8 +5080,8 @@ if (optimalK_comput)
   #################
   if (!noArcticNoBiomark)
   {
-    taxo_groups_noArctic = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs_noArcticNoBiomark_noLagoon.rds"))
-    optimalK_noArctic = readRDS(paste0(data_folder,"/OptimalK_2plusOTUs_noArcticNoBiomark_noLagoon.rds"))
+    taxo_groups_noArctic = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs_noArcticNoBiomark_noLagoon.rds"))
+    optimalK_noArctic = readRDS(paste0(results_folder,"/OptimalK_2plusOTUs_noArcticNoBiomark_noLagoon.rds"))
     names(optimalK_noArctic) = taxo_groups_noArctic
     plot.K.vs.K.arctic = ggplot(data = data.frame(x = optimalK[selected_groups], y = optimalK_noArctic[taxo_groups[selected_groups][taxo_groups[selected_groups] %in% taxo_groups_noArctic]])) + 
       geom_point(aes(x,y)) + geom_abline(slope = 1, intercept = 0) +
@@ -5371,8 +5373,6 @@ if (optimalK_comput)
     }
   }
   
-  setwd(figure_folder)
-  
   plot.mean.sim.vs.K = ggplot(data = data.frame(K = nb_topics_range100r, mean_sim)) +
     geom_point(aes(K,mean_sim[,1],colour=inference_method[1])) + geom_line(aes(K,mean_sim[,1],colour=inference_method[1])) +
     geom_point(aes(K,mean_sim[,2],colour=inference_method[2])) + geom_line(aes(K,mean_sim[,2],colour=inference_method[2])) +
@@ -5471,8 +5471,8 @@ if (optimalK_comput)
           plot.margin=unit(c(1,1,1,0.5),"mm")) +
     labs(x="Number K of assemblages", y="AIC 100 real.")
   
-  # pdf(paste0("Stability-llh_vs_K_AllTaxa_occ_Gibbs_comparison_woBest_deltaVariation",noArcticNoBiomark_insert,noLagoon_insert,".pdf"))
-  pdf(paste0("Stability-llh_vs_K_Bacillariophyta_occ_Gibbs_comparison_woBest_deltaVariation",noArcticNoBiomark_insert,noLagoon_insert,".pdf"))
+  # pdf(paste0(figure_folder,"/Stability-llh_vs_K_AllTaxa_occ_Gibbs_comparison_woBest_deltaVariation",noArcticNoBiomark_insert,noLagoon_insert,".pdf"))
+  pdf(paste0(figure_folder,"/Stability-llh_vs_K_Bacillariophyta_occ_Gibbs_comparison_woBest_deltaVariation",noArcticNoBiomark_insert,noLagoon_insert,".pdf"))
   print(plot.mean.sim.vs.K)
   print(plot.sim.intercept.vs.K)
   print(plot.llh.100r)
@@ -5550,8 +5550,8 @@ if (optimalK_comput)
           plot.margin=unit(c(1,1,1,0.5),"mm")) +
     labs(x="Number K of assemblages", y="Perplexity 10-sample fold")
   
-  # pdf(paste0("Perplexity_vs_K_Bacillariophyta_occ_Gibbs_comparison_woBest_noVEM_deltaVariation",noArcticNoBiomark_insert,noLagoon_insert,".pdf"))
-  pdf(paste0("Perplexity_vs_K_AllTaxa_occ_Gibbs_comparison_woBest_noVEM_deltaVariation",noArcticNoBiomark_insert,noLagoon_insert,".pdf"))
+  # pdf(paste0("figure_folder,"/Perplexity_vs_K_Bacillariophyta_occ_Gibbs_comparison_woBest_noVEM_deltaVariation",noArcticNoBiomark_insert,noLagoon_insert,".pdf"))
+  pdf(paste0(figure_folder,"/Perplexity_vs_K_AllTaxa_occ_Gibbs_comparison_woBest_noVEM_deltaVariation",noArcticNoBiomark_insert,noLagoon_insert,".pdf"))
   print(plot.perplexity)
   dev.off()
   ########################
@@ -5658,25 +5658,25 @@ if (optimalK_comput)
   dev.off()
   
   optimalK_ratio = optimalK100r_max[selected_groups]/optimalK[selected_groups]
-  pdf("OptimalK100rBest_vs_OptimalK_ratio_hist_selected.pdf")
+  pdf(paste0(figure_folder,"/OptimalK100rBest_vs_OptimalK_ratio_hist_selected.pdf"))
   hist(optimalK_ratio, breaks = 20, xlab = "Optimal K best 100r to optimal K mean 10r")
   dev.off()
   
   optimalK_ratio = optimalK100r_max[selected_groups]/optimalK100r[selected_groups]
-  pdf("OptimalK100rBest_vs_OptimalK100r_ratio_hist_selected.pdf")
+  pdf(paste0(figure_folder,"/OptimalK100rBest_vs_OptimalK100r_ratio_hist_selected.pdf"))
   hist(optimalK_ratio, breaks = 20, xlab = "Optimal K best 100r to optimal K mean 100r")
   dev.off()
   
   optimalK_ratio = optimalK2[selected_groups]/optimalK[selected_groups]
-  pdf("OptimalK_vs_OptimalK2_ratio_hist_selected.pdf")
+  pdf(paste0(figure_folder,"/OptimalK_vs_OptimalK2_ratio_hist_selected.pdf"))
   hist(optimalK_ratio, breaks = 10, xlab = "Optimal K threshold to optimal K 2nd derivative")
   dev.off()
   
-  pdf("Hist_optimalK2_selected.pdf")
+  pdf(paste0(figure_folder,"/Hist_optimalK2_selected.pdf"))
   hist(optimalK2[selected_groups], breaks = 10, xlab = "Optimal K threshold")
   dev.off()
   
-  pdf("Hist_optimalK_selected.pdf")
+  pdf(paste0(figure_folder,"/Hist_optimalK_selected.pdf"))
   hist(optimalK[selected_groups], breaks = 10, xlab = "Optimal K 2nd derivative")
   dev.off()
   
@@ -5895,16 +5895,16 @@ if (optimalK_comput)
     return(dens$z[ii])
   }
   
-  optimalK_min.crossValid_10fold = readRDS(paste0(data_folder,"/optimalK_min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
-  optimalK_min.crossValid_2fold = readRDS(paste0(data_folder,"/optimalK_min.crossValid_Gibbs2sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
-  optimalK_min.crossValid_2fold_longchain = readRDS(paste0(data_folder,"/optimalK_min.crossValid_Gibbs2sampleFolds2-25t_iter10000thin50burnin2000_2plusOTUs_noLagoon.rds"))[,1]
-  optimalK_min.crossValid_10fold_longchain_average = readRDS(paste0(data_folder,"/optimalK_min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_averageOverSamples_2plusOTUs_noLagoon.rds"))[,1]
+  optimalK_min.crossValid_10fold = readRDS(paste0(results_folder,"/optimalK_min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
+  optimalK_min.crossValid_2fold = readRDS(paste0(results_folder,"/optimalK_min.crossValid_Gibbs2sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
+  optimalK_min.crossValid_2fold_longchain = readRDS(paste0(results_folder,"/optimalK_min.crossValid_Gibbs2sampleFolds2-25t_iter10000thin50burnin2000_2plusOTUs_noLagoon.rds"))[,1]
+  optimalK_min.crossValid_10fold_longchain_average = readRDS(paste0(results_folder,"/optimalK_min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_averageOverSamples_2plusOTUs_noLagoon.rds"))[,1]
   
-  optimalK_max.llh = readRDS(paste0(data_folder,"/optimalK_max.llh_Gibbs100r2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
-  optimalK_max.llh_longchain = readRDS(paste0(data_folder,"/optimalK_max.llh_Gibbs20r2-25t_iter10000thin50burnin2000_2plusOTUs_noLagoon.rds"))[,1]
+  optimalK_max.llh = readRDS(paste0(results_folder,"/optimalK_max.llh_Gibbs100r2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
+  optimalK_max.llh_longchain = readRDS(paste0(results_folder,"/optimalK_max.llh_Gibbs20r2-25t_iter10000thin50burnin2000_2plusOTUs_noLagoon.rds"))[,1]
   
-  optimalK_sd.max.llh_longchain = readRDS(paste0(data_folder,"/optimalK_sd.max.llh_Gibbs20r2-25t_iter10000thin50burnin2000_2plusOTUs_noLagoon.rds"))[,1]
-  optimalK_sd.max.llh = readRDS(paste0(data_folder,"/optimalK_sd.max.llh_Gibbs100r2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
+  optimalK_sd.max.llh_longchain = readRDS(paste0(results_folder,"/optimalK_sd.max.llh_Gibbs20r2-25t_iter10000thin50burnin2000_2plusOTUs_noLagoon.rds"))[,1]
+  optimalK_sd.max.llh = readRDS(paste0(results_folder,"/optimalK_sd.max.llh_Gibbs100r2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
   
   dat = data.frame(y=optimalK_min.crossValid_10fold_longchain_average[!is.na(optimalK_min.crossValid_10fold_longchain_average) & !is.na(optimalK_min.crossValid_10fold) & !(taxo_groups %in% groups_to_remove) & diversity > 100],
                    x=optimalK_min.crossValid_10fold[!is.na(optimalK_min.crossValid_10fold_longchain_average) & !is.na(optimalK_min.crossValid_10fold) & !(taxo_groups %in% groups_to_remove) & diversity > 100])
@@ -5994,7 +5994,7 @@ if (optimalK_comput)
   
   # Gibbs optimal K vs. VEM optimal K:
   ##############################
-  optimalK = readRDS(paste0(data_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  optimalK = readRDS(paste0(results_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   dat = data.frame(y=optimalK_sd.max.llh[!(taxo_groups %in% groups_to_remove) & diversity > 100,1][-c(1,2,3,7)],
                    x=optimalK[!(taxo_groups %in% groups_to_remove) & diversity > 100][-c(1,2,3,7)])
@@ -6186,7 +6186,7 @@ if (optimalK_comput)
   #           hjust=0, 
   #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
   
-  ggsave(filename = "OptimalK_vs_log_diversity_ggplot.pdf", do.call("arrangeGrob", c(list(plot.optimalK_log_diversity), nrow=1)),
+  ggsave(filename = paste0(figure_folder,"/OptimalK_vs_log_diversity_ggplot.pdf"), do.call("arrangeGrob", c(list(plot.optimalK_log_diversity), nrow=1)),
          height = 1.5*10/4, width = 1.5*10/4)
   
   plot.optimalK_log_diversity = qplot(x = x, y = y, data=data.frame(x=log10(as.vector(diversity)[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh]),
@@ -6210,7 +6210,7 @@ if (optimalK_comput)
   #           hjust=0, 
   #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
   
-  ggsave(filename = "OptimalK_vs_log10_diversity_ggplot_selected.pdf", do.call("arrangeGrob", c(list(plot.optimalK_log_diversity), nrow=1)),
+  ggsave(filename = paste0(figure_folder,"/OptimalK_vs_log10_diversity_ggplot_selected.pdf"), do.call("arrangeGrob", c(list(plot.optimalK_log_diversity), nrow=1)),
          height = 1.5*10/4, width = 1.5*10/4)
   
   # summary(lm(optimalK[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh] ~ log10(as.vector(diversity))[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh]))
@@ -6220,7 +6220,7 @@ if (optimalK_comput)
   #######################
   div_threshold = 100
   
-  dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   dominant_function0 = dominant_function[selected_groups & diversity>div_threshold]
   # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
   # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
@@ -6278,7 +6278,7 @@ if (optimalK_comput)
   
   if (optimalK_vs_size)
   {
-    load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
+    load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
     
     # size_absoluteAbund_selected_groups = vector(length = length(taxo_groups), mode = "numeric")
     # size_relativeAbund_selected_groups = vector(length = length(taxo_groups), mode = "numeric")
@@ -6323,7 +6323,7 @@ if (optimalK_comput)
     #           hjust=0, 
     #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
     
-    ggsave(filename = "OptimalK_vs_size_ggplot_truncated.pdf", do.call("arrangeGrob", c(list(plot.optimalK_size), nrow=1)),
+    ggsave(filename = paste0(figure_folder,"/OptimalK_vs_size_ggplot_truncated.pdf"), do.call("arrangeGrob", c(list(plot.optimalK_size), nrow=1)),
            height = 1.5*10/4, width = 1.5*10/4)
     
     plot.optimalK_log_size = qplot(x = x, y = y, data=data.frame(x=log10(size_absoluteAbund[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh]),
@@ -6349,7 +6349,7 @@ if (optimalK_comput)
     #           hjust=0, 
     #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
     
-    ggsave(filename = "OptimalK_vs_log10_size_ggplot_selected.pdf", do.call("arrangeGrob", c(list(plot.optimalK_log_size), nrow=1)),
+    ggsave(filename = paste0(figure_folder,"/OptimalK_vs_log10_size_ggplot_selected.pdf"), do.call("arrangeGrob", c(list(plot.optimalK_log_size), nrow=1)),
            height = 1.5*10/4, width = 1.5*10/4)
     
     # summary(lm(optimalK[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh] ~ log10(size_absoluteAbund)[!(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh]))
@@ -6357,7 +6357,7 @@ if (optimalK_comput)
   
   if (optimalK_vs_travel_time_perOTU)
   {
-    prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_2yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_2yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     plot.optimalK_tt_perOTU = qplot(x = x, y = y, data=data.frame(x=prop_within_OTU_vect,y=optimalK), label=taxo_groups, geom="point") +
       theme_bw() +
@@ -6380,7 +6380,7 @@ if (optimalK_comput)
     #           hjust=0, 
     #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
     
-    ggsave(filename = "OptimalK_vs_OTU_travel_time_prop2y_ggplot.pdf", do.call("arrangeGrob", c(list(plot.optimalK_tt_perOTU), nrow=1)),
+    ggsave(filename = paste0(figure_folder,"/OptimalK_vs_OTU_travel_time_prop2y_ggplot.pdf"), do.call("arrangeGrob", c(list(plot.optimalK_tt_perOTU), nrow=1)),
            height = 1.5*10/4, width = 1.5*10/4)
     
     plot.tt_perOTU_optimalK = qplot(x = x, y = y, data=data.frame(x=optimalK,y=prop_within_OTU_vect), label=taxo_groups, geom="point") +
@@ -6404,15 +6404,15 @@ if (optimalK_comput)
     #           hjust=0, 
     #           parse = FALSE, check_overlap = F, na.rm = FALSE, show.legend = NA, inherit.aes = TRUE)
     
-    ggsave(filename = "OTU_travel_time_prop2y_vs_optimalK_ggplot.pdf", do.call("arrangeGrob", c(list(plot.tt_perOTU_optimalK), nrow=1)),
+    ggsave(filename = paste0(figure_folder,"/OTU_travel_time_prop2y_vs_optimalK_ggplot.pdf"), do.call("arrangeGrob", c(list(plot.tt_perOTU_optimalK), nrow=1)),
            height = 1.5*10/4, width = 1.5*10/4)
   }
 }
 
 if (convergence)
 {
-  optimalK_max.llh = readRDS(paste0(data_folder,"/optimalK_max.llh_Gibbs100r_2plusOTUs_noLagoon.rds"))
-  optimalK_min.crossValid = readRDS(paste0(data_folder,"/optimalK_min.crossValid_10sampleFolds_Gibbs100r_2plusOTUs_noLagoon.rds"))
+  optimalK_max.llh = readRDS(paste0(results_folder,"/optimalK_max.llh_Gibbs100r_2plusOTUs_noLagoon.rds"))
+  optimalK_min.crossValid = readRDS(paste0(results_folder,"/optimalK_min.crossValid_10sampleFolds_Gibbs100r_2plusOTUs_noLagoon.rds"))
   
   optimalK_mpar_posteriorLlh = 1
   optimalK_mpar_perplexity = 0
@@ -6476,8 +6476,8 @@ if (convergence)
 if (stability)
 {
   # taxo_groups = taxo_groupsNew
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   # Loading stability results from cluster:
   # for (taxon in taxo_groups)
@@ -6545,10 +6545,10 @@ if (stability)
   {
     figure_folder_Gibbs.VEM = paste0(figure_path,"/Gibbs/All_stations")
     
-    optimalK_max.llh = readRDS(paste0(data_folder,"/optimalK_max.llh_Gibbs100r2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
-    optimalK_sd.max.llh = readRDS(paste0(data_folder,"/optimalK_sd.max.llh_Gibbs100r2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
-    optimalK_min.crossValid = readRDS(paste0(data_folder,"/optimalK_min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
-    optimalK_prevalence.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+    optimalK_max.llh = readRDS(paste0(results_folder,"/optimalK_max.llh_Gibbs100r2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
+    optimalK_sd.max.llh = readRDS(paste0(results_folder,"/optimalK_sd.max.llh_Gibbs100r2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
+    optimalK_min.crossValid = readRDS(paste0(results_folder,"/optimalK_min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
+    optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
     optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
     optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]] 
     
@@ -6564,7 +6564,7 @@ if (stability)
   } else if (VEM)
   {
     figure_folder_Gibbs.VEM = paste0(figure_path,"/VEM/All_stations")
-    optimalK = readRDS(paste0(data_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    optimalK = readRDS(paste0(results_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   }
     
   mean_sim = vector(length = length(taxo_groups), mode = "numeric")
@@ -6642,11 +6642,11 @@ if (stability)
   
   if (VEM)
   {
-    saveRDS(alpha_best_real,paste0(data_folder,"/alpha_best_real_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    saveRDS(mean_sim,paste0(data_folder,"/mean_sim_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(alpha_best_real,paste0(results_folder,"/alpha_best_real_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(mean_sim,paste0(results_folder,"/mean_sim_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   } else if (Gibbs)
   {
-    saveRDS(mean_sim,paste0(data_folder,"/mean_sim_Gibbs_",optimalK_insert,"_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    saveRDS(mean_sim,paste0(results_folder,"/mean_sim_Gibbs_",optimalK_insert,"_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   }
   
   if (Gibbs)
@@ -6694,7 +6694,7 @@ if (stability)
   title(ylab = "Alpha best realization (log10)", xlab = "Rank in OTU richness", cex.lab = 1.4)
   dev.off()
   
-  mean_sim_VEM = readRDS(paste0(data_folder,"/mean_sim_2plusOTUs_noLagoon.rds"))
+  mean_sim_VEM = readRDS(paste0(results_folder,"/mean_sim_2plusOTUs_noLagoon.rds"))
   
   plot.mean.sim_log_diversity = ggplot(data=data.frame(x=log10(as.vector(diversity))[!(taxo_groups %in% groups_to_remove) & diversity > 100 & !is.na(mean_sim)],
                                                                     y=mean_sim[!(taxo_groups %in% groups_to_remove) & diversity > 100 & !is.na(mean_sim)])) +
@@ -6735,7 +6735,7 @@ if (stability)
   
   if (stability_vs_size)
   {
-    load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
+    load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
     
     # size_absoluteAbund_selected_groups = vector(length = length(taxo_groups), mode = "numeric")
     # size_relativeAbund_selected_groups = vector(length = length(taxo_groups), mode = "numeric")
@@ -6917,7 +6917,7 @@ if (stability)
   
   if (stability_vs_travel_time_perOTU)
   {
-    prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_2yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_2yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     plot.stability_tt_perOTU = qplot(x = x, y = y, data=data.frame(x=prop_within_OTU_vect,y=mean_sim), label=taxo_groups, geom="point") +
       theme_bw() +
@@ -6973,10 +6973,10 @@ if (posterior_distrib)
 {
   if (data_Federico)
   {
-    taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100
-    optimalK_prevalence.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+    optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
     optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
     optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]] 
   }
@@ -7021,18 +7021,18 @@ if (posterior_distrib)
       R.hat.allTaxa = sqrt(post.var.est/within.variance)
   }
   # saveRDS(chains,
-  #         paste0(data_folder,"/Chains.allTaxa_nb_iter3000_nb_real100_occurrence.rds"),
+  #         paste0(results_folder,"/Chains.allTaxa_nb_iter3000_nb_real100_occurrence.rds"),
   #         version=2)
   saveRDS(list(R.hat.500.allTaxa,R.hat.500),
-          paste0(data_folder,"/",short_marker,
+          paste0(results_folder,"/",short_marker,
                  "Rhat.burnin.",burnin,"_nb_iter3000_nb_real100_occurrence.rds"),
           version=2)
   saveRDS(list(R.hat.1000.allTaxa,R.hat.1000),
-          paste0(data_folder,"/",short_marker,
+          paste0(results_folder,"/",short_marker,
                  "Rhat.burnin.",burnin,"_nb_iter3000_nb_real100_occurrence.rds"),
           version=2)
   saveRDS(list(R.hat.2000.allTaxa,R.hat.2000),
-          paste0(data_folder,"/",short_marker,
+          paste0(results_folder,"/",short_marker,
                  "Rhat.burnin.",burnin,"_nb_iter3000_nb_real100_occurrence.rds"),
           version=2)
   
@@ -7129,19 +7129,19 @@ if (posterior_distrib)
   for (i_real in 1:10)
     diag(normalized.VI[[i_real]]) = NA
   # saveRDS(list(normalized.VI.best.real,normalized.VI),
-  #         paste0(data_folder,"/",short_marker,
+  #         paste0(results_folder,"/",short_marker,
   #                "Normalized_VI_10reals_different.stations.means.rds"),
   #         version=2)
   # saveRDS(list(normalized.VI.best.real,normalized.VI),
-  #         paste0(data_folder,"/",short_marker,
+  #         paste0(results_folder,"/",short_marker,
   #                "Normalized_VI_10reals_different.stations.means_old.code.rds"),
   #         version=2)
   # saveRDS(list(normalized.VI.best.real,normalized.VI),
-  #         paste0(data_folder,"/",short_marker,
+  #         paste0(results_folder,"/",short_marker,
   #                "Normalized_VI_10reals_different.stations.means_cluster.data.rds"),
   #         version=2)
   saveRDS(list(normalized.VI.best.real,normalized.VI),
-          paste0(data_folder,"/",short_marker,
+          paste0(results_folder,"/",short_marker,
                  "Normalized_VI_10reals_different.stations.means.rds"),
           version=2)
   
@@ -7200,11 +7200,11 @@ if (posterior_distrib)
     }
   }
   saveRDS(normalized.VI.within.group,
-          paste0(data_folder,"/",short_marker,
+          paste0(results_folder,"/",short_marker,
                  "Normalized_VI_within.groups_100reals_different.stations.means.rds"),
           version=2)
   saveRDS(mean.normalized.VI.within.group,
-          paste0(data_folder,"/",short_marker,
+          paste0(results_folder,"/",short_marker,
                  "Normalized_VI_mean.within.groups_100reals_different.stations.means.rds"),
           version=2)
 }
@@ -7213,11 +7213,11 @@ if (environmental_data)
 {
   library(vegan)
   
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   # taxo_groups = "AllTaxa"
   # selected_groups = T
   
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100
   
   target_groups = taxo_groups
@@ -7297,9 +7297,9 @@ if (environmental_data)
   if (Gibbs)
   {
     figure_folder_Gibbs.VEM = paste0(figure_path,"/Gibbs/All_stations")
-    # optimalK_max.llh = readRDS(paste0(data_folder,"/optimalK_max.llh_Gibbs100r_2plusOTUs_noLagoon.rds"))
-    # optimalK_min.crossValid = readRDS(paste0(data_folder,"/optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds2-35t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs_noLagoon.rds"))[,1]
-    optimalK_prevalence.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs",fold_size,"sampleFolds2-35t_iter",nb_iter,"thin",thin,"burnin500_2plusOTUs_noLagoon.rds"))
+    # optimalK_max.llh = readRDS(paste0(results_folder,"/optimalK_max.llh_Gibbs100r_2plusOTUs_noLagoon.rds"))
+    # optimalK_min.crossValid = readRDS(paste0(results_folder,"/optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds2-35t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs_noLagoon.rds"))[,1]
+    optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs",fold_size,"sampleFolds2-35t_iter",nb_iter,"thin",thin,"burnin500_2plusOTUs_noLagoon.rds"))
     optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
     optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]]
     
@@ -7320,8 +7320,8 @@ if (environmental_data)
   } else if (VEM)
   {
     figure_folder_Gibbs.VEM = paste0(figure_path,"/VEM/All_stations")
-    optimalK = readRDS(paste0(data_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    selected_groups = readRDS(paste0(data_folder,"/selected_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    optimalK = readRDS(paste0(results_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    selected_groups = readRDS(paste0(results_folder,"/selected_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     Gibbs_VEM_insert = ""
   } else if (Functional)
@@ -7454,8 +7454,8 @@ if (environmental_data)
   }
   stations_names = levels(as.factor(stations_depths$Station))
   
-  relativeAbund_file = paste0(data_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds")
-  functions_relativeAbund_file = paste0(data_folder,"/functions_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds")
+  relativeAbund_file = paste0(results_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds")
+  functions_relativeAbund_file = paste0(results_folder,"/functions_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds")
   if (file.exists(relativeAbund_file) && file.exists(functions_relativeAbund_file))
   {
     relativeAbund = readRDS(relativeAbund_file)
@@ -7644,8 +7644,8 @@ if (environmental_data)
         warning("\n! Missing fraction in",station,depth)
     }
     
-    # saveRDS(relativeAbund,paste0(data_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    # saveRDS(list(functions_relativeAbund,functions_relativeAbund0),paste0(data_folder,"/functions_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # saveRDS(relativeAbund,paste0(results_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # saveRDS(list(functions_relativeAbund,functions_relativeAbund0),paste0(results_folder,"/functions_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   }
   
   # selected_variables = c("Temperature","Salinity","ChlorophyllA","Oxygen")
@@ -7863,7 +7863,6 @@ if (environmental_data)
     varpart.latitude.depth.pval =  matrix(ncol = length(taxo_groups), nrow = 3, dimnames = list(c("Latitude only","Latitude and depth","Depth only"), taxo_groups), data = unlist(varpart.latitude.depth))
     
     #Figures:
-    setwd(figure_folder)
     varpart.latitude.depth0 = varpart.latitude.depth
     varpart.latitude.depth0[varpart.latitude.depth0 < 0] = 0
     env_sorting = sort.int(colSums(varpart.latitude.depth0[,selected_groups]), index.return = T, decreasing = T, na.last = T, method = "radix")$ix
@@ -7872,7 +7871,7 @@ if (environmental_data)
     shading_density[shading_density<0.05] = 0
     shading_density[shading_density>0] = 10
     
-    pdf(paste0("varpart_lda_latitude_vs_depth_decreasingTotalVariance.pdf"))
+    pdf(paste0(figure_folder,"/varpart_lda_latitude_vs_depth_decreasingTotalVariance.pdf"))
     par(mar=c(7.1,4.1,4.1,2.1))
     #barplot(VarPart_data.frame_reordered,col=terrain.colors(3),ann=F,names.arg=colnames(VarPart_data.frame_reordered),las=3,legend.text = T, args.legend = list(bty = "n"))
     x = barplot(varpart.latitude.depth0[,selected_groups][,env_sorting],col=terrain.colors(3),legend.text = T, xaxt="n", space = rep(1,ncol(shading_density)), args.legend = list(bty = "n"))
@@ -7887,11 +7886,11 @@ if (environmental_data)
     text(cex=0.35, x=x+3, y=-0.03, labels = labs, xpd=TRUE, srt=45, pos=2)
     dev.off()
     
-    load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+    load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
     plot(log10(size_relativeAbund[selected_groups]),varpart.latitude.depth0[1,selected_groups])
     plot(log10(size_relativeAbund[selected_groups]),varpart.latitude.depth0[3,selected_groups])
     
-    relativeAbund = readRDS(paste0(data_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    relativeAbund = readRDS(paste0(results_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     plot(log10(colMeans(relativeAbund,na.rm = T)[selected_groups]),varpart.latitude.depth0[1,selected_groups])
     summary(lm(log10(colMeans(relativeAbund,na.rm = T)[selected_groups]) ~ varpart.latitude.depth0[1,selected_groups]))
     plot(log10(colMeans(relativeAbund,na.rm = T)[selected_groups]),varpart.latitude.depth0[3,selected_groups])
@@ -7899,11 +7898,11 @@ if (environmental_data)
     plot(optimalK[selected_groups],varpart.latitude.depth0[1,selected_groups])
     plot(optimalK[selected_groups],varpart.latitude.depth0[3,selected_groups])
     
-    prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_expTmin_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_expTmin_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
     plot(1-prop_within_OTU_vect[selected_groups],varpart.latitude.depth0[1,selected_groups])
     plot(1-prop_within_OTU_vect[selected_groups],varpart.latitude.depth0[3,selected_groups])
     
-    dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     dominant_function0 = dominant_function[selected_groups]
     dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
     dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
@@ -7916,7 +7915,7 @@ if (environmental_data)
             axis.text=element_text(size=17),
             plot.margin=unit(c(1,1,1,0.5),"mm")) +
       labs(x="", y="Variance explained by depth")
-    pdf(paste0("varpart_depth_boxplot_functionalGroups_selected.pdf"))
+    pdf(paste0(figure_folder,"/varpart_depth_boxplot_functionalGroups_selected.pdf"))
     print(boxplot.depth.fraction.functions)
     dev.off()
     t.test(varpart.latitude.depth0[1,selected_groups][dominant_function0 == "phagotroph"],
@@ -7928,7 +7927,7 @@ if (environmental_data)
             axis.text=element_text(size=17),
             plot.margin=unit(c(1,1,1,0.5),"mm")) +
       labs(x="", y="Variance explained by latitude")
-    pdf(paste0("varpart_surface_boxplot_functionalGroups_selected.pdf"))
+    pdf(paste0(figure_folder,"/varpart_surface_boxplot_functionalGroups_selected.pdf"))
     print(boxplot.latitude.fraction.functions)
     dev.off()
     
@@ -8164,7 +8163,7 @@ if (environmental_data)
       env_selected = list(SUR=list(),DCM=list())
     } else
     {
-      var_select_result = readRDS(paste0(data_folder,"/RDA",
+      var_select_result = readRDS(paste0(results_folder,"/RDA",
                                          Gibbs_VEM_insert,target_groups_insert,
                                          "_separate.SUR.DCM_noSelectedAxes-envSelected-significantGlobalModel-nbSites",
                                          var.select_insert,preliminary_global_test_insert,indiv.signif.axes_insert,
@@ -8378,8 +8377,8 @@ if (environmental_data)
     #   cor_i[i] = cor(rowSums(functions_relativeAbund[!stations_to_remove,-i]),functions_relativeAbund[!stations_to_remove,i])
     # }
     
-    # increasing_llh = readRDS(paste0(data_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    # alpha_best_real = readRDS(paste0(data_folder,"/alpha_best_real_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # increasing_llh = readRDS(paste0(results_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # alpha_best_real = readRDS(paste0(results_folder,"/alpha_best_real_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     # 
     # selected_groups = !(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh
     # selected_groups = rep(T,length(taxo_groups))
@@ -9416,7 +9415,7 @@ if (environmental_data)
     if (var_select)
     {
       saveRDS(list(no_selected_axes,env_selected,significant_global_model,nb_sites),
-              paste0(data_folder,"/RDA",Gibbs_VEM_insert,target_groups_insert,
+              paste0(results_folder,"/RDA",Gibbs_VEM_insert,target_groups_insert,
                      "_separate.SUR.DCM_noSelectedAxes-envSelected-significantGlobalModel-nbSites",
                      var.select_insert,preliminary_global_test_insert,indiv.signif.axes_insert,BH_correction_insert,
                      abiotic_pca_insert,biotic_pca_insert,dis_MEM_insert,stdzation_insert,noArcticNoBiomark_insert,
@@ -9424,7 +9423,7 @@ if (environmental_data)
     } else if (indiv_signif_axes_selection)
     {
       saveRDS(list(no_selected_axes,env_selected,nb_sites),
-              paste0(data_folder,"/RDA",Gibbs_VEM_insert,target_groups_insert,
+              paste0(results_folder,"/RDA",Gibbs_VEM_insert,target_groups_insert,
                      "_separate.SUR.DCM_noSelectedAxes-envSelected-nbSites",
                      var.select_insert,indiv.signif.axes_insert,BH_correction_insert,
                      abiotic_pca_insert,biotic_pca_insert,dis_MEM_insert,stdzation_insert,noArcticNoBiomark_insert,
@@ -9435,39 +9434,39 @@ if (environmental_data)
   if (rda_lda)
   {
     saveRDS(list(adjr2_individualAxes_abiotic,pval_individualAxes_abiotic,adjr2_individualAxes_relativeAbund,pval_individualAxes_relativeAbund,adjr2_individualAxes_MEM,pval_individualAxes_MEM),
-            # paste0(data_folder,"/RDA_environment-currents_individualAxes_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-            paste0(data_folder,"/RDA",Gibbs_VEM_insert,target_groups_insert,"_separate.SUR.DCM_individualAxes",
+            # paste0(results_folder,"/RDA_environment-currents_individualAxes_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+            paste0(results_folder,"/RDA",Gibbs_VEM_insert,target_groups_insert,"_separate.SUR.DCM_individualAxes",
                    abiotic_pca_insert,biotic_pca_insert,dis_MEM_insert,stdzation_insert,noArcticNoBiomark_insert,"_eigenvalueThres0.8.rds"))
     saveRDS(list(adjr2_lumpedAxes_abiotic,pval_lumpedAxes_abiotic,adjr2_lumpedAxes_relativeAbund,pval_lumpedAxes_relativeAbund,adjr2_lumpedAxes_MEM,pval_lumpedAxes_MEM),
-            # paste0(data_folder,"/RDA_environment-currents_lumpedAxes_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-            paste0(data_folder,"/RDA",Gibbs_VEM_insert,target_groups_insert,"_separate.SUR.DCM_lumpedAxes",
+            # paste0(results_folder,"/RDA_environment-currents_lumpedAxes_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+            paste0(results_folder,"/RDA",Gibbs_VEM_insert,target_groups_insert,"_separate.SUR.DCM_lumpedAxes",
                    abiotic_pca_insert,biotic_pca_insert,dis_MEM_insert,stdzation_insert,noArcticNoBiomark_insert,"_eigenvalueThres0.8.rds"))
     # saveRDS(list(adjr2_orderedLumpedAxes_abiotic,pval_orderedLumpedAxes_abiotic,adjr2_orderedLumpedAxes_relativeAbund,pval_orderedLumpedAxes_relativeAbund,adjr2_orderedLumpedAxes_expTmin_distance,pval_orderedLumpedAxes_expTmin_distance,adjr2_orderedLumpedAxes_all,pval_orderedLumpedAxes_all),
     saveRDS(list(adjr2_orderedLumpedAxes_abiotic,pval_orderedLumpedAxes_abiotic,adjr2_orderedLumpedAxes_relativeAbund,pval_orderedLumpedAxes_relativeAbund,adjr2_orderedLumpedAxes_MEM,pval_orderedLumpedAxes_MEM),
-            # paste0(data_folder,"/RDA_environment-currents_orderedLumpedAxes_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-            paste0(data_folder,"/RDA",Gibbs_VEM_insert,target_groups_insert,"_separate.SUR.DCM_orderedLumpedAxes",
+            # paste0(results_folder,"/RDA_environment-currents_orderedLumpedAxes_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+            paste0(results_folder,"/RDA",Gibbs_VEM_insert,target_groups_insert,"_separate.SUR.DCM_orderedLumpedAxes",
                    abiotic_pca_insert,biotic_pca_insert,dis_MEM_insert,stdzation_insert,noArcticNoBiomark_insert,"_eigenvalueThres0.8.rds"))
     
     # saveRDS(list(adjr2_individualAxes_abiotic,pval_individualAxes_abiotic,adjr2_individualAxes_relativeAbund,pval_individualAxes_relativeAbund,adjr2_individualAxes_expTmin_distance,pval_individualAxes_expTmin_distance),
-    #       paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_individualAxes_independentSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    #       paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_individualAxes_independentSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     # saveRDS(list(adjr2_lumpedAxes_abiotic,pval_lumpedAxes_abiotic,adjr2_lumpedAxes_relativeAbund,pval_lumpedAxes_relativeAbund,adjr2_lumpedAxes_expTmin_distance,pval_lumpedAxes_expTmin_distance),
-    #       paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_lumpedAxes_independentSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    #       paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_lumpedAxes_independentSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     # # saveRDS(list(adjr2_orderedLumpedAxes_abiotic,pval_orderedLumpedAxes_abiotic,adjr2_orderedLumpedAxes_relativeAbund,pval_orderedLumpedAxes_relativeAbund,adjr2_orderedLumpedAxes_expTmin_distance,pval_orderedLumpedAxes_expTmin_distance,adjr2_orderedLumpedAxes_all,pval_orderedLumpedAxes_all),
     # saveRDS(list(adjr2_orderedLumpedAxes_abiotic,pval_orderedLumpedAxes_abiotic,adjr2_orderedLumpedAxes_relativeAbund,pval_orderedLumpedAxes_relativeAbund,adjr2_orderedLumpedAxes_expTmin_distance,pval_orderedLumpedAxes_expTmin_distance),
-    #       paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_all_orderedLumpedAxes_independentSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    #       paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_all_orderedLumpedAxes_independentSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   }
   
   if (varpart_lda)
   {
-    # saveRDS(list(varpart.groups,varpart.groups.pval),paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    # saveRDS(list(varpart.functions,varpart.functions.pval),paste0(data_folder,"/varpart_lda_abiotic_vs_functions",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    # saveRDS(list(varpart.groups.expTmin,varpart.groups.expTmin.pval),paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    # saveRDS(list(varpart.groups.expTmin,varpart.groups.expTmin.pval),paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    # saveRDS(list(varpart.groups.expTmin,varpart.groups.expTmin.pval),paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    # saveRDS(list(varpart.groups.expTmin,varpart.groups.expTmin.pval),paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))  
+    # saveRDS(list(varpart.groups,varpart.groups.pval),paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # saveRDS(list(varpart.functions,varpart.functions.pval),paste0(results_folder,"/varpart_lda_abiotic_vs_functions",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # saveRDS(list(varpart.groups.expTmin,varpart.groups.expTmin.pval),paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # saveRDS(list(varpart.groups.expTmin,varpart.groups.expTmin.pval),paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # saveRDS(list(varpart.groups.expTmin,varpart.groups.expTmin.pval),paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # saveRDS(list(varpart.groups.expTmin,varpart.groups.expTmin.pval),paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))  
     saveRDS(list(varpart.env.spatial,varpart.env.spatial.pval,sub.varpart.biotic.abiotic,sub.varpart.biotic.abiotic.pval,varpart.biotic.abiotic,varpart.biotic.abiotic.pval),
-            # paste0(data_folder,"/varpart_lda_environment-currents_bothDirectionsIndependentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-            paste0(data_folder,"/varpart_lda",
+            # paste0(results_folder,"/varpart_lda_environment-currents_bothDirectionsIndependentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+            paste0(results_folder,"/varpart_lda",
                    Gibbs_VEM_insert,target_groups_insert,"_separate.SUR.DCM",
                    var.select_insert,"_PCA0",preliminary_global_test_insert,indiv.signif.axes_insert,BH_correction_insert,
                    abiotic_pca_insert,biotic_pca_insert,dis_MEM_insert,stdzation_insert,noArcticNoBiomark_insert,
@@ -9478,10 +9477,10 @@ if (environmental_data)
   # varpart.groups.pval.variable.nb.of.axes[[which(2:30 == i_axis)]] = varpart.groups.pval
   # }
   # 
-  # saveRDS(list(varpart.groups.variable.nb.of.axes,varpart.groups.pval.variable.nb.of.axes),paste0(data_folder,"/varpart_abiotic_relativeAbund_varyingAxisNumber2-30",abiotic_pca_insert,biotic_pca_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # saveRDS(list(varpart.groups.variable.nb.of.axes,varpart.groups.pval.variable.nb.of.axes),paste0(results_folder,"/varpart_abiotic_relativeAbund_varyingAxisNumber2-30",abiotic_pca_insert,biotic_pca_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   # if (relative_abiotic_sd_per_OTU)
-  #   saveRDS(list(mean_OTU_abiotic_dispersion,OTU_abiotic_dispersion_allOTUs),paste0(data_folder,"/OTU_relative_abiotic_dispersion_",ncol(abiotic_data_trans_taxon),"variables",abiotic_pca_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  #   saveRDS(list(mean_OTU_abiotic_dispersion,OTU_abiotic_dispersion_allOTUs),paste0(results_folder,"/OTU_relative_abiotic_dispersion_",ncol(abiotic_data_trans_taxon),"variables",abiotic_pca_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   # setwd(figure_folder)
   library(ggplot2)
@@ -10049,7 +10048,7 @@ if (environmental_data)
     dev.off()
     
     #########################
-    load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+    load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
     
     # plot.margin=unit(c(7,1,1,0.5),"mm"))
     # height = 1.5*10/4, width = 1.5*10/4
@@ -10091,7 +10090,7 @@ if (environmental_data)
     dev.off()
     
     #########################
-    mean_sim = readRDS(paste0(data_folder,"/mean_sim_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    mean_sim = readRDS(paste0(results_folder,"/mean_sim_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     plot.rda.adjr2_stability = list()
     for (j in 1:ncol(adjr2))
@@ -10161,8 +10160,8 @@ if (environmental_data)
     dev.off()
     
     #############################
-    # prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     plot.rda.adjr2_OTU.connectivity = list()
     for (j in 1:ncol(adjr2))
@@ -10196,9 +10195,9 @@ if (environmental_data)
     dev.off()
     
     ###############################
-    # prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    # load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
-    prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+    prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     rda_available_groups = !(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh
     # rda_available_groups = vector(length = length(taxo_groups), mode = "logical")
@@ -10278,10 +10277,10 @@ if (environmental_data)
     dev.off()
     
     ###############################
-    # prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    # load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
-    dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_",travel_time_threshold,"yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    # load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+    dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     rda_available_groups = !(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh
     # rda_available_groups = vector(length = length(taxo_groups), mode = "logical")
@@ -10356,7 +10355,7 @@ if (environmental_data)
     dev.off()
     
     #############################
-    prop_within_topic_vect = readRDS(paste0(data_folder,"/Connectivity_2yearTminProportion_meanPerAssemblage_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    prop_within_topic_vect = readRDS(paste0(results_folder,"/Connectivity_2yearTminProportion_meanPerAssemblage_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     # ten_colors = c("cadetblue",NA,"darkblue","dodgerblue1","darkgoldenrod1","firebrick2","darkgreen","chartreuse2","dodgerblue1","deeppink1")
     
@@ -10392,7 +10391,7 @@ if (environmental_data)
     dev.off()
     
     #############################
-    prop_within_topic_vect = readRDS(paste0(data_folder,"/Connectivity_2yearTminProportion_meanPerAssemblage_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    prop_within_topic_vect = readRDS(paste0(results_folder,"/Connectivity_2yearTminProportion_meanPerAssemblage_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     plot.rda.adjr2_topic.connectivity = list()
     for (j in 1:ncol(adjr2))
@@ -10499,13 +10498,13 @@ if (environmental_data)
   # Varpart-specific figures:
   if (varpart_lda)
   {
-    # varpart.groups.expTmin.globalSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    # varpart.groups.expTmin.globalSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    # varpart.groups.expTmin.globalSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    # varpart.groups.expTmin.globalSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     # 
-    varpart.groups.expTmin.indSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.indSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.indSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.indSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
-    varpart.indSelec = readRDS(paste0(data_folder,"/varpart_lda",Gibbs_VEM_insert,target_groups_insert,
+    varpart.indSelec = readRDS(paste0(results_folder,"/varpart_lda",Gibbs_VEM_insert,target_groups_insert,
                                       "_separate.SUR.DCM_both.directions.independent.selection_PCA0",
                                       abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,"_eigenvalueThres0.8",noLagoon_insert,".rds"))
     varpart.env.spatial = varpart.indSelec[[1]]
@@ -10536,13 +10535,13 @@ if (environmental_data)
     varpart.groups.expTmin.indSelec0 = varpart.groups.expTmin.indSelec
     varpart.groups.expTmin.indSelec0[varpart.groups.expTmin.indSelec0<0] = 0
     
-    # significant_global_model_globalSelec = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    significant_global_model_old = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    # significant_global_model_globalSelec = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    significant_global_model_old = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     significant_global_model_indSelec_old = vector(length = length(taxo_groups), mode = "logical")
     for (i_taxon in 1:length(taxo_groups))
       significant_global_model_indSelec_old[i_taxon] = all(significant_global_model_old[[i_taxon]])
     
-    significant_global_model = readRDS(paste0(data_folder,"/RDA",Gibbs_VEM_insert,
+    significant_global_model = readRDS(paste0(results_folder,"/RDA",Gibbs_VEM_insert,
                                               "_separate.SUR.DCM_noSelectedAxes-envSelected-significantGlobalModel-nbSites_both.directions.independent.selection",
                                               abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,"_eigenvalueThres0.8",noLagoon_insert,".rds"))[[3]]
     significant_global_model_indSelec = list(SUR=vector(length = length(taxo_groups), mode = "logical"),
@@ -11198,7 +11197,7 @@ if (environmental_data)
       
       div_threshold = 100
       
-      dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
       dominant_function0 = dominant_function[selected_groups & diversity>div_threshold]
       # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
       # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
@@ -11464,7 +11463,7 @@ if (environmental_data)
     ###   Four functional groups plots     ###
     ##########################################
      
-    dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     # ten_colors = c("cadetblue",NA,"darkblue","dodgerblue1","darkgoldenrod1","firebrick2","darkgreen","chartreuse2","dodgerblue1","deeppink1")
     # functions = c("copepoda","endophotosymbiont","gelatineous_carnivores_filterers","other metazoa","parasite","phagotroph","photohost","phototroph","pteropoda","unknown")
     
@@ -12014,17 +12013,17 @@ if (environmental_data)
     ##############################################
     {
     
-    varpart.groups.expTmin.globalSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.globalSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    varpart.groups.expTmin.indSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.indSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.globalSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.globalSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.indSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.indSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     varpart.groups.expTmin.indSelec0 = varpart.groups.expTmin.indSelec
     varpart.groups.expTmin.indSelec0[varpart.groups.expTmin.indSelec0<0] = 0
     varpart.groups.expTmin.globalSelec0 = varpart.groups.expTmin.globalSelec
     varpart.groups.expTmin.globalSelec0[varpart.groups.expTmin.globalSelec0<0] = 0
     
-    significant_global_model = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    significant_global_model = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     # plot.tot.variance.ind.vs.global.selection = ggplot(data=data.frame(x=colSums(varpart.groups.expTmin.indSelec0[,selected_groups & significant_global_model]),
     #                                                                  y=colSums(varpart.groups.expTmin.globalSelec0[,selected_groups & significant_global_model]))) +
@@ -12104,20 +12103,20 @@ if (environmental_data)
     # number of selected axes - global vs. independent selection #
     ##############################################################
     {
-    # varpart.groups.expTmin.globalSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    # varpart.groups.expTmin.globalSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    # varpart.groups.expTmin.indSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    # varpart.groups.expTmin.indSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    # varpart.groups.expTmin.globalSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    # varpart.groups.expTmin.globalSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    # varpart.groups.expTmin.indSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    # varpart.groups.expTmin.indSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     # 
     # varpart.groups.expTmin.indSelec0 = varpart.groups.expTmin.indSelec
     # varpart.groups.expTmin.indSelec0[varpart.groups.expTmin.indSelec0<0] = 0
     # varpart.groups.expTmin.globalSelec0 = varpart.groups.expTmin.globalSelec
     # varpart.groups.expTmin.globalSelec0[varpart.groups.expTmin.globalSelec0<0] = 0
     
-    env_selected_indSelec = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    env_selected_globalSelec = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    env_selected_indSelec = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    env_selected_globalSelec = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
     
-    significant_global_model = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    significant_global_model = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     test = vector(length = length(taxo_groups), mode = "logical")
     for (i_taxon in 1:(length(taxo_groups)-2))
@@ -12275,10 +12274,10 @@ if (environmental_data)
     ########################################################
     {
     
-    varpart.groups.expTmin.indSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.indSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    varpart.groups.expTmin.indSelec.old = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.indSelec.old.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.indSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.indSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.indSelec.old = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.indSelec.old.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     varpart.groups.expTmin.indSelec0 = varpart.groups.expTmin.indSelec
     varpart.groups.expTmin.indSelec0[varpart.groups.expTmin.indSelec0<0] = 0
@@ -12356,12 +12355,12 @@ if (environmental_data)
     ###########################################
     {
     
-    varpart.groups.expTmin.real1.globalSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.real1.globalSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    varpart.groups.expTmin.real2.globalSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.real2.globalSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    varpart.groups.expTmin.real3.globalSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.real3.globalSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.real1.globalSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.real1.globalSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.real2.globalSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.real2.globalSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.real3.globalSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.real3.globalSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     varpart.groups.expTmin.real1.globalSelec0 = varpart.groups.expTmin.real1.globalSelec
     varpart.groups.expTmin.real1.globalSelec0[varpart.groups.expTmin.real1.globalSelec0<0] = 0
@@ -12370,8 +12369,8 @@ if (environmental_data)
     varpart.groups.expTmin.real3.globalSelec0 = varpart.groups.expTmin.real3.globalSelec
     varpart.groups.expTmin.real3.globalSelec0[varpart.groups.expTmin.real3.globalSelec0<0] = 0
   
-    env_selected_real2.globalSelec = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    env_selected_real3.globalSelec = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    env_selected_real2.globalSelec = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    env_selected_real3.globalSelec = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
     
     real2_real3_abiotic2_selection = vector(length = length(taxo_groups), mode = "numeric")
     for (i_taxon in 1:(length(taxo_groups)-2))
@@ -12420,7 +12419,7 @@ if (environmental_data)
     
     real2_over_real3_abiotic_ratio = (varpart.groups.expTmin.real2.globalSelec0[5,]/colSums(varpart.groups.expTmin.real2.globalSelec0))/(varpart.groups.expTmin.real3.globalSelec0[5,]/colSums(varpart.groups.expTmin.real3.globalSelec0))
     
-    significant_global_model = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    significant_global_model = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     plot.global.selection.real = ggplot(data=data.frame(x=colSums(varpart.groups.expTmin.real1.globalSelec0[,selected_groups & significant_global_model]),
                                                                        y=colSums(varpart.groups.expTmin.real2.globalSelec0[,selected_groups & significant_global_model]))) +
@@ -12493,19 +12492,19 @@ if (environmental_data)
     #############################################################
     {
     
-    varpart.groups.expTmin.real1.globalSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.real1.globalSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    varpart.groups.expTmin.real2.globalSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.real2.globalSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.real1.globalSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.real1.globalSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.real2.globalSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.real2.globalSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     varpart.groups.expTmin.real1.globalSelec0 = varpart.groups.expTmin.real1.globalSelec
     varpart.groups.expTmin.real1.globalSelec0[varpart.groups.expTmin.real1.globalSelec0<0] = 0
     varpart.groups.expTmin.real2.globalSelec0 = varpart.groups.expTmin.real2.globalSelec
     varpart.groups.expTmin.real2.globalSelec0[varpart.groups.expTmin.real2.globalSelec0<0] = 0
   
-    # env_selected_real1.globalSelec = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_bothDirectionsGlobalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    # env_selected_real2.globalSelec = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_bothDirectionsGlobalSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    significant_global_model = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_bothDirectionsGlobalSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    # env_selected_real1.globalSelec = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_bothDirectionsGlobalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    # env_selected_real2.globalSelec = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_bothDirectionsGlobalSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    significant_global_model = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_bothDirectionsGlobalSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     plot.global.selection.real = ggplot(data=data.frame(x=colSums(varpart.groups.expTmin.real1.globalSelec0[,selected_groups & significant_global_model]),
                                                                        y=colSums(varpart.groups.expTmin.real2.globalSelec0[,selected_groups & significant_global_model]))) +
@@ -12578,18 +12577,18 @@ if (environmental_data)
     #################################################
     {
     
-    varpart.groups.expTmin.real1.indSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.real1.indSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    varpart.groups.expTmin.real2.indSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.real2.indSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.real1.indSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.real1.indSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.real2.indSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.real2.indSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection1_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     varpart.groups.expTmin.real1.indSelec0 = varpart.groups.expTmin.real1.indSelec
     varpart.groups.expTmin.real1.indSelec0[varpart.groups.expTmin.real1.indSelec0 < 0] = 0
     varpart.groups.expTmin.real2.indSelec0 = varpart.groups.expTmin.real2.indSelec
     varpart.groups.expTmin.real2.indSelec0[varpart.groups.expTmin.real2.indSelec0 < 0] = 0
     
-    # significant_global_model = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    significant_global_model = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_independentSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    # significant_global_model = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    significant_global_model = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_independentSelection1",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     significant_groups = vector(length = length(taxo_groups), mode = "logical")
     for (i_taxon in 1:length(taxo_groups))
@@ -12665,7 +12664,7 @@ if (environmental_data)
     # Gibbs VEM fraction comparison #
     #################################
     {
-      varpart.env.spatial.VEM = readRDS(paste0(data_folder,"/varpart_lda_environment-currents_bothDirectionsIndependentSelection_PCA0_abioticPCA_bioticPCA_eigenvalueThres0.8_noLagoon.rds"))[[1]]
+      varpart.env.spatial.VEM = readRDS(paste0(results_folder,"/varpart_lda_environment-currents_bothDirectionsIndependentSelection_PCA0_abioticPCA_bioticPCA_eigenvalueThres0.8_noLagoon.rds"))[[1]]
       
       plot.tot.var.Gibbs.vs.VEM = ggplot(data=data.frame(x=colSums(varpart.env.spatial.VEM)[selected_groups],y=colSums(varpart.env.spatial)[selected_groups])) +
         geom_point(aes(x,y)) +
@@ -12715,13 +12714,13 @@ if (environmental_data)
     ####################################
     {
     
-    varpart.groups.expTmin.globalSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.globalSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.globalSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.globalSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_globalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
-    varpart.groups.expTmin.bothDirGlobalSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.bothDirGlobalSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_bothDirectionsGlobalSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
     
-    varpart.groups.expTmin.indSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    varpart.groups.expTmin.indSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    varpart.groups.expTmin.indSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    varpart.groups.expTmin.indSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     
     varpart.groups.expTmin.globalSelec0 = varpart.groups.expTmin.globalSelec
     varpart.groups.expTmin.globalSelec0[varpart.groups.expTmin.globalSelec0<0] = 0
@@ -12730,10 +12729,10 @@ if (environmental_data)
     varpart.groups.expTmin.indSelec0 = varpart.groups.expTmin.indSelec
     varpart.groups.expTmin.indSelec0[varpart.groups.expTmin.indSelec0<0] = 0
     
-    significant_global_model_globalSelec = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    significant_global_model_bothDirGlobalSelec = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_bothDirectionsglobalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    # significant_global_model = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
-    significant_global_model = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    significant_global_model_globalSelec = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    significant_global_model_bothDirGlobalSelec = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_bothDirectionsglobalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    # significant_global_model = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_globalSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+    significant_global_model = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
     # significant_groups = vector(length = length(taxo_groups), mode = "logical")
     significant_global_model_indSelec = vector(length = length(taxo_groups), mode = "logical")
     for (i_taxon in 1:length(taxo_groups))
@@ -13213,7 +13212,7 @@ if (environmental_data)
     dev.off()
     
     ##################
-    dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     ten_colors = c("cadetblue",NA,"darkblue","dodgerblue1","darkgoldenrod1","firebrick2","darkgreen","chartreuse2","dodgerblue1","deeppink1")
     functions = c("copepoda","endophotosymbiont","gelatineous_carnivores_filterers","other metazoa","parasite","phagotroph","photohost","phototroph","pteropoda","unknown")
     
@@ -13509,7 +13508,7 @@ if (environmental_data)
     # Size plots                                          #
     #######################################################
     {
-      load(paste0(data_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+      load(paste0(results_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
       
       #############################
       # Ratio:
@@ -13654,7 +13653,7 @@ if (environmental_data)
     #############################
       # Raw fractions:  
       
-    load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+    load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
     
     varpart.groups.expTmin0 = varpart.groups
     varpart.groups.expTmin0[varpart.groups.expTmin0<0] = 0
@@ -14205,7 +14204,7 @@ if (environmental_data)
     dev.off()
     
     ##################
-    diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     plot.total.biotic.abiotic.vs.diversity = ggplot(data=data.frame(x=log10(as.vector(diversity)[selected_groups]),y=varpart.groups0[3,selected_groups]+varpart.groups0[2,selected_groups]+varpart.groups0[1,selected_groups])) +
       geom_point(aes(x,y)) +
@@ -14230,7 +14229,7 @@ if (environmental_data)
     #######################################################
     {
     
-    mean_sim = readRDS(paste0(data_folder,"/mean_sim_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    mean_sim = readRDS(paste0(results_folder,"/mean_sim_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     #################
     plot.currents.vs.stability = ggplot(data=data.frame(x=mean_sim[selected_groups & significant_global_model_indSelec],y=colSums(varpart.groups.expTmin.indSelec0[c(3,4,6,7),selected_groups & significant_global_model_indSelec]))) +
@@ -14521,7 +14520,7 @@ if (environmental_data)
     # Optimal K plots                                     #
     #######################################################
     {
-      prevalence.corrected_K = readRDS(paste0(data_folder,"/Prevalence-corrected.number.of.assemblages_all.SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))[[2]]
+      prevalence.corrected_K = readRDS(paste0(results_folder,"/Prevalence-corrected.number.of.assemblages_all.SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))[[2]]
       #############################
       # Ratio:
       div_threshold = 100
@@ -14701,8 +14700,8 @@ if (environmental_data)
     #######################################################
     {
     
-    prop_within_OTU_vect0 = readRDS(paste0(data_folder,"/Connectivity_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-    prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_expTmin_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    prop_within_OTU_vect0 = readRDS(paste0(results_folder,"/Connectivity_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+    prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_expTmin_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
     
     # "Pure biotic","Mixed biotic-abiotic","Mixed biotic-currents","Mixed biotic-abiotic-currents","Pure abiotic","Mixed abiotic-currents","Pure currents"
     
@@ -14923,7 +14922,7 @@ if (environmental_data)
     dev.off()
     
     ##################
-    dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     ten_colors = c("cadetblue",NA,"darkblue","dodgerblue1","darkgoldenrod1","firebrick2","darkgreen","chartreuse2","dodgerblue1","deeppink1")
     functions = c("copepoda","endophotosymbiont","gelatineous_carnivores_filterers","other metazoa","parasite","phagotroph","photohost","phototroph","pteropoda","unknown")
     
@@ -14946,14 +14945,13 @@ if (environmental_data)
     pdf(paste0("varpart.groups_cumulated.biotic.abiotic_vs_connectivity.t_minThres.1.5y_ggplot",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,"_functionColors_selected.pdf"))
     print(plot.total.biotic.abiotic.vs.connectivity)
     dev.off()
-    
     }
     
     #######################################################
     # Mean abundance plots                                #
     #######################################################
     {
-      relativeAbund = readRDS(paste0(data_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      relativeAbund = readRDS(paste0(results_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
       
       plot.pure.abiotic.vs.mean.abundance = ggplot(data=data.frame(x=log10(colMeans(relativeAbund,na.rm = T))[selected_groups & significant_global_model_indSelec],y=varpart.groups.expTmin.indSelec0[5,selected_groups & significant_global_model_indSelec])) +
         geom_point(aes(x,y)) +
@@ -15521,7 +15519,6 @@ if (environmental_data)
   
   if (abiotic_dissimilarity_all)
   {
-    setwd(figure_folder)
     library(ggplot2)
     library(gridExtra)
     
@@ -15532,7 +15529,7 @@ if (environmental_data)
       spl = split(plot.abiotic.dis[[k]][rda_available_groups[1:133]], (seq_along(plot.abiotic.dis[[k]][rda_available_groups[1:133]])-1) %/% 20)
       ppl = lapply(spl, function(g) marrangeGrob(grobs = g, nrow = 4, ncol = 5))
       # pdf("llh_vs_K_ggplot_errbar.pdf",height = 1.5*10, width = 1.5*10)
-      pdf(paste0("Sorensen_vs_",rownames(Mantel_out[[1]])[k],"_dissimilarity_all_selected_ggplot1.pdf"),height = 1.5*10, width = 1.5*10)
+      pdf(paste0(figure_folder,"/Sorensen_vs_",rownames(Mantel_out[[1]])[k],"_dissimilarity_all_selected_ggplot1.pdf"),height = 1.5*10, width = 1.5*10)
       print(ppl)
       dev.off()
     }
@@ -15542,9 +15539,9 @@ if (environmental_data)
     mantel.r2 = t(matrix(ncol = length(taxo_groups), nrow = ncol(abiotic_data_trans_taxon), dimnames = list(colnames(abiotic_data_trans_taxon), taxo_groups), data = unlist(mantelr2)))
     mantel.pval = t(matrix(ncol = length(taxo_groups), nrow = ncol(abiotic_data_trans_taxon), dimnames = list(colnames(abiotic_data_trans_taxon), taxo_groups), data = unlist(mantelpval)))
     
-    prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_2yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-    load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
-    dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_2yearTminProportion_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+    dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     # Defining colours for functional groups:
     ten_colors = c("cadetblue",NA,"darkblue","dodgerblue1","darkgoldenrod1","firebrick2","darkgreen","chartreuse2","dodgerblue1","deeppink1")
     
@@ -15603,7 +15600,7 @@ if (environmental_data)
     # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_stabilityColors_selected.pdf"))
     # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_diversityColors_morethan50OTUs.pdf"))
     # pdf(paste0("Mantel_R2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_sizeColors.pdf"))
-    pdf(paste0("Mantel_R2_vs_OTU_connectivity_ggplot",mantel_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_functionColors1.pdf"))
+    pdf(paste0(figure_folder,"/Mantel_R2_vs_OTU_connectivity_ggplot",mantel_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_functionColors1.pdf"))
     # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_optimalKColors_selected.pdf"))
     for (j in 1:(ncol(mantel.r2)+1))
       print(plot.mantel.r2_OTU.connectivity[[j]])
@@ -15664,11 +15661,11 @@ if (environmental_data)
       guides(colour = guide_colorbar(barwidth = 14, barheight = 0.7, title.position="bottom"))
     # guides(colour = guide_legend(title.position="bottom"))
     
-    # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_stabilityColors_selected.pdf"))
-    # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_diversityColors_morethan50OTUs.pdf"))
-    # pdf(paste0("Mantel_R2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_sizeColors.pdf"))
-    pdf(paste0("Mantel_R2_vs_OTU_connectivity_ggplot",mantel_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_pvalColors1.pdf"))
-    # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_optimalKColors_selected.pdf"))
+    # pdf(paste0(figure_folder,"/RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_stabilityColors_selected.pdf"))
+    # pdf(paste0(figure_folder,"/RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_diversityColors_morethan50OTUs.pdf"))
+    # pdf(paste0(figure_folder,"/Mantel_R2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_sizeColors.pdf"))
+    pdf(paste0(figure_folder,"/Mantel_R2_vs_OTU_connectivity_ggplot",mantel_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_pvalColors1.pdf"))
+    # pdf(paste0(figure_folder,"/RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_optimalKColors_selected.pdf"))
     for (j in 1:(ncol(mantel.r2)+1))
       print(plot.mantel.r2_OTU.connectivity[[j]])
     dev.off()
@@ -15728,11 +15725,11 @@ if (environmental_data)
       # guides(colour = guide_colorbar(barwidth = 14, barheight = 0.7, title.position="bottom"))
       guides(colour = guide_legend(title.position="bottom"))
     
-    # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_stabilityColors_selected.pdf"))
-    # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_diversityColors_morethan50OTUs.pdf"))
-    # pdf(paste0("Mantel_R2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_sizeColors.pdf"))
-    pdf(paste0("Mantel_slope_vs_OTU_connectivity_ggplot",mantel_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_functionColors1.pdf"))
-    # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_optimalKColors_selected.pdf"))
+    # pdf(paste0(figure_folder,"/RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_stabilityColors_selected.pdf"))
+    # pdf(paste0(figure_folder,"/RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_diversityColors_morethan50OTUs.pdf"))
+    # pdf(paste0(figure_folder,"/Mantel_R2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_sizeColors.pdf"))
+    pdf(paste0(figure_folder,"/Mantel_slope_vs_OTU_connectivity_ggplot",mantel_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_selected_functionColors1.pdf"))
+    # pdf(paste0(figure_folder,"/RDA_adjR2_vs_OTU_connectivity_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_optimalKColors_selected.pdf"))
     for (j in 1:(ncol(mantel.slope)+1))
       print(plot.mantel.slope_OTU.connectivity[[j]])
     dev.off()
@@ -15740,7 +15737,6 @@ if (environmental_data)
   
   if (abiotic_dissimilarity_all && (rda_all || rda_lda))
   {
-    setwd(figure_folder)
     library(ggplot2)
     library(gridExtra)
     
@@ -15750,7 +15746,7 @@ if (environmental_data)
     mantel.adjr2 = t(matrix(ncol = length(taxo_groups), nrow = ncol(abiotic_data_trans_taxon), dimnames = list(colnames(abiotic_data_trans_taxon), taxo_groups), data = unlist(mantelr2)))
     mantel.pval = t(matrix(ncol = length(taxo_groups), nrow = ncol(abiotic_data_trans_taxon), dimnames = list(colnames(abiotic_data_trans_taxon), taxo_groups), data = unlist(mantelpval)))
     
-    mean_sim = readRDS(paste0(data_folder,"/mean_sim_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    mean_sim = readRDS(paste0(results_folder,"/mean_sim_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     rda_available_groups = !(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh
     
@@ -15808,10 +15804,10 @@ if (environmental_data)
       # panel.grid.major = element_blank(), panel.grid.minor = element_blank())
       guides(colour = guide_colorbar(barwidth = 14, barheight = 0.7, title.position="bottom"))
     
-    pdf(paste0("Mantel_R2_vs_RDA_adjR2_ggplot",abiotic_pca_insert,"_",ncol(adjr2),"variables_stabilityColors_selected1.pdf"))
-    # pdf(paste0("Mantel_R2_vs_RDA_adjR2_ggplot",abiotic_pca_insert,"_",ncol(adjr2),"variables_diversityColors_morethan50OTUs.pdf"))
-    # pdf(paste0("Mantel_R2_vs_RDA_adjR2_ggplot",abiotic_pca_insert,"_",ncol(adjr2),"variables_sizeColors_selected.pdf"))
-    # pdf(paste0("Mantel_R2_vs_RDA_adjR2_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_optimalKColors_selected.pdf"))
+    pdf(paste0(figure_folder,"/Mantel_R2_vs_RDA_adjR2_ggplot",abiotic_pca_insert,"_",ncol(adjr2),"variables_stabilityColors_selected1.pdf"))
+    # pdf(paste0(figure_folder,"/Mantel_R2_vs_RDA_adjR2_ggplot",abiotic_pca_insert,"_",ncol(adjr2),"variables_diversityColors_morethan50OTUs.pdf"))
+    # pdf(paste0(figure_folder,"/Mantel_R2_vs_RDA_adjR2_ggplot",abiotic_pca_insert,"_",ncol(adjr2),"variables_sizeColors_selected.pdf"))
+    # pdf(paste0(figure_folder,"/Mantel_R2_vs_RDA_adjR2_ggplot",OTU_lda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_optimalKColors_selected.pdf"))
     for (j in 1:(ncol(adjr2)+1))
       print(plot.dis.vs.rda[[j]])
     dev.off()
@@ -15821,7 +15817,7 @@ if (environmental_data)
   {
     mean_OTU_abiotic_dispersion_mat = t(matrix(ncol = length(taxo_groups), nrow = 2*ncol(abiotic_data_trans_taxon)-1, dimnames = list(colnames(OTU_abiotic_dispersion_allOTUs[[1]]), taxo_groups), data = unlist(mean_OTU_abiotic_dispersion)))
     
-    dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     #rda_available_groups = !(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh
     # rda_available_groups = selected_groups
@@ -15834,7 +15830,7 @@ if (environmental_data)
     functions = c("copepoda","endophotosymbiont","gelatineous_carnivores_filterers","other metazoa","parasite","phagotroph","photohost","phototroph","pteropoda","unknown")
     
     ##############################################
-    load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+    load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
     
     # plot.margin=unit(c(7,1,1,0.5),"mm"))
     # height = 1.5*10/4, width = 1.5*10/4
@@ -15859,8 +15855,8 @@ if (environmental_data)
       #                      values = rescale(min(pval[rda_available_groups,j]),0.05,max(pval[rda_available_groups,j])), na.value="cyan", guide = "colourbar")
     }
     
-    # pdf(paste0("Mean_abiotic_dispersion_vs_size_ggplot_",ncol(mean_OTU_abiotic_dispersion_mat),"variables",abiotic_pca_insert,noArcticNoBiomark_insert,"_selected.pdf"))
-    pdf(paste0("Mean_abiotic_dispersion_vs_size_ggplot_",ncol(mean_OTU_abiotic_dispersion_mat),"variables",abiotic_pca_insert,noArcticNoBiomark_insert,".pdf"))
+    # pdf(paste0("figure_folder,"/Mean_abiotic_dispersion_vs_size_ggplot_",ncol(mean_OTU_abiotic_dispersion_mat),"variables",abiotic_pca_insert,noArcticNoBiomark_insert,"_selected.pdf"))
+    pdf(paste0(figure_folder,"/Mean_abiotic_dispersion_vs_size_ggplot_",ncol(mean_OTU_abiotic_dispersion_mat),"variables",abiotic_pca_insert,noArcticNoBiomark_insert,".pdf"))
     # for (j in 1:(ncol(adjr2)+1))
     for (j in 1:(ncol(mean_OTU_abiotic_dispersion_mat)))
       print(plot.OTU.abiotic.sd_size[[j]])
@@ -15890,7 +15886,7 @@ if (environmental_data)
     #     guides(colour = guide_legend(title.position="bottom"))
     # }
     # 
-    # # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_",travel_time_threshold,"yearTminProportion_ggplot",rda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_functionColors_selected1.pdf"))
+    # # pdf(paste0(figure_folder,"/RDA_adjR2_vs_OTU_connectivity_",travel_time_threshold,"yearTminProportion_ggplot",rda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_functionColors_selected1.pdf"))
     # pdf(paste0("RDA_adjR2_vs_OTU_connectivity_",particle_thres,"particlesThres_meanPerOTU_ggplot",rda_insert,abiotic_pca_insert,"_",ncol(adjr2),"variables_functionColors_selected1.pdf"))
     # # for (j in 1:(ncol(adjr2)+1))
     # for (j in 1:ncol(adjr2))
@@ -15921,7 +15917,7 @@ if (environmental_data)
       #                      values = rescale(min(pval[rda_available_groups,j]),0.05,max(pval[rda_available_groups,j])), na.value="cyan", guide = "colourbar")
     }
     
-    pdf(paste0("Mean_abiotic_dispersion_vs_adj_R2_RDA_LDA_ggplot_",ncol(mean_OTU_abiotic_dispersion_mat),"variables",abiotic_pca_insert,"_selected.pdf"))
+    pdf(paste0(figure_folder,"/Mean_abiotic_dispersion_vs_adj_R2_RDA_LDA_ggplot_",ncol(mean_OTU_abiotic_dispersion_mat),"variables",abiotic_pca_insert,"_selected.pdf"))
     # for (j in 1:(ncol(adjr2)+1))
     for (j in 1:(ncol(mean_OTU_abiotic_dispersion_mat)))
       print(plot.OTU.abiotic.sd_size[[j]])
@@ -15933,7 +15929,7 @@ if (environmental_data)
     mean_dissimilarity_within_OTU_mat = t(matrix(ncol = length(taxo_groups), nrow = 2*ncol(abiotic_data_trans_taxon)-1, dimnames = list(colnames(rownames_Mantel_out), taxo_groups), data = unlist(mean_dissimilarity_within_OTU)))
     
     ##############################################
-    load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+    load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
     
     # plot.margin=unit(c(7,1,1,0.5),"mm"))
     # height = 1.5*10/4, width = 1.5*10/4
@@ -15956,7 +15952,7 @@ if (environmental_data)
       #                      values = rescale(min(pval[rda_available_groups,j]),0.05,max(pval[rda_available_groups,j])), na.value="cyan", guide = "colourbar")
     }
     
-    pdf(paste0("Mean_abiotic_dissimilarity_vs_size_ggplot_",ncol(mean_OTU_abiotic_dissimilarity_mat),"variables",abiotic_pca_insert,"_selected.pdf"))
+    pdf(paste0(figure_folder,"/Mean_abiotic_dissimilarity_vs_size_ggplot_",ncol(mean_OTU_abiotic_dissimilarity_mat),"variables",abiotic_pca_insert,"_selected.pdf"))
     # for (j in 1:(ncol(adjr2)+1))
     for (j in 1:(ncol(mean_dissimilarity_within_OTU_mat)))
       print(plot.OTU.abiotic.dissimilarity_size[[j]])
@@ -16065,13 +16061,13 @@ if (environmental_data)
       # dev.off()
       
       # pdf(paste0("Explained_variance_PCA_relative_abundance_",nrow(relativeAbund_PCA$co),"variables_noStdzation.pdf"))
-      pdf(paste0("Explained_variance_PCA_relative_abundance_",nrow(relativeAbund_PCA0$co),"variables",stdzation_insert,".pdf"))
+      pdf(paste0(figure_folder,"/Explained_variance_PCA_relative_abundance_",nrow(relativeAbund_PCA0$co),"variables",stdzation_insert,".pdf"))
       par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
       plot(relativeAbund_PCA0$eig/sum(relativeAbund_PCA0$eig),ylab="Proportion of variance",xlab="PCA axis")
       abline(h = 1/nrow(relativeAbund_PCA$co), lty = 2)
       dev.off()
       
-      pdf(paste0("Explained_variance_PCA_relative_abundance_",nrow(relativeAbund_PCA0$co),"variables",stdzation_insert,"_barplot.pdf"))
+      pdf(paste0(figure_folder,"/Explained_variance_PCA_relative_abundance_",nrow(relativeAbund_PCA0$co),"variables",stdzation_insert,"_barplot.pdf"))
       par(cex.lab=1.5,cex.main=1.7,cex.axis=2,lwd=2)
       barplot(relativeAbund_PCA0$eig/sum(relativeAbund_PCA0$eig),ylab="",xlab="",col="black")
       abline(h = 1/nrow(relativeAbund_PCA0$co), lty = 2)
@@ -16084,26 +16080,26 @@ if (environmental_data)
       # dev.off()
       
       # pdf(paste0("Explained_variance_PCA_functions_relativeAbund_selected_",nrow(functions_relativeAbund_selected_PCA$co),"variables_noStdzation.pdf"))
-      pdf(paste0("Explained_variance_PCA_functions_relativeAbund_selected_",nrow(functions_relativeAbund_selected_PCA0$co),"variables",stdzation_insert,".pdf"))
+      pdf(paste0(figure_folder,"/Explained_variance_PCA_functions_relativeAbund_selected_",nrow(functions_relativeAbund_selected_PCA0$co),"variables",stdzation_insert,".pdf"))
       par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
       plot(functions_relativeAbund_selected_PCA0$eig/sum(functions_relativeAbund_selected_PCA0$eig),ylab="Proportion of variance",xlab="PCA axis")
       abline(h = 1/nrow(functions_relativeAbund_selected_PCA0$co), lty = 2)
       dev.off()
       
-      pdf(paste0("Explained_variance_PCA_functions_relativeAbund_",nrow(functions_relativeAbund_PCA0$co),"variables",stdzation_insert,".pdf"))
+      pdf(paste0(figure_folder,"/Explained_variance_PCA_functions_relativeAbund_",nrow(functions_relativeAbund_PCA0$co),"variables",stdzation_insert,".pdf"))
       par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
       plot(functions_relativeAbund_PCA0$eig/sum(functions_relativeAbund_PCA0$eig),ylab="Proportion of variance",xlab="PCA axis")
       abline(h = 1/nrow(functions_relativeAbund_PCA0$co), lty = 2)
       dev.off()
     }
     
-    pdf(paste0("expTmin_distance_PCoA_positive_eigenvalues.pdf"))
+    pdf(paste0(figure_folder,"/expTmin_distance_PCoA_positive_eigenvalues.pdf"))
     par(cex.lab=1.5,cex.main=1.7,cex.axis=1.5,lwd=2)
     plot(expTmin_distance_pcoa$values$Eigenvalues[1:61],ylab="Eigenvalue",xlab="Eigenvector")
     abline(h = 1, lty = 2)
     dev.off()
     
-    pdf(paste0("expTmin_distance_PCoA_positive_eigenvalues_barplot.pdf"))
+    pdf(paste0(figure_folder,"/expTmin_distance_PCoA_positive_eigenvalues_barplot.pdf"))
     par(cex.lab=1.5,cex.main=1.7,cex.axis=2,lwd=2,bty = "o")
     barplot(expTmin_distance_pcoa$values$Eigenvalues[1:61]/sum(expTmin_distance_pcoa$values$Eigenvalues[1:61]),ylab="", col = "black")
     dev.off()
@@ -16137,7 +16133,7 @@ if (environmental_data)
       # dev.off()
       
       # pdf(paste0("relative_abundance_PCA_axes_",nrow(relativeAbund_PCA$co),"variables_noStdzation.pdf"))
-      pdf(paste0("relative_abundance_PCA_axes_",nrow(relativeAbund_PCA0$co),"variables",stdzation_insert,".pdf"))
+      pdf(paste0(figure_folder,"/relative_abundance_PCA_axes_",nrow(relativeAbund_PCA0$co),"variables",stdzation_insert,".pdf"))
       # pdf(paste0("read_abundance_PCA_axes_",length(which(read_abundance_PCA$eig>1)),"variables_weights.pdf"))
       #bottom left top right
       #par(mar=c(5.1,4.1,4.1,2.1)
@@ -16165,7 +16161,7 @@ if (environmental_data)
       dev.off()
       
       # pdf(paste0("functions_relativeAbund_PCA_axes_",nrow(functions_relativeAbund_selected_PCA$co),"variables_noStdzation.pdf"))
-      pdf(paste0("functions_relativeAbund_PCA_axes_",nrow(functions_relativeAbund_PCA0$co),"variables",stdzation_insert,".pdf"))
+      pdf(paste0(figure_folder,"/functions_relativeAbund_PCA_axes_",nrow(functions_relativeAbund_PCA0$co),"variables",stdzation_insert,".pdf"))
       # pdf(paste0("read_abundance_PCA_axes_",length(which(read_abundance_PCA$eig>1)),"variables_weights.pdf"))
       #bottom left top right
       #par(mar=c(5.1,4.1,4.1,2.1)
@@ -16193,7 +16189,7 @@ if (environmental_data)
     if (abiotic_pca)
     {
       # c("Marine.biome","Ocean.region","Biogeographical.province")
-      pdf(paste0("abiotic_PCA_geographic_classes_",ncol(abiotic_data_trans),"variables_axes1-2.pdf"))
+      pdf(paste0(figure_folder,"/abiotic_PCA_geographic_classes_",ncol(abiotic_data_trans),"variables_axes1-2.pdf"))
       for (k in 1:4)
       {
         colors = rainbow_hcl(length(levels(as.factor(geographic_classes[!stations_to_remove,k]))))
@@ -16204,7 +16200,7 @@ if (environmental_data)
       }
       dev.off()
       
-      pdf(paste0("abiotic_PCA_geographic_classes_",ncol(abiotic_data_trans),"variables_axes1-3.pdf"))
+      pdf(paste0(figure_folder,"/abiotic_PCA_geographic_classes_",ncol(abiotic_data_trans),"variables_axes1-3.pdf"))
       for (k in 1:4)
       {
         colors = rainbow_hcl(length(levels(as.factor(geographic_classes[!stations_to_remove,k]))))
@@ -16215,7 +16211,7 @@ if (environmental_data)
       }
       dev.off()
       
-      pdf(paste0("abiotic_PCA_geographic_classes_",ncol(abiotic_data_trans),"variables_axes2-3.pdf"))
+      pdf(paste0(figure_folder,"/abiotic_PCA_geographic_classes_",ncol(abiotic_data_trans),"variables_axes2-3.pdf"))
       for (k in 1:4)
       {
         colors = rainbow_hcl(length(levels(as.factor(geographic_classes[!stations_to_remove,k]))))
@@ -16226,12 +16222,12 @@ if (environmental_data)
       }
       dev.off()
       
-      pdf(paste0("abiotic_PCA_corcircle_",ncol(abiotic_data_trans),"variables.pdf"))
+      pdf(paste0(figure_folder,"/abiotic_PCA_corcircle_",ncol(abiotic_data_trans),"variables.pdf"))
       #par(mar = c(2.1, 2.1, 2.1, 1.1))
       s.corcircle(abiotic_PCA$co, full = F, box = TRUE)
       dev.off()
       
-      pdf(paste0("abiotic_PCA_geographic_classes_corcircle_",ncol(abiotic_data_trans),"variables.pdf"),width=2*6,height=6)
+      pdf(paste0(figure_folder,"/abiotic_PCA_geographic_classes_corcircle_",ncol(abiotic_data_trans),"variables.pdf"),width=2*6,height=6)
       for (k in 1:4)
       {
         colors = rainbow_hcl(length(levels(as.factor(geographic_classes[!stations_to_remove,k]))))
@@ -16258,7 +16254,7 @@ if (environmental_data)
       # }
       # dev.off()
       
-      pdf(paste0("abiotic_PCA_scatter_",ncol(abiotic_data_trans),"variables.pdf"))
+      pdf(paste0(figure_folder,"/abiotic_PCA_scatter_",ncol(abiotic_data_trans),"variables.pdf"))
       scatter(abiotic_PCA,clabel=NULL)
       dev.off()
       
@@ -16279,7 +16275,7 @@ if (environmental_data)
     
     if (biotic_pca)
     {
-      pdf(paste0("read_abundance_PCA_geographic_classes_corcircle_",ncol(read_abundance_PCA$li),"variables.pdf"),width=2*6,height=6)
+      pdf(paste0(figure_folder,"/read_abundance_PCA_geographic_classes_corcircle_",ncol(read_abundance_PCA$li),"variables.pdf"),width=2*6,height=6)
       for (k in 1:4)
       {
         colors = rainbow_hcl(length(levels(as.factor(geographic_classes[,k]))))
@@ -16291,19 +16287,19 @@ if (environmental_data)
       }
       dev.off()
       
-      pdf(paste0("read_abundance_PCA_scatter_",ncol(read_abundance_PCA$li),"variables.pdf"))
+      pdf(paste0(figure_folder,"/read_abundance_PCA_scatter_",ncol(read_abundance_PCA$li),"variables.pdf"))
       scatter(read_abundance_PCA,clabel=NULL)
       dev.off()
       
-      pdf(paste0("read_abundance_PCA_corcircle_",ncol(read_abundance_PCA$li),"variables.pdf"))
+      pdf(paste0(figure_folder,"/read_abundance_PCA_corcircle_",ncol(read_abundance_PCA$li),"variables.pdf"))
       #par(mar = c(2.1, 2.1, 2.1, 1.1))
       s.corcircle(read_abundance_PCA$co, full = F, box = TRUE)
       dev.off()
     }
     
-    mean_sim = readRDS(paste0(data_folder,"/mean_sim_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    mean_sim = readRDS(paste0(results_folder,"/mean_sim_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
-    pdf(paste0("abiotic_PCA_geographic_classes_",ncol(abiotic_data_trans),"variables_taxoGroups_selected.pdf"))
+    pdf(paste0(figure_folder,"/abiotic_PCA_geographic_classes_",ncol(abiotic_data_trans),"variables_taxoGroups_selected.pdf"))
     for (taxon in c("AllTaxa",taxo_groups[selected_groups]))
     {
       i_taxon = ifelse(taxon != "AllTaxa", which(taxo_groups == taxon), length(taxo_groups)+1)
@@ -16456,9 +16452,8 @@ if (environmental_data)
           guides(colour = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
       }
       
-      setwd(figure_folder)
       # pdf("Abiotic_maps_all.pdf")
-      pdf(paste0("PCA_axes_maps_",ncol(abiotic_PCA$li),"axes_noweights.pdf"))
+      pdf(paste0(figure_folder,"/PCA_axes_maps_",ncol(abiotic_PCA$li),"axes_noweights.pdf"))
       for (k in 1:ncol(abiotic_PCA$li))
         print(tmp.plot[[k]])
       dev.off()
@@ -16550,10 +16545,9 @@ if (environmental_data)
           guides(colour = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
       }
       
-      setwd(figure_folder)
       # pdf("Abiotic_maps_all.pdf")
       # pdf(paste0("Functions_PCA_axes_maps_",ncol(functions_relativeAbund_PCA$li),"axes_noStdzation.pdf"))
-      pdf(paste0("Functions_PCA_axes_maps_",ncol(functions_relativeAbund_PCA0$li),"axes",stdzation_insert,".pdf"))
+      pdf(paste0(figure_folder,"/Functions_PCA_axes_maps_",ncol(functions_relativeAbund_PCA0$li),"axes",stdzation_insert,".pdf"))
       for (k in 1:ncol(functions_relativeAbund_PCA0$li))
         print(tmp.plot[[k]])
       dev.off()
@@ -16641,10 +16635,9 @@ if (environmental_data)
           guides(colour = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
       }
       
-      setwd(figure_folder)
       # pdf("Abiotic_maps_all.pdf")
       # pdf(paste0("Taxonomic_groups_relativeAbund_PCA_axes_maps_",ncol(relativeAbund_PCA$li),"axes_noStdzation.pdf"))
-      pdf(paste0("Taxonomic_groups_relativeAbund_PCA_axes_maps_",ncol(relativeAbund_PCA0$li),"axes",stdzation_insert,".pdf"))
+      pdf(paste0(figure_folder,"/Taxonomic_groups_relativeAbund_PCA_axes_maps_",ncol(relativeAbund_PCA0$li),"axes",stdzation_insert,".pdf"))
       for (k in 1:ncol(relativeAbund_PCA0$li))
         print(tmp.plot[[k]])
       dev.off()
@@ -16745,9 +16738,8 @@ if (environmental_data)
     # print(test.pie)
     # dev.off()
     
-    setwd(figure_folder)
     # pdf("Abiotic_maps_all.pdf")
-    pdf(paste0("Abiotic_maps_",ncol(abiotic_data),"variables.pdf"))
+    pdf(paste0(figure_folder,"/Abiotic_maps_",ncol(abiotic_data),"variables.pdf"))
     for (k in 1:ncol(abiotic_data))
       print(tmp.plot[[k]])
     dev.off()
@@ -16847,9 +16839,8 @@ if (environmental_data)
         guides(colour = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
     }
     
-    setwd(figure_folder)
     # pdf("Abiotic_maps_all.pdf")
-    pdf(paste0("functions_relativeAbund_selectedGroups_maps_",ncol(functions_relativeAbund_selected),"variables.pdf"))
+    pdf(paste0(figure_folder,"/functions_relativeAbund_selectedGroups_maps_",ncol(functions_relativeAbund_selected),"variables.pdf"))
     for (k in 1:ncol(functions_relativeAbund_selected))
       print(tmp.plot[[k]])
     dev.off()
@@ -16949,9 +16940,8 @@ if (environmental_data)
         guides(colour = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
     }
     
-    setwd(figure_folder)
     # pdf("Abiotic_maps_all.pdf")
-    pdf(paste0("relativeAbund_selected_maps_",ncol(relativeAbund[,selected_groups]),"variables.pdf"))
+    pdf(paste0(figure_folder,"/relativeAbund_selected_maps_",ncol(relativeAbund[,selected_groups]),"variables.pdf"))
     for (k in 1:ncol(relativeAbund[,selected_groups]))
       print(tmp.plot[[k]])
     dev.off()
@@ -16959,7 +16949,7 @@ if (environmental_data)
     ####################################################
     library(scales)
     
-    pdf(paste0("biplot_expTmin_distance",noArcticNoBiomark_insert,noLagoon_insert,".pdf"))
+    pdf(paste0(figure_folder,"/biplot_expTmin_distance",noArcticNoBiomark_insert,noLagoon_insert,".pdf"))
     biplot(expTmin_distance_pcoa)
     dev.off()
     
@@ -17054,9 +17044,8 @@ if (environmental_data)
     #     guides(colour = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
     # }
     
-    setwd(figure_folder)
     # pdf("Abiotic_maps_all.pdf")
-    pdf(paste0("expTmin_distance_positiveEigenvalues_maps.pdf"))
+    pdf(paste0(figure_folder,"/expTmin_distance_positiveEigenvalues_maps.pdf"))
     for (k in 1:ncol(expTmin_distance_pcoa$vectors))
       print(tmp.plot[[k]])
     dev.off()
@@ -17163,7 +17152,7 @@ if (environmental_data)
     
     ######################
     # Plotting the eigenvectors of the mixed layer distance matrix, for Surface stations:
-    pdf(paste0("MixedLayer_distance_positiveEigenvalues_marmaps_SUR.pdf"))
+    pdf(paste0(figure_folder,"/MixedLayer_distance_positiveEigenvalues_marmaps_SUR.pdf"))
     for (k in 1:ncol(SUR_DCM_distance_pcoa$vectors))
     {
       # Plotting Surface:
@@ -17176,7 +17165,7 @@ if (environmental_data)
     dev.off()
     
     # Plotting the eigenvectors of the mixed layer distance matrix, for DCM stations:
-    pdf(paste0("MixedLayer_distance_positiveEigenvalues_marmaps_DCM.pdf"))
+    pdf(paste0(figure_folder,"/MixedLayer_distance_positiveEigenvalues_marmaps_DCM.pdf"))
     for (k in 1:ncol(SUR_DCM_distance_pcoa$vectors))
     {
       # Plotting Surface:
@@ -17335,9 +17324,8 @@ if (environmental_data)
         guides(colour = guide_colorbar(barwidth = 8, barheight = 0.4, title.position="bottom"))
     }
     
-    setwd(figure_folder)
     # pdf("Abiotic_maps_all.pdf")
-    pdf(paste0("expTmin_distance_nmds_2dimensions_maps.pdf"))
+    pdf(paste0(figure_folder,"/expTmin_distance_nmds_2dimensions_maps.pdf"))
     for (k in 1:ncol(expTmin_distance_nmds$points))
       print(tmp.plot[[k]])
     dev.off()
@@ -17368,12 +17356,12 @@ if (alltaxa_assemblage_composition)
     assemblage_composition = readRDS(paste0(data.folder,"/Rtopicmodels_LDA_Gibbs_alpha0.1_delta0.1_nb_topics",K,"_nb_iter",nb_iter,"_nb_real",nb_real,"_meanPosteriorDistributedLlh_thin",thin,"_burnin",burnin,"_occurrence/1st_closestToMean_realization/assemblage_composition.rds"))
   }
   
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   taxo_groups_unmodified = levels(as.factor(assemblage_composition$taxogroup2))[sort.int(table(as.factor(assemblage_composition$taxogroup2)),index.return = T,decreasing = T)$ix]
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   # functions = levels(as.factor(assemblage_composition$Function))[sort.int(table(as.factor(assemblage_composition$Function)),index.return = T,decreasing = T)$ix]
   functions = c("phototroph","photohost","endophotosymbiont","phagotroph","copepoda","pteropoda","gelatineous_carnivores_filterers","other metazoa","parasite","unknown")
-  # selected_groups = readRDS(paste0(data_folder,"/selected_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # selected_groups = readRDS(paste0(results_folder,"/selected_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   selected_groups = !(taxo_groups %in% groups_to_remove) & diversity>100
   # selected_functions = !functions %in% c("pteropoda","endophotosymbiont","unknown")
 
@@ -17592,7 +17580,7 @@ if (alltaxa_assemblage_composition)
   }
   function_colors = c("darkgreen","chartreuse2","orange","firebrick2","cadetblue","darkblue","darkturquoise","dodgerblue1","darkgoldenrod1","grey")
   
-  # dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   # # dominant_function_simplified  = dominant_function
   # # dominant_function_simplified[dominant_function == "copepoda" & "other metazoa" & "pteropoda"] = "Metazoa"
   # functions = c("copepoda","endophotosymbiont","gelatineous_carnivores_filterers","other metazoa","parasite","phagotroph","photohost","phototroph","pteropoda","unknown")
@@ -18225,12 +18213,12 @@ if (alltaxa_biogeographic_clustering)
     # assemblage_composition = readRDS(paste0(data.folder,"/Rtopicmodels_LDA_Gibbs_alpha0.1_delta0.1_nb_topics",K,"_nb_iter",nb_iter,"_nb_real",nb_real,"_meanPosteriorDistributedLlh_thin",thin,"_burnin",burnin,"_occurrence/1st_closestToMean_realization/assemblage_composition.rds"))
   }
   
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   # taxo_groups_unmodified = levels(as.factor(assemblage_composition$taxogroup2))[sort.int(table(as.factor(assemblage_composition$taxogroup2)),index.return = T,decreasing = T)$ix]
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   # functions = levels(as.factor(assemblage_composition$Function))[sort.int(table(as.factor(assemblage_composition$Function)),index.return = T,decreasing = T)$ix]
   functions = c("phototroph","photohost","endophotosymbiont","phagotroph","copepoda","pteropoda","gelatineous_carnivores_filterers","other metazoa","parasite","unknown")
-  # selected_groups = readRDS(paste0(data_folder,"/selected_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # selected_groups = readRDS(paste0(results_folder,"/selected_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   selected_groups = !(taxo_groups %in% groups_to_remove) & diversity>100
   
   spatial_topicmix_kriged = readRDS(paste0(data.folder,"/Rtopicmodels_LDA_Gibbs_alpha0.1_delta0.1_nb_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_meanPosteriorDistributedLlh_thin",thin,"_burnin",burnin,"_occurrence/1st_closestToMean_realization/Spatial_topicmix_kriged.rds"))
@@ -18696,15 +18684,15 @@ if (assemblage_maps)
   library(ggimage)
   library(marmap)
   
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100
   
-  optimalK_min.crossValid = readRDS(paste0(data_folder,"/optimalK_min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
-  optimalK_prevalence.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+  optimalK_min.crossValid = readRDS(paste0(results_folder,"/optimalK_min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
+  optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
   optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
   optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]] 
-  optimalK_prevalenceSUR.DCM.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalenceSUR-DCM.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+  optimalK_prevalenceSUR.DCM.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalenceSUR-DCM.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
   optimalK_prevalenceSUR.DCM.min.crossValid.allTaxa = optimalK_prevalenceSUR.DCM.min.crossValid.complete[[1]]
   optimalK_prevalenceSUR.DCM.min.crossValid = optimalK_prevalenceSUR.DCM.min.crossValid.complete[[2]]
   
@@ -18747,7 +18735,7 @@ if (assemblage_maps)
   # group = "Dinophyceae"
   # group = "Bolidophyceae"
   
-  pie_positions.SUR = read.table(data_folder,"/Surf_pies_modified.txt",sep=",",header=F)
+  pie_positions.SUR = read.table(results_folder,"/Surf_pies_modified.txt",sep=",",header=F)
   # pie_positions.SUR[c(55,57) - 1,] = pie_positions.SUR[c(57,55) - 1,]
   pie_positions.SUR[55:57 - 1,] = pie_positions.SUR[c(56,57,55) - 1,]
   pie_positions.SUR[56 - 1,] = pie_positions.SUR[56 - 1,] + c(1.5,0)
@@ -18755,7 +18743,7 @@ if (assemblage_maps)
   pie_positions.SUR[51 - 1,] = pie_positions.SUR[51 - 1,] + c(-2,3)
   rownames(pie_positions.SUR) = rownames(coord[stations_depths[,2] == "SUR",])[-44]
   
-  pie_positions.DCM = read.table(data_folder,"/DCM_pies_modified.txt",sep=",",header=F)
+  pie_positions.DCM = read.table(results_folder,"/DCM_pies_modified.txt",sep=",",header=F)
   rownames(pie_positions.DCM) = rownames(coord[stations_depths[,2] == "DCM",])
   
   # File transfer from cluster:
@@ -19406,21 +19394,21 @@ if (assemblage_maps)
 
 if (Sur_DCM_comparison)
 {
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   nb_iter = 1000 
   thin = 25
   burnin = 2000
   fold_size = 10
-  # optimalK_min.crossValid = readRDS(paste0(data_folder,"/optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds2-35t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs_noLagoon.rds"))[,1]
-  optimalK_prevalence.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+  # optimalK_min.crossValid = readRDS(paste0(results_folder,"/optimalK_min.crossValid_Gibbs",fold_size,"sampleFolds2-35t_iter",nb_iter,"thin",thin,"burnin",burnin,"_2plusOTUs_noLagoon.rds"))[,1]
+  optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
   optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
   optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]] 
   selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100
-  # optimalK = readRDS(paste0(data_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  # selected_groups = readRDS(paste0(data_folder,"/selected_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  # diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # optimalK = readRDS(paste0(results_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # selected_groups = readRDS(paste0(results_folder,"/selected_groups_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
   VI = rep(NA,length(taxo_groups))
   # H_SUR_plus_H_DCM = rep(NA,length(taxo_groups))
@@ -19507,17 +19495,17 @@ if (Sur_DCM_comparison)
   ###############
   # setwd(data_folder)
   
-  saveRDS(VI_over_K,file=paste0(data_folder,"/VI.over.K_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-  saveRDS(Normalized_VI,file=paste0(data_folder,"/Normalized.VI_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-  saveRDS(VI,file=paste0(data_folder,"/VI_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  saveRDS(VI_over_K,file=paste0(results_folder,"/VI.over.K_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  saveRDS(Normalized_VI,file=paste0(results_folder,"/Normalized.VI_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  saveRDS(VI,file=paste0(results_folder,"/VI_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
   
-  significant_global_model = readRDS(paste0(data_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+  significant_global_model = readRDS(paste0(results_folder,"/RDA_abiotic_relativeAbund_expTmin_envSelected_significantGlobalModel_nbSites_independentSelection",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
   significant_global_model_indSelec = vector(length = length(taxo_groups), mode = "logical")
   for (i_taxon in 1:length(taxo_groups))
     significant_global_model_indSelec[i_taxon] = all(significant_global_model[[i_taxon]])
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
-  varpart.groups.expTmin.indSelec = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-  varpart.groups.expTmin.indSelec.pval = readRDS(paste0(data_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
+  varpart.groups.expTmin.indSelec = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+  varpart.groups.expTmin.indSelec.pval = readRDS(paste0(results_folder,"/varpart_lda_abiotic_vs_taxoGroups_vs_expTmin_independentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[2]]
   varpart.groups.expTmin.indSelec0 = varpart.groups.expTmin.indSelec
   varpart.groups.expTmin.indSelec0[varpart.groups.expTmin.indSelec0<0] = 0
   
@@ -19637,7 +19625,7 @@ if (Sur_DCM_comparison)
   
   div_threshold = 100
   
-  dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   dominant_function0 = dominant_function[selected_groups & diversity>div_threshold]
   # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
   # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
@@ -19698,8 +19686,8 @@ if (MEM_structure)
   library(ape)
   library(ggplot2)
   library(gridExtra)
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100
   
   nb_increment = 20
@@ -20086,7 +20074,7 @@ if (MEM_structure)
   if (charac.tmin)
   {
     # saveRDS(charac_tmin.SUR_scale,
-    #         paste0(data_folder,"/MEM.charac.tmin.scale_SUR.rds"))
+    #         paste0(results_folder,"/MEM.charac.tmin.scale_SUR.rds"))
     
     spl = split(Moran.step.tmin.w.spline[!is.na(Moran.step.tmin.w.spline)], 
                 (seq_along(Moran.step.tmin.w.spline[!is.na(Moran.step.tmin.w.spline)])-1) %/% 20)
@@ -20097,7 +20085,7 @@ if (MEM_structure)
   } else if (charac.dist)
   { 
     # saveRDS(charac_dist.SUR_scale,
-    #         paste0(data_folder,"/MEM.charac.dist.scale_SUR.rds"))
+    #         paste0(results_folder,"/MEM.charac.dist.scale_SUR.rds"))
     
     spl = split(Moran.step.dist.w.spline[!is.na(Moran.step.dist.w.spline)], 
                 (seq_along(Moran.step.dist.w.spline[!is.na(Moran.step.dist.w.spline)])-1) %/% 20)
@@ -20146,10 +20134,10 @@ if (spatial_structure)
   library(vegan)
   library(splines)
   library(moments)
-  taxo_groups = readRDS(paste0(data_folder,"/",short_marker,"taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  diversity = readRDS(paste0(data_folder,"/",short_marker,"diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  tot_reads = readRDS(paste0(data_folder,"/Total.read.numbers.rds"))
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+  taxo_groups = readRDS(paste0(results_folder,"/",short_marker,"taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/",short_marker,"diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  tot_reads = readRDS(paste0(results_folder,"/Total.read.numbers.rds"))
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
   if (data_Federico)
   {
     selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100
@@ -20159,24 +20147,24 @@ if (spatial_structure)
   } else if (data_psbO)
     selected_groups = 1:6
   if (!is.null(raref))
-    tot_reads = readRDS(paste0(data_folder,"/Total.read.numbers.rds"))
+    tot_reads = readRDS(paste0(results_folder,"/Total.read.numbers.rds"))
   
   if (data_Federico)
   {
     if (is.null(raref))
     {
-      optimalK_min.crossValid = readRDS(paste0(data_folder,"/optimalK_min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
-      optimalK_prevalence.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+      optimalK_min.crossValid = readRDS(paste0(results_folder,"/optimalK_min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
+      optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
       optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
       optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]] 
-      optimalK_prevalenceSUR.DCM.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalenceSUR-DCM.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+      optimalK_prevalenceSUR.DCM.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalenceSUR-DCM.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
       optimalK_prevalenceSUR.DCM.min.crossValid.allTaxa = optimalK_prevalenceSUR.DCM.min.crossValid.complete[[1]]
       optimalK_prevalenceSUR.DCM.min.crossValid = optimalK_prevalenceSUR.DCM.min.crossValid.complete[[2]]
       
-      optimalK_sd.max.llh = readRDS(paste0(data_folder,"/optimalK_sd.max.llh_Gibbs100r2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
+      optimalK_sd.max.llh = readRDS(paste0(results_folder,"/optimalK_sd.max.llh_Gibbs100r2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))[,1]
     } else 
     {
-      optimalK_prevalence.min.crossValid = readRDS(paste0(data_folder,"/",
+      optimalK_prevalence.min.crossValid = readRDS(paste0(results_folder,"/",
                                                           if (raref == "random.group.div") raref
                                                           else paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)], collapse=""),
                                                           if (!is.null(reals)) paste0(".1-",reals) else "",
@@ -20184,7 +20172,7 @@ if (spatial_structure)
     }
   } else
   {
-    optimalK_prevalence.min.crossValid = readRDS(paste0(data_folder,"/",short_marker,"optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds"))
+    optimalK_prevalence.min.crossValid = readRDS(paste0(results_folder,"/",short_marker,"optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds"))
   }
   
   geographic_distances = read.table(paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone/Geographic_distances.csv"),sep="\t",header=T,row.names=1)
@@ -21788,13 +21776,13 @@ if (spatial_structure)
     if (data_Federico)
     {
       if (V4_stations || psbO_stations)
-        saveRDS(lat_I_sym,paste0(data_folder,"/Lat_I",station_insert,"_sigma2.",sigma2,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+        saveRDS(lat_I_sym,paste0(results_folder,"/Lat_I",station_insert,"_sigma2.",sigma2,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
       else
-      # saveRDS(list(lat_JSD,lat_JSD.allTaxa),paste0(data_folder,"/Lat_JSD_sigma2.",sigma2,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-        # saveRDS(list(lat_I_sym,lat_I_sym.allTaxa),paste0(data_folder,"/Lat_I_sigma2.",sigma2,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-        saveRDS(list(lat_I_sym,lat_I_sym.allTaxa),paste0(data_folder,"/random.group.div_lat_I_sigma2.",sigma2,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      # saveRDS(list(lat_JSD,lat_JSD.allTaxa),paste0(results_folder,"/Lat_JSD_sigma2.",sigma2,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+        # saveRDS(list(lat_I_sym,lat_I_sym.allTaxa),paste0(results_folder,"/Lat_I_sigma2.",sigma2,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+        saveRDS(list(lat_I_sym,lat_I_sym.allTaxa),paste0(results_folder,"/random.group.div_lat_I_sigma2.",sigma2,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     } else
-      saveRDS(lat_I_sym,paste0(data_folder,"/",short_marker,"lat_I_sigma2.",sigma2,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      saveRDS(lat_I_sym,paste0(results_folder,"/",short_marker,"lat_I_sigma2.",sigma2,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
     #############################
     # Assemblage number across latitudinal ranges:
@@ -21894,7 +21882,7 @@ if (spatial_structure)
     ################
     div_threshold = 100
     
-    dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     dominant_function0 = dominant_function[selected_groups & diversity>div_threshold]
     # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
     # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
@@ -22066,12 +22054,12 @@ if (spatial_structure)
     if (data_Federico)
     {
       if (V4_stations || psbO_stations)
-        saveRDS(basin_I_within,paste0(data_folder,"/Basin_I",station_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+        saveRDS(basin_I_within,paste0(results_folder,"/Basin_I",station_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
       else
-        # saveRDS(list(basin_I_within,basin_I_within.allTaxa),paste0(data_folder,"/Basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-        saveRDS(list(basin_I_within,basin_I_within.allTaxa),paste0(data_folder,"/random.group.div_basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+        # saveRDS(list(basin_I_within,basin_I_within.allTaxa),paste0(results_folder,"/Basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+        saveRDS(list(basin_I_within,basin_I_within.allTaxa),paste0(results_folder,"/random.group.div_basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     } else
-      saveRDS(basin_I_within,paste0(data_folder,"/",short_marker,"basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+      saveRDS(basin_I_within,paste0(results_folder,"/",short_marker,"basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
       
     # col.vect = rep("black",length(which(selected_groups)))
     # col.vect[Lat_pval[selected_groups,1] > 0.05 | is.na(Lat_pval[selected_groups,1])] = "red"
@@ -22110,9 +22098,9 @@ if (spatial_structure)
   {
     saveRDS(list(list(JSD.allTaxa, coord_JSD.allTaxa),
                  list(JSD, coord_JSD)),
-            file=paste0(data_folder,"/JSD_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+            file=paste0(results_folder,"/JSD_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     
-    JSD_object = readRDS(paste0(data_folder,"/JSD_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    JSD_object = readRDS(paste0(results_folder,"/JSD_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     JSD.allTaxa = JSD_object[[1]][[1]]
     coord_JSD.allTaxa = JSD_object[[1]][[2]]
     JSD = JSD_object[[2]][[1]]
@@ -22229,11 +22217,11 @@ if (spatial_structure)
   
   if (Shannon_Simpson)
   {
-    saveRDS(list(shannon,shannon_SUR,shannon_DCM),file=paste0(data_folder,"/",short_marker,"Shannon.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-    saveRDS(list(simpson,simpson_SUR,simpson_DCM),file=paste0(data_folder,"/",short_marker,"Simpson.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-    saveRDS(list(shannon_total,shannon_total_SUR,shannon_total_DCM),file=paste0(data_folder,"/",short_marker,"Shannon.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-    saveRDS(list(simpson_total,simpson_total_SUR,simpson_total_DCM),file=paste0(data_folder,"/",short_marker,"Simpson.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-    saveRDS(list(nb_dominants,nb_absolute_dominants),file=paste0(data_folder,"/",short_marker,"Nb.dominant.assemblages.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+    saveRDS(list(shannon,shannon_SUR,shannon_DCM),file=paste0(results_folder,"/",short_marker,"Shannon.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+    saveRDS(list(simpson,simpson_SUR,simpson_DCM),file=paste0(results_folder,"/",short_marker,"Simpson.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+    saveRDS(list(shannon_total,shannon_total_SUR,shannon_total_DCM),file=paste0(results_folder,"/",short_marker,"Shannon.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+    saveRDS(list(simpson_total,simpson_total_SUR,simpson_total_DCM),file=paste0(results_folder,"/",short_marker,"Simpson.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+    saveRDS(list(nb_dominants,nb_absolute_dominants),file=paste0(results_folder,"/",short_marker,"Nb.dominant.assemblages.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
     # Plot Shannon diversity maps group per group for Surface stations:
     ###############
     library(marmap)
@@ -22390,26 +22378,26 @@ if (spatial_structure)
       if (V4_stations || psbO_stations)
       {
         saveRDS(list(I_square.observed_w.mean,I_square.p.value_w.mean),
-                file=paste0(data_folder,"/Moran.I",station_insert,"_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+                file=paste0(results_folder,"/Moran.I",station_insert,"_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
       } else if (!is.null(raref))
       {
         saveRDS(list(I_square.observed_w.mean,I_square.p.value_w.mean),
-                file=paste0(data_folder,"/",
+                file=paste0(results_folder,"/",
                 if (raref == "random.group.div") raref
                 else paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)], collapse=""),
                 if (!is.null(reals)) paste0(".1-",reals) else "",
                 "_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
       } else
         saveRDS(list(I_square.observed_w.mean_allTaxa,I_square.observed_w.mean,I_square.p.value_w.mean_allTaxa,I_square.p.value_w.mean),
-                file=paste0(data_folder,"/Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+                file=paste0(results_folder,"/Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
     } else
     {
       saveRDS(list(I_square.observed_w.mean,I_square.p.value_w.mean),
-              file=paste0(data_folder,"/",short_marker,"Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+              file=paste0(results_folder,"/",short_marker,"Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
     }
     
     saveRDS(list(prevalence.corrected_K.allTaxa,prevalence.corrected_K),
-            file=paste0(data_folder,"/Prevalence-corrected.number.of.assemblages_all.SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+            file=paste0(results_folder,"/Prevalence-corrected.number.of.assemblages_all.SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
     
     if (autocorr_scale)
     {
@@ -22419,33 +22407,33 @@ if (spatial_structure)
         {
           saveRDS(list(list(increment.allTaxa, I_step_observed_w.mean.allTaxa, I_step_relative_w.mean.allTaxa, I_step_p.value_w.mean.allTaxa),
                        list(increment,I_step_observed_w.mean, I_step_relative_w.mean, I_step_p.value_w.mean)),
-                  file=paste0(data_folder,"/MoranI_spatialAutocorr_20increment_log.scale_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+                  file=paste0(results_folder,"/MoranI_spatialAutocorr_20increment_log.scale_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
         } else if (!log.scale)
         {
           if (V4_stations || psbO_stations)
           {
             saveRDS(list(increment,I_step_observed_w.mean, I_step_relative_w.mean, I_step_p.value_w.mean),
-                    file=paste0(data_folder,"/MoranI",station_insert,"_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+                    file=paste0(results_folder,"/MoranI",station_insert,"_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
           } else if (!is.null(raref))
           {
             saveRDS(list(increment,I_step_observed_w.mean, I_step_relative_w.mean, I_step_p.value_w.mean),
-                    file=paste0(data_folder,"/",
+                    file=paste0(results_folder,"/",
                                 paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)], collapse=""),
                                 "_MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
           } else
             saveRDS(list(list(increment.allTaxa, I_step_observed_w.mean.allTaxa, I_step_relative_w.mean.allTaxa, I_step_p.value_w.mean.allTaxa),
                          list(increment,I_step_observed_w.mean, I_step_relative_w.mean, I_step_p.value_w.mean)),
-                    file=paste0(data_folder,"/MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+                    file=paste0(results_folder,"/MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
         }
       } else
       {
         if (log.scale)
         {
           saveRDS(list(increment,I_step_observed_w.mean, I_step_relative_w.mean, I_step_p.value_w.mean),
-                  file=paste0(data_folder,"/",short_marker,"MoranI_spatialAutocorr_20increment_log.scale_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+                  file=paste0(results_folder,"/",short_marker,"MoranI_spatialAutocorr_20increment_log.scale_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
         } else 
           saveRDS(list(increment,I_step_observed_w.mean, I_step_relative_w.mean, I_step_p.value_w.mean),
-                  file=paste0(data_folder,"/",short_marker,"MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+                  file=paste0(results_folder,"/",short_marker,"MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
       }
     }
     
@@ -22459,7 +22447,7 @@ if (spatial_structure)
       {
         if (V4_stations || psbO_stations)
         {
-          Moran.step = readRDS(paste0(data_folder,"/MoranI",station_insert,"_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+          Moran.step = readRDS(paste0(results_folder,"/MoranI",station_insert,"_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
           increment = Moran.step[[1]]
           I_step_observed_w.mean = Moran.step[[2]]
           I_step_relative_w.mean = Moran.step[[3]]
@@ -22467,11 +22455,11 @@ if (spatial_structure)
         } else if (!is.null(raref))
         {
           if (log.scale)
-            Moran.step = readRDS(paste0(data_folder,"/",
+            Moran.step = readRDS(paste0(results_folder,"/",
                                         paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)], collapse=""),
                                         "_MoranI_spatialAutocorr_20increment_log.scale_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
           else 
-            Moran.step = readRDS(paste0(data_folder,"/",
+            Moran.step = readRDS(paste0(results_folder,"/",
                                         paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)], collapse=""),
                                         "_MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
           increment = Moran.step[[1]]
@@ -22481,9 +22469,9 @@ if (spatial_structure)
         } else
         {
           if (log.scale)
-            Moran.step = readRDS(paste0(data_folder,"/MoranI_spatialAutocorr_20increment_log.scale_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+            Moran.step = readRDS(paste0(results_folder,"/MoranI_spatialAutocorr_20increment_log.scale_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
           else 
-            Moran.step = readRDS(paste0(data_folder,"/MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+            Moran.step = readRDS(paste0(results_folder,"/MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
           increment.allTaxa = Moran.step[[1]][[1]]
           I_step_observed_w.mean.allTaxa = Moran.step[[1]][[2]]
           I_step_relative_w.mean.allTaxa = Moran.step[[1]][[3]]
@@ -22496,9 +22484,9 @@ if (spatial_structure)
       } else
       {
         if (log.scale)
-          Moran.step = readRDS(paste0(data_folder,"/",short_marker,"MoranI_spatialAutocorr_20increment_log.scale_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+          Moran.step = readRDS(paste0(results_folder,"/",short_marker,"MoranI_spatialAutocorr_20increment_log.scale_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
         else 
-          Moran.step = readRDS(paste0(data_folder,"/",short_marker,"MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+          Moran.step = readRDS(paste0(results_folder,"/",short_marker,"MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
         increment = Moran.step[[1]]
         I_step_observed_w.mean = Moran.step[[2]]
         I_step_relative_w.mean = Moran.step[[3]]
@@ -22922,20 +22910,20 @@ if (spatial_structure)
       {
         if (V4_stations || psbO_stations)
         {
-          saveRDS(charac_scale,file=paste0(data_folder,"/MoranI",station_insert,"_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+          saveRDS(charac_scale,file=paste0(results_folder,"/MoranI",station_insert,"_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
         } else if (!is.null(raref))
         {
-          saveRDS(charac_scale,file=paste0(data_folder,"/",
+          saveRDS(charac_scale,file=paste0(results_folder,"/",
                                            paste(strsplit(raref,split="",fixed=T)[[1]][2:nchar(raref)], collapse=""),
                                            "_MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
         } else
         {
-          saveRDS(list(charac_scale,charac_scale.allTaxa),file=paste0(data_folder,"/MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-          saveRDS(list(slope,intercept),file=paste0(data_folder,"/MoranI_slope.intercept_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+          saveRDS(list(charac_scale,charac_scale.allTaxa),file=paste0(results_folder,"/MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+          saveRDS(list(slope,intercept),file=paste0(results_folder,"/MoranI_slope.intercept_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
         }
       } else
       {
-        saveRDS(charac_scale,file=paste0(data_folder,"/",short_marker,"MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+        saveRDS(charac_scale,file=paste0(results_folder,"/",short_marker,"MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
       }
         
       # charac_scale = matrix(nrow = length(taxo_groups), ncol = 3, data = NA)
@@ -23282,7 +23270,7 @@ if (spatial_structure)
         #####################
         div_threshold = 100
         
-        dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+        dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
         dominant_function0 = dominant_function[selected_groups & diversity>div_threshold]
         # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
         # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
@@ -23556,8 +23544,8 @@ if (spatial_structure)
     ############
     # Stability plots:
     ############
-    # mean_sim = readRDS(paste0(data_folder,"/mean_sim_Gibbs_optimalK_min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds"))
-    mean_sim = readRDS(paste0(data_folder,"/mean_sim_optimalK_Gibbs.prevalence.min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds"))
+    # mean_sim = readRDS(paste0(results_folder,"/mean_sim_Gibbs_optimalK_min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds"))
+    mean_sim = readRDS(paste0(results_folder,"/mean_sim_optimalK_Gibbs.prevalence.min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds"))
     
     plot.Moran.I_mean.sim = ggplot(data=data.frame(y=I_square.observed_w.mean[selected_groups,1],
                                                    x=mean_sim[selected_groups])) +
@@ -23627,7 +23615,7 @@ if (spatial_structure)
     #########
     # Surf.-DCM comparison:
     ##########
-    # mean_sim = readRDS(paste0(data_folder,"/mean_sim_Gibbs_optimalK_min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds"))
+    # mean_sim = readRDS(paste0(results_folder,"/mean_sim_Gibbs_optimalK_min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds"))
     
     div_threshold = 1000
     
@@ -23651,7 +23639,7 @@ if (spatial_structure)
     ############
     div_threshold = 100
     
-    dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+    dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
     dominant_function0 = dominant_function[selected_groups & diversity>div_threshold]
     # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
     # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
@@ -23709,30 +23697,30 @@ if (spatial_structure)
 
 if (correlation_tables)
 {
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
   selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100 
   
   Gibbs_VEM_insert = "_Gibbs.prevalence.min.crossValid10sampleFolds"
-  optimalK_prevalence.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+  optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
   optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
   optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]]   
     
-  mean_sim = readRDS(paste0(data_folder,"/mean_sim_optimalK_Gibbs.prevalence.min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds"))
-  # SUR.DCM_VI_over_K = readRDS(paste0(data_folder,"/VI.over.K_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-  SUR.DCM_Normalized.VI = readRDS(paste0(data_folder,"/Normalized.VI_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-  Moran.I = readRDS(paste0(data_folder,"/Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  mean_sim = readRDS(paste0(results_folder,"/mean_sim_optimalK_Gibbs.prevalence.min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds"))
+  # SUR.DCM_VI_over_K = readRDS(paste0(results_folder,"/VI.over.K_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  SUR.DCM_Normalized.VI = readRDS(paste0(results_folder,"/Normalized.VI_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  Moran.I = readRDS(paste0(results_folder,"/Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
   I_square.observed_w.mean_allTaxa = Moran.I[[1]]
   I_square.observed_w.mean = Moran.I[[2]]
   I_square.p.value_w.mean_allTaxa = Moran.I[[3]]
   I_square.p.value_w.mean = Moran.I[[4]]
-  autocorr.scale = readRDS(paste0(data_folder,"/MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  autocorr.scale = readRDS(paste0(results_folder,"/MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   charac_scale = autocorr.scale[[1]]
   charac_scale.allTaxa = autocorr.scale[[2]]  
-  lat_I.result = readRDS(paste0(data_folder,"/Lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  lat_I.result = readRDS(paste0(results_folder,"/Lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   lat_I = lat_I.result[[1]]
-  basin_I.result = readRDS(paste0(data_folder,"/Basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  basin_I.result = readRDS(paste0(results_folder,"/Basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   basin_I = basin_I.result[[1]]
   
   abiotic_pca_insert = "_abioticPCA"
@@ -23741,8 +23729,8 @@ if (correlation_tables)
   dis_MEM_insert = "_dist-based.MEM"
   div_threshold = 100
   
-  # varpart.indSelec = readRDS(paste0(data_folder,"/varpart_lda_environment-currents_bothDirectionsIndependentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  varpart.indSelec = readRDS(paste0(data_folder,"/varpart_lda",Gibbs_VEM_insert,
+  # varpart.indSelec = readRDS(paste0(results_folder,"/varpart_lda_environment-currents_bothDirectionsIndependentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  varpart.indSelec = readRDS(paste0(results_folder,"/varpart_lda",Gibbs_VEM_insert,
                                     "_separate.SUR.DCM_both.directions.independent.selection_PCA0",
                                     abiotic_pca_insert,biotic_pca_insert,dis_MEM_insert,stdzation_insert,noArcticNoBiomark_insert,"_eigenvalueThres0.8",noLagoon_insert,".rds"))
   varpart.env.spatial = varpart.indSelec[[1]]
@@ -23764,9 +23752,9 @@ if (correlation_tables)
   varpart.biotic.abiotic[[2]][varpart.biotic.abiotic[[2]]<0] = 0
   varpart.biotic.abiotic.pval = varpart.indSelec[[6]]
   
-  VI_over_K = readRDS(paste0(data_folder,"/VI.over.K_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-  Normalized_VI = readRDS(paste0(data_folder,"/Normalized.VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-  VI = readRDS(paste0(data_folder,"/VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  VI_over_K = readRDS(paste0(results_folder,"/VI.over.K_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  Normalized_VI = readRDS(paste0(results_folder,"/Normalized.VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  VI = readRDS(paste0(results_folder,"/VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
   
   # Using PCoA:
   #############
@@ -24284,8 +24272,8 @@ if (correlation_tables)
   dev.off()
   
   ######################
-  prop_within_OTU_vect0 = readRDS(paste0(data_folder,"/Connectivity_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
-  prop_within_OTU_list = readRDS(paste0(data_folder,"/Connectivity_expTmin_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  prop_within_OTU_vect0 = readRDS(paste0(results_folder,"/Connectivity_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))[[1]]
+  prop_within_OTU_list = readRDS(paste0(results_folder,"/Connectivity_expTmin_1.5yearTminThres_10particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   prop_within_OTU_vect = prop_within_OTU_list[[1]]
   prop_within_OTU_null = prop_within_OTU_list[[2]]
   prop_within_OTU_allOTUs = prop_within_OTU_list[[3]]
@@ -24482,14 +24470,14 @@ if (correlation_tables)
 
 if (group_comparison)
 {
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
   selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100 
   
-  optimalK = readRDS(paste0(data_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  optimalK = readRDS(paste0(results_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   Gibbs_VEM_insert = "_Gibbs.prevalence.min.crossValid10sampleFolds"
-  optimalK_prevalence.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+  optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
   optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
   optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]]   
   
@@ -24614,11 +24602,11 @@ if (group_comparison)
     }
   }
   
-  saveRDS(VI,paste0(data_folder,"/VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-  saveRDS(VI_over_K,paste0(data_folder,"/VI.over.K_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-  saveRDS(VI_over_logK,paste0(data_folder,"/VI.over.K_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-  # saveRDS(Normalized_VI,paste0(data_folder,"/Normalized.VI.consistent_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
-  saveRDS(Normalized_VI,paste0(data_folder,"/Normalized.VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds_new.rds"))
+  saveRDS(VI,paste0(results_folder,"/VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  saveRDS(VI_over_K,paste0(results_folder,"/VI.over.K_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  saveRDS(VI_over_logK,paste0(results_folder,"/VI.over.K_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  # saveRDS(Normalized_VI,paste0(results_folder,"/Normalized.VI.consistent_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  saveRDS(Normalized_VI,paste0(results_folder,"/Normalized.VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds_new.rds"))
   
   #############################
   # VI matrix decomposition:  #
@@ -24671,7 +24659,7 @@ if (group_comparison)
   # biplot(VI_pcoa)
   # dev.off()
   
-  dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   functions = c("copepoda","endophotosymbiont","gelatineous_carnivores_filterers","other metazoa","parasite","phagotroph","photohost","phototroph","pteropoda","unknown")
   ten_colors = c("cadetblue",NA,"darkblue","dodgerblue1","darkgoldenrod1","firebrick2","darkgreen","chartreuse2","dodgerblue1","deeppink1")
   
@@ -25033,7 +25021,7 @@ if (group_comparison)
          yminus=mean_sd_sil_Normalized_VI[,1]-mean_sd_sil_Normalized_VI[,2],ylab = "Mean silhouette", xlab = "Number of clusters")
   dev.off()
   
-  dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   dominant_function0 = dominant_function[selected_groups & diversity>div_threshold]
   # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
   # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
@@ -25090,7 +25078,6 @@ if (group_comparison)
   #######################
   # Pairwise analysis:  #
   #######################
-  setwd(figure_folder)
   
   library(lattice)
   library(ggplot2)
@@ -25102,7 +25089,7 @@ if (group_comparison)
   Normalized_VI1[Normalized_VI1 > 0.5] = NA
   write.table(Normalized_VI1, file = paste0("Normalized_VI_lowerThan0.5_selected_groups",noArcticNoBiomark_insert,noLagoon_insert,".csv"), quote = F, sep = ";", col.names = T, row.names = T)
   
-  dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   # dominant_function_simplified  = dominant_function
   # dominant_function_simplified[dominant_function == "copepoda" & "other metazoa" & "pteropoda"] = "Metazoa"
   functions = c("copepoda","endophotosymbiont","gelatineous_carnivores_filterers","other metazoa","parasite","phagotroph","photohost","phototroph","pteropoda","unknown")
@@ -25111,7 +25098,7 @@ if (group_comparison)
   # five_colors = c("darkgoldenrod1","darkgreen","darkblue","chartreuse2","firebrick2","grey50")
   five_colors = c("darkgoldenrod1","darkgreen","darkblue","chartreuse2","firebrick2",NA)
   particle_thres = 1000
-  prop_within_OTU_vect = readRDS(paste0(data_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  prop_within_OTU_vect = readRDS(paste0(results_folder,"/Connectivity_",particle_thres,"particlesThres_meanPerOTU_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   # prop_within_OTU_vect = prop_within_OTU_list[[1]]
   # prop_within_OTU_null = prop_within_OTU_list[[2]]
   
@@ -25189,27 +25176,27 @@ if (group_comparison)
   pair_connectivity_difference = pair_connectivity_difference_list[[2]]
   mean_pair_connectivity = mean_pair_connectivity_list[[2]]
   
-  pdf("VI_vs_K_diff.pdf")
+  pdf(figure_folder,"/VI_vs_K_diff.pdf")
   plot(abs(best_matching_groups$group1.K - best_matching_groups$group2.K), best_matching_groups$VI, ann = F)
   title(ylab = "VI", xlab = "Difference in optimal K")
   dev.off()
   
-  pdf("VI_vs_mean_K.pdf")
+  pdf(figure_folder,"/VI_vs_mean_K.pdf")
   plot((best_matching_groups$group1.K + best_matching_groups$group2.K)/2, best_matching_groups$VI, ann = F)
   title(ylab = "VI", xlab = "Average optimal K")
   dev.off()
   
-  pdf("VI_over_log(meanK)_vs_mean_K.pdf")
+  pdf(figure_folder,"/VI_over_log(meanK)_vs_mean_K.pdf")
   plot((best_matching_groups$group1.K + best_matching_groups$group2.K)/2, best_matching_groups$VI/log((best_matching_groups$group1.K + best_matching_groups$group2.K)/2), ann = F)
   title(ylab = "VI/log(av. K)", xlab = "Average optimal K")
   dev.off()
   
-  pdf("Normalized_VI_vs_mean_K.pdf")
+  pdf(figure_folder,"/Normalized_VI_vs_mean_K.pdf")
   plot((best_matching_groups$group1.K + best_matching_groups$group2.K)/2, best_matching_groups$VI, ann = F)
   title(ylab = "Normalized VI", xlab = "Average optimal K")
   dev.off()
   
-  pdf("VI_over_log(meanK)_vs_Normalized_K.pdf")
+  pdf(figure_folder,"/VI_over_log(meanK)_vs_Normalized_K.pdf")
   plot(best_matching_groups_list[[2]][rownames(best_matching_groups),"VI"], best_matching_groups$VI/log((best_matching_groups$group1.K + best_matching_groups$group2.K)/2), ann = F)
   title(ylab = "VI/log(av. K)", xlab = "Normalized K")
   dev.off()
@@ -25231,7 +25218,7 @@ if (group_comparison)
     # geom_smooth(method='lm') +
     guides(colour = guide_legend(title.position="bottom"))
   
-  ggsave(filename = paste0("VI_vs_connectivity_difference_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_PairFunctionColorsNoGrey_selected.pdf"), do.call("arrangeGrob", c(list(plot.VI.pairs.vs.connectivity.diff), nrow=1)),
+  ggsave(filename = paste0(figure_folder,"/VI_vs_connectivity_difference_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_PairFunctionColorsNoGrey_selected.pdf"), do.call("arrangeGrob", c(list(plot.VI.pairs.vs.connectivity.diff), nrow=1)),
          height = 1.5*4, width = 1.5*4)
   
   plot.VI.pairs.vs.average.connectivity = ggplot(data = data.frame(x = mean_pair_connectivity, y = best_matching_groups$VI)) + 
@@ -25254,7 +25241,7 @@ if (group_comparison)
   
   # ggsave(filename = paste0("VI_vs_average_connectivity_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_PairFunctionColorsNoGrey_selected.pdf"), 
   # ggsave(filename = paste0("Normalized_VI_vs_average_connectivity_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_PairFunctionColorsNoGrey_selected.pdf"), 
-  ggsave(filename = paste0("Normalized_VI_vs_average_connectivity_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_PairFunctionColors_selected.pdf"),
+  ggsave(filename = paste0(figure_folder,"/Normalized_VI_vs_average_connectivity_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_PairFunctionColors_selected.pdf"),
          do.call("arrangeGrob", c(list(plot.VI.pairs.vs.average.connectivity), nrow=1)), height = 1.5*4, width = 1.5*4)
   
   #plot(VI/log(optimalK[selected_groups]),Normalized_VI)
@@ -25283,7 +25270,7 @@ if (group_comparison)
     # geom_vline(xintercept = prop_within_OTU_null, linetype = "dashed") +
     geom_smooth(aes(x,y),method='lm')
   
-  ggsave(filename = paste0("Mean_VI_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.mean.VI_log_size), nrow=1)),
+  ggsave(filename = paste0(figure_folder,"/Mean_VI_vs_size_log10_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.mean.VI_log_size), nrow=1)),
          height = 1.5*4, width = 1.5*4)
   
   plot.mean.VI_OTU_connectivity = ggplot(data = data.frame(x = prop_within_OTU_vect[selected_groups], y = mean_VI_to_other_groups)) + 
@@ -25298,7 +25285,7 @@ if (group_comparison)
     # geom_vline(xintercept = prop_within_OTU_null, linetype = "dashed") +
     geom_smooth(aes(x,y),method='lm')
   
-  ggsave(filename = paste0("Mean_VI_vs_travel_time_prop_OTU_",particle_thres,"particlesThres_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.mean.VI_OTU_connectivity), nrow=1)),
+  ggsave(filename = paste0(figure_folder,"/Mean_VI_vs_travel_time_prop_OTU_",particle_thres,"particlesThres_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected.pdf"), do.call("arrangeGrob", c(list(plot.mean.VI_OTU_connectivity), nrow=1)),
          height = 1.5*4, width = 1.5*4)
   
   plot.mean.VI_OTU_connectivity = ggplot(data = data.frame(x = prop_within_OTU_vect[selected_groups], y = mean_VI_to_other_groups)) + 
@@ -25318,28 +25305,28 @@ if (group_comparison)
     # geom_smooth(method='lm') +
     guides(colour = guide_legend(title.position="bottom"))
   
-  ggsave(filename = paste0("Mean_VI_vs_travel_time_prop_OTU_",particle_thres,"particlesThres_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_functionColors_selected.pdf"), do.call("arrangeGrob", c(list(plot.mean.VI_OTU_connectivity), nrow=1)),
+  ggsave(filename = paste0(figure_folder,"/Mean_VI_vs_travel_time_prop_OTU_",particle_thres,"particlesThres_ggplot_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_functionColors_selected.pdf"), do.call("arrangeGrob", c(list(plot.mean.VI_OTU_connectivity), nrow=1)),
          height = 1.5*4, width = 1.5*4)
 }
 
 if (marker_comparison)
 {
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata"))
   
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  taxo_groups_psbO = readRDS(paste0(data_folder,"/psbO_taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  taxo_groups_V4 = readRDS(paste0(data_folder,"/V4_taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups_psbO = readRDS(paste0(results_folder,"/psbO_taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  taxo_groups_V4 = readRDS(paste0(results_folder,"/V4_taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   selected_groups = !(taxo_groups %in% groups_to_remove) & as.vector(diversity) > 100 
   selected_groups_psbO = 1:6
   selected_groups_V4 = 1:41
   
-  optimalK_prevalence.min.crossValid.complete = readRDS(paste0(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+  optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
   optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
   optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]]   
-  optimalK_prevalence.min.crossValid_psbO = readRDS(paste0(data_folder,"/psbO_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds"))
-  optimalK_prevalence.min.crossValid_V4 = readRDS(paste0(data_folder,"/V4_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds"))
+  optimalK_prevalence.min.crossValid_psbO = readRDS(paste0(results_folder,"/psbO_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds"))
+  optimalK_prevalence.min.crossValid_V4 = readRDS(paste0(results_folder,"/V4_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds"))
   #
   
   nb_iter = 1000
@@ -25430,7 +25417,7 @@ if (marker_comparison)
     }
   }
   
-  saveRDS(list(Normalized_VI_V9.V4,Normalized_VI_V9.psbO),paste0(data_folder,"/Normalized.VI_marker.comparison.SUR_V9-V4_V9-psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  saveRDS(list(Normalized_VI_V9.V4,Normalized_VI_V9.psbO),paste0(results_folder,"/Normalized.VI_marker.comparison.SUR_V9-V4_V9-psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
   
   ###########
   Normalized_VI_psbO = matrix(nrow = length(taxo_groups_psbO), 
@@ -25461,7 +25448,7 @@ if (marker_comparison)
     }
   }
   
-  saveRDS(list(Normalized_VI_V4,Normalized_VI_psbO),paste0(data_folder,"/Normalized.VI_group.comparison.SUR_V4.psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+  saveRDS(list(Normalized_VI_V4,Normalized_VI_psbO),paste0(results_folder,"/Normalized.VI_group.comparison.SUR_V4.psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 }
 
 if (Arctic_analyses)
@@ -25484,13 +25471,13 @@ if (Arctic_analyses)
   proportion_NorthAtlantic_assemb = matrix(nrow = length(taxo_groups), ncol = 4, data = NA, dimnames = list(taxo_groups,c("152","155","158","163")))
   dominant_topic_152_to_163 = matrix(nrow = length(taxo_groups), ncol = 4, data = NA, dimnames = list(taxo_groups,c("152","155","158","163")))
   dominant_topic_158_SUR_DCM = matrix(nrow = length(taxo_groups), ncol = 2, dimnames = list(taxo_groups,c("SUR","DCM")), data = NA)
-  taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  increasing_llh = readRDS(paste0(data_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  alpha_best_real = readRDS(paste0(data_folder,"/alpha_best_real_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  optimalK = readRDS(paste0(data_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  mean_sim = readRDS(paste0(data_folder,"/mean_sim_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  increasing_llh = readRDS(paste0(results_folder,"/Increasing_llh_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  alpha_best_real = readRDS(paste0(results_folder,"/alpha_best_real_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  optimalK = readRDS(paste0(results_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  mean_sim = readRDS(paste0(results_folder,"/mean_sim_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".Rdata")) 
   selected_groups = !(taxo_groups %in% groups_to_remove) & alpha_best_real<1 & increasing_llh
   for (taxon in taxo_groups[selected_groups])
   {
@@ -25644,7 +25631,7 @@ if (Arctic_analyses)
     assemblage_distinctiveness_index[i_taxon] = mean(as.matrix(Hellinger_assemblages)[rownames(as.matrix(Hellinger_assemblages)) != Arctic_dominant_topic[i_taxon],Arctic_dominant_topic[i_taxon]])/mean(as.matrix(Hellinger_assemblages)[selected_matrix])
   }
   
-  dominant_function = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  dominant_function = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   dominant_function_simplified  = dominant_function
   dominant_function_simplified[dominant_function %in% c("copepoda","other metazoa","pteropoda")] = "metazoa"
   # functions = c("copepoda","endophotosymbiont","gelatineous_carnivores_filterers","other metazoa","parasite","phagotroph","photohost","phototroph","pteropoda","unknown")
@@ -26106,33 +26093,33 @@ if (Arctic_analyses)
   
   # Estimated group body size in Arctic vs non-Artic
   ##################################################
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,".Rdata"))
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,".Rdata"))
   size_absoluteAbund_noArctic = size_absoluteAbund
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,"_0.8inf.Rdata"))
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,"_0.8inf.Rdata"))
   size_absoluteAbund_noArctic_0.8inf = size_absoluteAbund
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,"_NoSmallSizeFraction.Rdata"))
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,"_NoSmallSizeFraction.Rdata"))
   size_absoluteAbund_noArctic_NoSmallSizeFraction = size_absoluteAbund
-  taxo_groups_noArctic = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+  taxo_groups_noArctic = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
   names(size_absoluteAbund_noArctic) = taxo_groups_noArctic
   names(size_absoluteAbund_noArctic_0.8inf) = taxo_groups_noArctic
   names(size_absoluteAbund_noArctic_NoSmallSizeFraction) = taxo_groups_noArctic
-  increasing_llh_noArctic = readRDS(paste0(data_folder,"/Increasing_llh_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
-  alpha_best_real_noArctic = readRDS(paste0(data_folder,"/alpha_best_real_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+  increasing_llh_noArctic = readRDS(paste0(results_folder,"/Increasing_llh_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+  alpha_best_real_noArctic = readRDS(paste0(results_folder,"/alpha_best_real_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
   selected_groups_noArctic = !(taxo_groups_noArctic %in% groups_to_remove) & alpha_best_real_noArctic<1 & increasing_llh_noArctic
-  dominant_function_noArctic = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
+  dominant_function_noArctic = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds"))
   dominant_function_simplified_noArctic  = dominant_function_noArctic
   dominant_function_simplified_noArctic[dominant_function_noArctic %in% c("copepoda","other metazoa","pteropoda")] = "metazoa"
   
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_ArcticOnly",noLagoon_insert,".Rdata"))
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_ArcticOnly",noLagoon_insert,".Rdata"))
   size_absoluteAbund_ArcticOnly_0.8inf = size_absoluteAbund
-  load(paste0(data_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_ArcticOnly",noLagoon_insert,"_No0.8inf.Rdata"))
+  load(paste0(results_folder,"/group_sizes_byStationByDepth_",div_threshold,"plusOTUs_ArcticOnly",noLagoon_insert,"_No0.8inf.Rdata"))
   size_absoluteAbund_ArcticOnly_No0.8inf = size_absoluteAbund
-  taxo_groups_Arctic = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noLagoon_insert,".rds"))
+  taxo_groups_Arctic = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noLagoon_insert,".rds"))
   names(size_absoluteAbund_ArcticOnly_0.8inf) = taxo_groups_Arctic
-  increasing_llh_Arctic = readRDS(paste0(data_folder,"/Increasing_llh_2plusOTUs",noLagoon_insert,".rds"))
-  alpha_best_real_Arctic = readRDS(paste0(data_folder,"/alpha_best_real_2plusOTUs",noLagoon_insert,".rds"))
+  increasing_llh_Arctic = readRDS(paste0(results_folder,"/Increasing_llh_2plusOTUs",noLagoon_insert,".rds"))
+  alpha_best_real_Arctic = readRDS(paste0(results_folder,"/alpha_best_real_2plusOTUs",noLagoon_insert,".rds"))
   selected_groups_Arctic = !(taxo_groups_Arctic %in% groups_to_remove) & alpha_best_real_Arctic<1 & increasing_llh_Arctic
-  dominant_function_Arctic = readRDS(paste0(data_folder,"/dominant_function_",div_threshold,"plusOTUs",noLagoon_insert,".rds"))
+  dominant_function_Arctic = readRDS(paste0(results_folder,"/dominant_function_",div_threshold,"plusOTUs",noLagoon_insert,".rds"))
   dominant_function_simplified_Arctic  = dominant_function_Arctic
   dominant_function_simplified_Arctic[dominant_function_Arctic %in% c("copepoda","other metazoa","pteropoda")] = "metazoa"
   
@@ -26382,9 +26369,9 @@ if (Arctic_analyses)
   
   # Selected groups Arctic vs non-Arctic:
   ###########
-  diversity_noArctic = readRDS(paste0(data_folder,"/diversity_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds")) 
+  diversity_noArctic = readRDS(paste0(results_folder,"/diversity_2plusOTUs_noArcticNoBiomark",noLagoon_insert,".rds")) 
   names(diversity_noArctic) = taxo_groups_noArctic
-  diversity_Arctic = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noLagoon_insert,".rds"))
+  diversity_Arctic = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noLagoon_insert,".rds"))
   names(diversity_Arctic) = taxo_groups_Arctic
   
   tmp.plot = ggplot(data = data.frame(x = log10(as.vector(diversity_noArctic[taxo_groups_Arctic[selected_groups_Arctic]])),

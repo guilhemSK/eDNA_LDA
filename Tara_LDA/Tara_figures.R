@@ -1,3 +1,5 @@
+# See lines 67-77 to specify paths to figure, code and data folders.
+
 library(gridExtra)
 library(ggplot2)
 library(ggforce)
@@ -65,6 +67,9 @@ if (!noArcticNoBiomark && !noCoastalArcticNoBiomark && !ArcticOnly)
 ########################
 # Path to figure folder:
 figure_folder = paste0("/Users/guilhemsommeria-klein/Desktop/Manuscrits/Tara/Figures/Gibbs",Arctic_insert)
+# Path to saved results:
+code_folder = "/Users/guilhemsommeria-klein/Desktop/Code/Projects/eDNA_LDA"
+results_folder = paste0(code_folder,"/Tara_LDA/Saved_results")
 # Path to local data folder:
 data_folder = "/Users/guilhemsommeria-klein/Desktop/Post-doc_ENS/Donnees_Tara"
 # Path to cluster data folder - workspace 3:
@@ -79,19 +84,19 @@ groups_to_remove = c("undetermined_eukaryote","other_filosan_*","other_myzozoan_
                        "undetermined_ochrophyta","undetermined_thecofilosan","undetermined_fungi","other_Discoba")
 # groups_to_remove_psbO = c("Trebouxiophyceae","Chrysophyceae","Ciliophora","Euglenida")
 
-taxo_groups = readRDS(paste0(data_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-taxo_groups_psbO = readRDS(paste0(data_folder,"/psbO_taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-taxo_groups_V4 = readRDS(paste0(data_folder,"/V4_taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+taxo_groups_psbO = readRDS(paste0(results_folder,"/psbO_taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+taxo_groups_V4 = readRDS(paste0(results_folder,"/V4_taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 ####
-diversity = readRDS(paste0(data_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 # names(diversity) = taxo_groups # Recently modified! Check for compatiblity.
-diversity_psbO = readRDS(paste0(data_folder,"/psbO_diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-diversity_V4 = readRDS(paste0(data_folder,"/V4_diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+diversity_psbO = readRDS(paste0(results_folder,"/psbO_diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+diversity_V4 = readRDS(paste0(results_folder,"/V4_diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 names(diversity_V4) = taxo_groups_V4 # Recently modified! Check for compatiblity.
 ####
-relativeAbund = readRDS(paste0(data_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+relativeAbund = readRDS(paste0(results_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 ####
-load(paste0(data_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"0.Rdata"))
+load(paste0(results_folder,"/group_sizes_byStationByDepth_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"0.Rdata"))
 div_threshold = 100
 ######
 selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > div_threshold
@@ -104,10 +109,10 @@ selected_groups_psbO[1:6] = T
 selected_groups_V4 = rep(F,length(taxo_groups_V4))
 selected_groups_V4[1:41] = T
 ######
-tot_reads = readRDS(data_folder,"/Total.read.numbers.rds")
+tot_reads = readRDS(results_folder,"/Total.read.numbers.rds")
 
 ##########
-dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 dominant_function0 = dominant_function[selected_groups & diversity>div_threshold]
 # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
 # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
@@ -151,61 +156,61 @@ taxo_groups_unmodified = levels(as.factor(taxo_groups_OTUs))[sort.int(table(as.f
 #######
 
 #########
-optimalK_prevalence.min.crossValid.complete = readRDS(data_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds")
+optimalK_prevalence.min.crossValid.complete = readRDS(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds")
 optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
 optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]]   
 ####
-optimalK_prevalence.min.crossValid_psbO = readRDS(data_folder,"/psbO_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds")
+optimalK_prevalence.min.crossValid_psbO = readRDS(results_folder,"/psbO_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds")
 ####
-optimalK_prevalence.min.crossValid_V4 = readRDS(data_folder,"/V4_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds")
+optimalK_prevalence.min.crossValid_V4 = readRDS(results_folder,"/V4_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds")
 #######
 
 ######
-mean_sim = readRDS(data_folder,"/mean_sim_optimalK_Gibbs.prevalence.min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds")
+mean_sim = readRDS(results_folder,"/mean_sim_optimalK_Gibbs.prevalence.min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds")
 mean_sim.allTaxa = 0.894643970320553 
-normalized.VI.within.group = readRDS(data_folder,"/Normalized_VI_within.groups_100reals_different.stations.means.rds")
-mean.normalized.VI.within.group = readRDS(data_folder,"/Normalized_VI_mean.within.groups_100reals_different.stations.means.rds")
+normalized.VI.within.group = readRDS(results_folder,"/Normalized_VI_within.groups_100reals_different.stations.means.rds")
+mean.normalized.VI.within.group = readRDS(results_folder,"/Normalized_VI_mean.within.groups_100reals_different.stations.means.rds")
 mean.normalized.VI.allTaxa = 0.8196249
-R.hat.500.result = readRDS(data_folder,"/Rhat.burnin.500_nb_iter3000_nb_real100_occurrence.rds")
+R.hat.500.result = readRDS(results_folder,"/Rhat.burnin.500_nb_iter3000_nb_real100_occurrence.rds")
 R.hat.500.allTaxa = R.hat.500.result[[1]]
 R.hat.500 = R.hat.500.result[[2]]
-R.hat.1000.result = readRDS(data_folder,"/Rhat.burnin.1000_nb_iter3000_nb_real100_occurrence.rds")
+R.hat.1000.result = readRDS(results_folder,"/Rhat.burnin.1000_nb_iter3000_nb_real100_occurrence.rds")
 R.hat.1000.allTaxa = R.hat.1000.result[[1]]
 R.hat.1000 = R.hat.1000.result[[2]]
-R.hat.2000.result = readRDS(data_folder,"/Rhat.burnin.2000_nb_iter3000_nb_real100_occurrence.rds")
+R.hat.2000.result = readRDS(results_folder,"/Rhat.burnin.2000_nb_iter3000_nb_real100_occurrence.rds")
 R.hat.2000.allTaxa = R.hat.2000.result[[1]]
 R.hat.2000 = R.hat.2000.result[[2]]
-# SUR.DCM_VI_over_K = readRDS(data_folder,"/VI.over.K_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
-SUR.DCM_Normalized.VI = readRDS(data_folder,"/Normalized.VI_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+# SUR.DCM_VI_over_K = readRDS(results_folder,"/VI.over.K_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+SUR.DCM_Normalized.VI = readRDS(results_folder,"/Normalized.VI_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 ######
 
 #######
-Moran.I = readRDS(data_folder,"/Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I = readRDS(results_folder,"/Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean_allTaxa = Moran.I[[1]]
 I_square.observed_w.mean = Moran.I[[2]]
 I_square.p.value_w.mean_allTaxa = Moran.I[[3]]
 I_square.p.value_w.mean = Moran.I[[4]]
-autocorr.scale = readRDS(paste0(data_folder,"/MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+autocorr.scale = readRDS(paste0(results_folder,"/MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 charac_scale = autocorr.scale[[1]]
 charac_scale.allTaxa = autocorr.scale[[2]]
-slope.intercept = readRDS(paste0(data_folder,"/MoranI_slope.intercept_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+slope.intercept = readRDS(paste0(results_folder,"/MoranI_slope.intercept_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 slope = slope.intercept[[1]]
 intercept = slope.intercept[[2]]
-basin_I.result = readRDS(data_folder,"/Basin_I_noLagoon.rds")
+basin_I.result = readRDS(results_folder,"/Basin_I_noLagoon.rds")
 basin_I = basin_I.result[[1]]
-lat_I.result = readRDS(paste0(data_folder,"/Lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+lat_I.result = readRDS(paste0(results_folder,"/Lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 lat_I = lat_I.result[[1]]
 #####
-Moran.I.104 = readRDS(data_folder,"/104_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.104 = readRDS(results_folder,"/104_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.104 = Moran.I.104[[1]]
 I_square.p.value_w.mean.104 = Moran.I.104[[2]]
-diversity.104 = readRDS(data_folder,"/Rarefied_diversity.104.105.106.rds")[[1]]
-Moran.I.105 = readRDS(data_folder,"/105_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+diversity.104 = readRDS(results_folder,"/Rarefied_diversity.104.105.106.rds")[[1]]
+Moran.I.105 = readRDS(results_folder,"/105_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.105 = Moran.I.105[[1]]
 I_square.p.value_w.mean.105 = Moran.I.105[[2]]
-diversity.105 = readRDS(data_folder,"/Rarefied_diversity.104.105.106.rds")[[2]]
+diversity.105 = readRDS(results_folder,"/Rarefied_diversity.104.105.106.rds")[[2]]
 ######
-mean_prevalence_results = readRDS(data_folder,"/mean_OTU.prevalence.200.250.300.350.500.1000.rds")
+mean_prevalence_results = readRDS(results_folder,"/mean_OTU.prevalence.200.250.300.350.500.1000.rds")
 mean_prevalence = mean_prevalence_results[[1]]
 mean_prevalence.200 = mean_prevalence_results[[2]]
 mean_prevalence.250 = mean_prevalence_results[[3]]
@@ -213,7 +218,7 @@ mean_prevalence.300 = mean_prevalence_results[[4]]
 mean_prevalence.350 = mean_prevalence_results[[5]]
 mean_prevalence.500 = mean_prevalence_results[[6]]
 mean_prevalence.1000 = mean_prevalence_results[[7]]
-median_prevalence_results = readRDS(data_folder,"/median_OTU.prevalence.200.250.300.350.500.1000.rds")
+median_prevalence_results = readRDS(results_folder,"/median_OTU.prevalence.200.250.300.350.500.1000.rds")
 median_prevalence = median_prevalence_results[[1]]
 median_prevalence.200 = median_prevalence_results[[2]]
 median_prevalence.250 = median_prevalence_results[[3]]
@@ -221,134 +226,134 @@ median_prevalence.300 = median_prevalence_results[[4]]
 median_prevalence.350 = median_prevalence_results[[5]]
 median_prevalence.500 = median_prevalence_results[[6]]
 median_prevalence.1000 = median_prevalence_results[[7]]
-Moran.I.200 = readRDS(data_folder,"/200_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.200 = readRDS(results_folder,"/200_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.200 = Moran.I.200[[1]]
 I_square.p.value_w.mean.200 = Moran.I.200[[2]]
-charac_scale.200 = readRDS(data_folder,"/200_MoranI_charach.autocorr.scale_20increment_2plusOTUs_noLagoon.rds")
-diversity.200 = readRDS(data_folder,"/Total.read.numbers.200_diversity.200.rds")[[2]]
-tot_reads.200 = readRDS(data_folder,"/Total.read.numbers.200_diversity.200.rds")[[1]]
-Moran.I.250 = readRDS(data_folder,"/250_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+charac_scale.200 = readRDS(results_folder,"/200_MoranI_charach.autocorr.scale_20increment_2plusOTUs_noLagoon.rds")
+diversity.200 = readRDS(results_folder,"/Total.read.numbers.200_diversity.200.rds")[[2]]
+tot_reads.200 = readRDS(results_folder,"/Total.read.numbers.200_diversity.200.rds")[[1]]
+Moran.I.250 = readRDS(results_folder,"/250_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.250 = Moran.I.250[[1]]
 I_square.p.value_w.mean.250 = Moran.I.250[[2]]
-diversity.250 = readRDS(data_folder,"/Total.read.numbers.250_diversity.250.rds")[[2]]
-tot_reads.250 = readRDS(data_folder,"/Total.read.numbers.250_diversity.250.rds")[[1]]
-Moran.I.300 = readRDS(data_folder,"/300_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+diversity.250 = readRDS(results_folder,"/Total.read.numbers.250_diversity.250.rds")[[2]]
+tot_reads.250 = readRDS(results_folder,"/Total.read.numbers.250_diversity.250.rds")[[1]]
+Moran.I.300 = readRDS(results_folder,"/300_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.300 = Moran.I.300[[1]]
 I_square.p.value_w.mean.300 = Moran.I.300[[2]]
-diversity.300 = readRDS(data_folder,"/Total.read.numbers.300_diversity.300.rds")[[2]]
-tot_reads.300 = readRDS(data_folder,"/Total.read.numbers.300_diversity.300.rds")[[1]]
-Moran.I.350 = readRDS(data_folder,"/350_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+diversity.300 = readRDS(results_folder,"/Total.read.numbers.300_diversity.300.rds")[[2]]
+tot_reads.300 = readRDS(results_folder,"/Total.read.numbers.300_diversity.300.rds")[[1]]
+Moran.I.350 = readRDS(results_folder,"/350_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.350 = Moran.I.350[[1]]
 I_square.p.value_w.mean.350 = Moran.I.350[[2]]
-diversity.350 = readRDS(data_folder,"/Total.read.numbers.350_diversity.350.rds")[[2]]
-tot_reads.350 = readRDS(data_folder,"/Total.read.numbers.350_diversity.350.rds")[[1]]
-Moran.I.500 = readRDS(data_folder,"/500_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+diversity.350 = readRDS(results_folder,"/Total.read.numbers.350_diversity.350.rds")[[2]]
+tot_reads.350 = readRDS(results_folder,"/Total.read.numbers.350_diversity.350.rds")[[1]]
+Moran.I.500 = readRDS(results_folder,"/500_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.500 = Moran.I.500[[1]]
 I_square.p.value_w.mean.500 = Moran.I.500[[2]]
-diversity.500 = readRDS(data_folder,"/Total.read.numbers.500_diversity.500.rds")[[2]]
-tot_reads.500 = readRDS(data_folder,"/Total.read.numbers.500_diversity.500.rds")[[1]]
+diversity.500 = readRDS(results_folder,"/Total.read.numbers.500_diversity.500.rds")[[2]]
+tot_reads.500 = readRDS(results_folder,"/Total.read.numbers.500_diversity.500.rds")[[1]]
 #######
-# Moran.I.200.random = readRDS(data_folder,"/200.random.1-5_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+# Moran.I.200.random = readRDS(results_folder,"/200.random.1-5_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 # I_square.observed_w.mean.200.random.5reals = Moran.I.200.random[[1]]
 # I_square.p.value_w.mean.200.random.5reals = Moran.I.200.random[[2]]
-Moran.I.250.random = readRDS(data_folder,"/250.random_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.250.random = readRDS(results_folder,"/250.random_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.250.random = Moran.I.250.random[[1]]
 I_square.p.value_w.mean.250.random = Moran.I.250.random[[2]]
-Moran.I.350.random = readRDS(data_folder,"/350.random_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.350.random = readRDS(results_folder,"/350.random_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.350.random = Moran.I.350.random[[1]]
 I_square.p.value_w.mean.350.random = Moran.I.350.random[[2]]
-Moran.I.200.random = readRDS(data_folder,"/200.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.200.random = readRDS(results_folder,"/200.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.200.random.10reals = Moran.I.200.random[[1]]
 I_square.p.value_w.mean.200.random.10reals = Moran.I.200.random[[2]]
-Moran.I.400.random = readRDS(data_folder,"/400.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.400.random = readRDS(results_folder,"/400.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.400.random.10reals = Moran.I.400.random[[1]]
 I_square.p.value_w.mean.400.random.10reals = Moran.I.400.random[[2]]
-Moran.I.800.random = readRDS(data_folder,"/800.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.800.random = readRDS(results_folder,"/800.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.800.random.10reals = Moran.I.800.random[[1]]
 I_square.p.value_w.mean.800.random.10reals = Moran.I.800.random[[2]]
-mean_prevalence_results = readRDS(data_folder,"/mean_OTU.prevalence.250.350.random.rds")
+mean_prevalence_results = readRDS(results_folder,"/mean_OTU.prevalence.250.350.random.rds")
 mean_prevalence.250.random = mean_prevalence_results[[1]]
 mean_prevalence.350.random = mean_prevalence_results[[1]]
-median_prevalence_results = readRDS(data_folder,"/median_OTU.prevalence.250.350.random.rds")
+median_prevalence_results = readRDS(results_folder,"/median_OTU.prevalence.250.350.random.rds")
 median_prevalence.250.random = median_prevalence_results[[1]]
 median_prevalence.350.random = median_prevalence_results[[1]]
 #####
-Moran.I.random.groups = readRDS(data_folder,"/random.group.div_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.random.groups = readRDS(results_folder,"/random.group.div_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 I_square.observed_w.mean.random.groups = Moran.I.random.groups[[1]]
 I_square.p.value_w.mean.random.groups = Moran.I.random.groups[[2]]
-lat_I_random.groups = readRDS(data_folder,"/random.group.div_lat_I_sigma2.25_noLagoon.rds")[[1]]
-basin_I_random.groups = readRDS(data_folder,"/random.group.div_basin_I_noLagoon.rds")[[1]]
+lat_I_random.groups = readRDS(results_folder,"/random.group.div_lat_I_sigma2.25_noLagoon.rds")[[1]]
+basin_I_random.groups = readRDS(results_folder,"/random.group.div_basin_I_noLagoon.rds")[[1]]
 #####
-shannon_results = readRDS(data_folder,"/Shannon.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+shannon_results = readRDS(results_folder,"/Shannon.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 shannon_SUR = unlist(lapply(shannon_results[[2]],mean))
 shannon_DCM = unlist(lapply(shannon_results[[3]],mean))
-simpson_results = readRDS(data_folder,"/Simpson.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+simpson_results = readRDS(results_folder,"/Simpson.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 simpson_SUR = 1-unlist(lapply(simpson_results[[2]],mean))
 invsimpson_SUR = 1/unlist(lapply(simpson_results[[2]],mean))
-shannon_total_results = readRDS(data_folder,"/Shannon.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+shannon_total_results = readRDS(results_folder,"/Shannon.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 shannon_total_SUR = shannon_total_results[[2]]
 shannon_total_DCM = shannon_total_results[[3]]
-simpson_total_results = readRDS(data_folder,"/Simpson.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+simpson_total_results = readRDS(results_folder,"/Simpson.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 simpson_total_SUR = 1-simpson_total_results[[2]]
 invsimpson_total_SUR = 1/simpson_total_results[[2]]
-nb_dominants_results = readRDS(data_folder,"/Nb.dominant.assemblages.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+nb_dominants_results = readRDS(results_folder,"/Nb.dominant.assemblages.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 nb_dominants = nb_dominants_results[[1]]
 nb_absolute_dominants = nb_dominants_results[[2]]
 ######
-Moran.I_V9.psbO = readRDS(paste0(data_folder,"/Moran.I_psbO.stations_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+Moran.I_V9.psbO = readRDS(paste0(results_folder,"/Moran.I_psbO.stations_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean_V9.psbO = Moran.I_V9.psbO[[1]]
 I_square.p.value_w.mean_V9.psbO = Moran.I_V9.psbO[[2]]
-charac_scale_V9.psbO = readRDS(paste0(data_folder,"/MoranI_psbO.stations_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-lat_I_V9.psbO = readRDS(paste0(data_folder,"/lat_I_psbO.stations_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-basin_I_V9.psbO = readRDS(paste0(data_folder,"/basin_I_psbO.stations",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+charac_scale_V9.psbO = readRDS(paste0(results_folder,"/MoranI_psbO.stations_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+lat_I_V9.psbO = readRDS(paste0(results_folder,"/Lat_I_psbO.stations_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+basin_I_V9.psbO = readRDS(paste0(results_folder,"/Basin_I_psbO.stations",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 ######
-Moran.I_V9.V4 = readRDS(paste0(data_folder,"/Moran.I_V4.stations_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+Moran.I_V9.V4 = readRDS(paste0(results_folder,"/Moran.I_V4.stations_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean_V9.V4 = Moran.I_V9.V4[[1]]
 I_square.p.value_w.mean_V9.V4 = Moran.I_V9.V4[[2]]
-charac_scale_V9.V4 = readRDS(paste0(data_folder,"/MoranI_V4.stations_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-lat_I_V9.V4 = readRDS(paste0(data_folder,"/lat_I_V4.stations_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-basin_I_V9.V4 = readRDS(paste0(data_folder,"/basin_I_V4.stations",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+charac_scale_V9.V4 = readRDS(paste0(results_folder,"/MoranI_V4.stations_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+lat_I_V9.V4 = readRDS(paste0(results_folder,"/Lat_I_V4.stations_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+basin_I_V9.V4 = readRDS(paste0(results_folder,"/Basin_I_V4.stations",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 ######
-Moran.I_psbO = readRDS(paste0(data_folder,"/psbO_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+Moran.I_psbO = readRDS(paste0(results_folder,"/psbO_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean_psbO = Moran.I_psbO[[1]]
 I_square.p.value_w.mean_psbO = Moran.I_psbO[[2]]
-charac_scale_psbO = readRDS(paste0(data_folder,"/psbO_MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-lat_I_psbO = readRDS(paste0(data_folder,"/psbO_lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-basin_I_psbO = readRDS(paste0(data_folder,"/psbO_basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+charac_scale_psbO = readRDS(paste0(results_folder,"/psbO_MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+lat_I_psbO = readRDS(paste0(results_folder,"/psbO_lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+basin_I_psbO = readRDS(paste0(results_folder,"/psbO_basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 ####
-Moran.I_V4 = readRDS(paste0(data_folder,"/V4_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
+Moran.I_V4 = readRDS(paste0(results_folder,"/V4_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean_V4 = Moran.I_V4[[1]]
 I_square.p.value_w.mean_V4 = Moran.I_V4[[2]]
-charac_scale_V4 = readRDS(paste0(data_folder,"/V4_MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-lat_I_V4 = readRDS(paste0(data_folder,"/V4_lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-basin_I_V4 = readRDS(paste0(data_folder,"/V4_basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+charac_scale_V4 = readRDS(paste0(results_folder,"/V4_MoranI_charach.autocorr.scale_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+lat_I_V4 = readRDS(paste0(results_folder,"/V4_lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+basin_I_V4 = readRDS(paste0(results_folder,"/V4_basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 ######
-Normalized_VI_V9.V4.psbO = readRDS(data_folder,"/Normalized.VI_marker.comparison.SUR_V9-V4_V9-psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Normalized_VI_V9.V4.psbO = readRDS(results_folder,"/Normalized.VI_marker.comparison.SUR_V9-V4_V9-psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 Normalized_VI_V9.V4 = Normalized_VI_V9.V4.psbO[[1]]
 Normalized_VI_V9.psbO = Normalized_VI_V9.V4.psbO[[2]]
-Normalized_VI_V4.psbO = readRDS(data_folder,"/Normalized.VI_group.comparison.SUR_V4.psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Normalized_VI_V4.psbO = readRDS(results_folder,"/Normalized.VI_group.comparison.SUR_V4.psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 Normalized_VI_V4 = Normalized_VI_V4.psbO[[1]]
 Normalized_VI_psbO = Normalized_VI_V4.psbO[[2]]
 
 # Old:
-# varpart.indSelec = readRDS(paste0(data_folder,"/varpart_lda_environment-currents_bothDirectionsIndependentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+# varpart.indSelec = readRDS(paste0(results_folder,"/varpart_lda_environment-currents_bothDirectionsIndependentSelection_PCA0",abiotic_pca_insert,biotic_pca_insert,stdzation_insert,noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 #
 # Variable selection + individually selected axes:
-# varpart.indSelec = readRDS(paste0(data_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
+# varpart.indSelec = readRDS(paste0(results_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
 #                                   "_separate.SUR.DCM_both.directions.independent.selection_PCA0_abioticPCA_bioticPCA_eigenvalueThres0.8",noLagoon_insert,"_(0ter).rds"))
 # Variable selection without preliminary tests:
-# varpart.indSelec = readRDS(paste0(data_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
+# varpart.indSelec = readRDS(paste0(results_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
 #                                   "_separate.SUR.DCM_both.directions.independent.selection_PCA0_no.indiv.signif.axes_no.prelim.global.test_abioticPCA_bioticPCA_eigenvalueThres0.8.rds"))
 # Only variable selection:
-# varpart.indSelec = readRDS(paste0(data_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
+# varpart.indSelec = readRDS(paste0(results_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
                                   # "_separate.SUR.DCM_both.directions.independent.selection_PCA0_no.indiv.signif.axes_abioticPCA_bioticPCA_eigenvalueThres0.8.rds"))
 # Only individually selected axes:
-# varpart.indSelec = readRDS(paste0(data_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
+# varpart.indSelec = readRDS(paste0(results_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
 #                                   "_separate.SUR.DCM_PCA0_abioticPCA_bioticPCA_eigenvalueThres0.8.rds"))
-varpart.indSelec = readRDS(paste0(data_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
+varpart.indSelec = readRDS(paste0(results_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
                                   "_separate.SUR.DCM_PCA0_BH.correction_abioticPCA_bioticPCA_eigenvalueThres0.8.rds"))
 # No selection whatsoever:
-# varpart.indSelec = readRDS(paste0(data_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
+# varpart.indSelec = readRDS(paste0(results_folder,"/varpart_lda_Gibbs.prevalence.min.crossValid10sampleFolds",
 #                                   "_separate.SUR.DCM_PCA0_no.indiv.signif.axes_abioticPCA_bioticPCA_eigenvalueThres0.8.rds"))
 varpart.env.spatial = varpart.indSelec[[1]]
 varpart.env.spatial[[1]][varpart.env.spatial[[1]]<0] = 0
@@ -370,7 +375,7 @@ varpart.biotic.abiotic[[2]][varpart.biotic.abiotic[[2]]<0] = 0
 varpart.biotic.abiotic.pval = varpart.indSelec[[6]]
 
 #########
-Normalized_VI = readRDS(data_folder,"/Normalized.VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Normalized_VI = readRDS(results_folder,"/Normalized.VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 div_threshold = 100
 NormalizedVI_pcoa = vector(length = 3, mode = "list")
 names(NormalizedVI_pcoa) = c("SUR","DCM","All")
@@ -382,7 +387,7 @@ for (i_case in 1:3)
 }
 
 ########
-normalized.VI.reals = readRDS(paste0(data_folder,"/Normalized_VI_10reals_different.stations.means.rds"))
+normalized.VI.reals = readRDS(paste0(results_folder,"/Normalized_VI_10reals_different.stations.means.rds"))
 normalized.VI.best.real = normalized.VI.reals[[1]] 
 normalized.VI.10.reals = normalized.VI.reals[[2]]
 
@@ -542,7 +547,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
 
 # Old fig. 2 autocorr. scale:
 {
-  Moran.step = readRDS(paste0(data_folder,"/MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  Moran.step = readRDS(paste0(results_folder,"/MoranI_spatialAutocorr_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   increment.allTaxa = Moran.step[[1]][[1]]
   I_step_observed_w.mean.allTaxa = Moran.step[[1]][[2]]
   # I_step_relative_w.mean.allTaxa = Moran.step[[1]][[3]]
@@ -596,7 +601,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
 
 # Old fig. 2 JSD Surf. DCM plot
 {
-  JSD_object = readRDS(paste0(data_folder,"/JSD_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  JSD_object = readRDS(paste0(results_folder,"/JSD_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   JSD.allTaxa = JSD_object[[1]][[1]]
   coord_JSD.allTaxa = JSD_object[[1]][[2]]
   
@@ -670,23 +675,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
 
 # Old fig. 3 - v1:
 {
-  div_threshold = 100
-  
-  dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  dominant_function0 = dominant_function[selected_groups & diversity>div_threshold][-69]
-  # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
-  # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
-  dominant_function0[dominant_function0 == "unknown"] = NA
-  dominant_function0[dominant_function0 == "photohost"] = "Collodaria"
-  dominant_function0[dominant_function0 == "pteropoda"] = "Pteropoda"
-  dominant_function0[dominant_function0 == "copepoda"] = "Copepoda"
-  dominant_function0[dominant_function0 == "gelatineous_carnivores_filterers"] = "Gel. carn. filterers"
-  dominant_function0[taxo_groups[selected_groups & diversity>div_threshold][-69] == "Dinophyceae"] = "Dinophyceae"
-  dominant_function0[taxo_groups[selected_groups & diversity>div_threshold][-69] == "Bacillariophyta"] = "Bacillariophyta"
-  dominant_function0[dominant_function0 == "phototroph"] = "Other phototrophs"
-  dominant_function0[dominant_function0 == "phagotroph"] = "Phagotrophs"
-  dominant_function0[dominant_function0 == "other metazoa"] = "Other metazoa"
-  dominant_function0[dominant_function0 == "parasite"] = "Parasites"
+  dominant_function0 = dominant_function0[-69]
   # alpha = rep(1,length(taxo_groups[selected_groups]))
   # alpha[dominant_function0 %in% c("copepoda","pteropoda")] = 0 
   # Changes how the factors are stored (order of levels()) so that geom_boxplot plots them by deceasing number of groups:
@@ -955,23 +944,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
 {
   div_threshold = 100
   
-  ##########
-  dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  dominant_function0 = dominant_function[selected_groups & diversity>div_threshold][-69]
-  # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
-  # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
-  dominant_function0[dominant_function0 == "unknown"] = NA
-  dominant_function0[dominant_function0 == "photohost"] = "Collodaria"
-  dominant_function0[dominant_function0 == "pteropoda"] = "Pteropoda"
-  dominant_function0[dominant_function0 == "copepoda"] = "Copepoda"
-  dominant_function0[dominant_function0 == "gelatineous_carnivores_filterers"] = "Gel. carn. filterers"
-  dominant_function0[taxo_groups[selected_groups & diversity>div_threshold][-69] == "Dinophyceae"] = "Dinophyceae"
-  dominant_function0[taxo_groups[selected_groups & diversity>div_threshold][-69] == "Bacillariophyta"] = "Bacillariophyta"
-  dominant_function0[taxo_groups[selected_groups & diversity>div_threshold][-69] == "Chrysophyceae"] = "Phototrophs"
-  dominant_function0[dominant_function0 == "phototroph"] = "Other phototrophs"
-  dominant_function0[dominant_function0 == "phagotroph"] = "Phagotrophs"
-  dominant_function0[dominant_function0 == "other metazoa"] = "Other metazoa"
-  dominant_function0[dominant_function0 == "parasite"] = "Parasites"
+  dominant_function0 = dominant_function0[-69]
   # alpha = rep(1,length(taxo_groups[selected_groups]))
   # alpha[dominant_function0 %in% c("copepoda","pteropoda")] = 0 
   # Changes how the factors are stored (order of levels()) so that geom_boxplot plots them by deceasing number of groups:
@@ -1382,9 +1355,9 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
 
 # Old fig. 3 - lat. sym.
 {
-  lat_JSD.result = readRDS(paste0(data_folder,"/Lat_JSD_sigma2.10",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  lat_JSD.result = readRDS(paste0(results_folder,"/Lat_JSD_sigma2.10",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   lat_JSD = lat_JSD.result[[1]]
-  lat_I.result = readRDS(paste0(data_folder,"/Lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  lat_I.result = readRDS(paste0(results_folder,"/Lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
   lat_I = lat_I.result[[1]]
   
   i_case = 1
@@ -2016,7 +1989,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
     stations_depths[station_depth_index,1:2] = c(strsplit(rownames(coord)[station_depth_index],split=" ",fixed=T)[[1]][1],
                                                  strsplit(rownames(coord)[station_depth_index],split=" ",fixed=T)[[1]][2])
   }
-  pie_positions.SUR = read.table(paste0(data_folder,"/Surf_pies_modified.txt"),sep=",",header=F)
+  pie_positions.SUR = read.table(paste0(results_folder,"/Surf_pies_modified.txt"),sep=",",header=F)
   # pie_positions.SUR[c(55,57) - 1,] = pie_positions.SUR[c(57,55) - 1,]
   pie_positions.SUR[55:57 - 1,] = pie_positions.SUR[c(56,57,55) - 1,]
   pie_positions.SUR[56 - 1,] = pie_positions.SUR[56 - 1,] + c(1.5,0)
@@ -2958,21 +2931,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   div_threshold = 100
   
   ##########
-  dominant_function = readRDS(paste0(data_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
-  dominant_function0 = dominant_function[selected_groups & diversity>div_threshold][-69]
-  # dominant_function0[dominant_function0 %in% c("other metazoa","gelatineous_carnivores_filterers","copepoda","pteropoda")] = "metazoa"
-  # dominant_function0[dominant_function0 %in% c("unknown","photohost")] = NA
-  dominant_function0[dominant_function0 == "unknown"] = NA
-  dominant_function0[dominant_function0 == "photohost"] = "Collodaria"
-  dominant_function0[dominant_function0 == "pteropoda"] = "Pteropoda"
-  dominant_function0[dominant_function0 == "copepoda"] = "Copepoda"
-  dominant_function0[dominant_function0 == "gelatineous_carnivores_filterers"] = "Gel. carn. filterers"
-  dominant_function0[taxo_groups[selected_groups & diversity>div_threshold][-69] == "Dinophyceae"] = "Dinophyceae"
-  dominant_function0[taxo_groups[selected_groups & diversity>div_threshold][-69] == "Bacillariophyta"] = "Bacillariophyta"
-  dominant_function0[dominant_function0 == "phototroph"] = "Other phototrophs"
-  dominant_function0[dominant_function0 == "phagotroph"] = "Phagotrophs"
-  dominant_function0[dominant_function0 == "other metazoa"] = "Other metazoa"
-  dominant_function0[dominant_function0 == "parasite"] = "Parasites"
+  dominant_function0 = dominant_function0[-69]
   # alpha = rep(1,length(taxo_groups[selected_groups]))
   # alpha[dominant_function0 %in% c("copepoda","pteropoda")] = 0 
   # Changes how the factors are stored (order of levels()) so that geom_boxplot plots them by deceasing number of groups:
@@ -5849,7 +5808,7 @@ for (station_depth_index in 1:nrow(coord))
                                                strsplit(rownames(coord)[station_depth_index],split=" ",fixed=T)[[1]][2])
 }
 
-pie_positions.SUR = read.table(paste0(data_folder,"/Surf_pies_modified.txt"),sep=",",header=F)
+pie_positions.SUR = read.table(paste0(results_folder,"/Surf_pies_modified.txt"),sep=",",header=F)
 # pie_positions.SUR[c(55,57) - 1,] = pie_positions.SUR[c(57,55) - 1,]
 pie_positions.SUR[55:57 - 1,] = pie_positions.SUR[c(56,57,55) - 1,]
 pie_positions.SUR[56 - 1,] = pie_positions.SUR[56 - 1,] + c(1.5,0)
@@ -6176,7 +6135,7 @@ dev.off()
   blues = c("lightsteelblue4", "lightsteelblue3", "lightsteelblue2", "lightsteelblue1")
   greys = c(grey(0.6), grey(0.93), grey(0.99))
   
-  pie_positions.SUR = read.table(paste0(data_folder,"Surf_pies_modified.txt"),sep=",",header=F)
+  pie_positions.SUR = read.table(paste0(results_folder,"Surf_pies_modified.txt"),sep=",",header=F)
   # pie_positions.SUR[c(55,57) - 1,] = pie_positions.SUR[c(57,55) - 1,]
   pie_positions.SUR[55:57 - 1,] = pie_positions.SUR[c(56,57,55) - 1,]
   pie_positions.SUR[56 - 1,] = pie_positions.SUR[56 - 1,] + c(1.5,0)
@@ -6261,7 +6220,7 @@ dev.off()
   
   # biotic
   ##########
-  relativeAbund_file = paste0(data_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds")
+  relativeAbund_file = paste0(results_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds")
   relativeAbund_all = readRDS(relativeAbund_file)
   
   relativeAbund_PCA0 = list()
@@ -6460,19 +6419,19 @@ dev.off()
 
 # Fig. S. adj. R2 hist per MEM
 {
-  adjr2_individualAxes_MEM = readRDS(paste0(data_folder,"/",
-                                     "RDA_Gibbs.prevalence.min.crossValid10sampleFolds_separate.SUR.DCM_individualAxes",
-                                     "_abioticPCA_bioticPCA_eigenvalueThres0.8.rds"))[[5]]
-  envSelected = readRDS(paste0(data_folder,"/",
-                                      "RDA_Gibbs.prevalence.min.crossValid10sampleFolds_separate.SUR.DCM_",
-                                      # "noSelectedAxes-envSelected-significantGlobalModel-nbSites_",
-                                      "noSelectedAxes-envSelected-nbSites_",
-                                      # "both.directions.independent.selection",
-                                      "BH.correction",
-                                      "_abioticPCA_bioticPCA_eigenvalueThres0.8.rds"))[[2]]
+  adjr2_individualAxes_MEM = readRDS(paste0(results_folder,"/",
+                                            "RDA_Gibbs.prevalence.min.crossValid10sampleFolds_separate.SUR.DCM_individualAxes",
+                                            "_abioticPCA_bioticPCA_eigenvalueThres0.8.rds"))[[5]]
+  envSelected = readRDS(paste0(results_folder,"/",
+                               "RDA_Gibbs.prevalence.min.crossValid10sampleFolds_separate.SUR.DCM_",
+                               # "noSelectedAxes-envSelected-significantGlobalModel-nbSites_",
+                               "noSelectedAxes-envSelected-nbSites_",
+                               # "both.directions.independent.selection",
+                               "BH.correction",
+                               "_abioticPCA_bioticPCA_eigenvalueThres0.8.rds"))[[2]]
   
-  charac_dist.SUR_scale = readRDS(paste0(data_folder,"/MEM.charac.dist.scale_SUR.rds"))
-  charac_tmin.SUR_scale = readRDS(paste0(data_folder,"/MEM.charac.tmin.scale_SUR.rds"))
+  charac_dist.SUR_scale = readRDS(paste0(results_folder,"/MEM.charac.dist.scale_SUR.rds"))
+  charac_tmin.SUR_scale = readRDS(paste0(results_folder,"/MEM.charac.tmin.scale_SUR.rds"))
   
   # max.selected.axes = vector(length = length(taxo_groups), mode = "numeric")
   # envSelected.SUR.MEM = list()
@@ -6665,10 +6624,10 @@ dev.off()
 
 # Fig. S. adj. R2 hist per abiotic axis:
 {
-  adjr2_individualAxes_abiotic = readRDS(paste0(data_folder,"/",
+  adjr2_individualAxes_abiotic = readRDS(paste0(results_folder,"/",
                                             "RDA_Gibbs.prevalence.min.crossValid10sampleFolds_separate.SUR.DCM_individualAxes_",
                                             "independent.selection_abioticPCA_bioticPCA_eigenvalueThres0.8_noLagoon.rds"))[[1]]
-  envSelected = readRDS(paste0(data_folder,"/",
+  envSelected = readRDS(paste0(results_folder,"/",
                                "RDA_Gibbs.prevalence.min.crossValid10sampleFolds_separate.SUR.DCM_",
                                "noSelectedAxes-envSelected-significantGlobalModel-nbSites_",
                                "both.directions.independent.selection_abioticPCA_bioticPCA_eigenvalueThres0.8_noLagoon.rds"))[[2]]
@@ -11000,7 +10959,7 @@ dev.off()
 # Comparison across reals AllTaxa
 {
   sampled_logLiks = readRDS(data_folder,"/18S_V9_TARA_CompleteSizeRange_byStationByDepth_AllTaxa_noLagoon/Rtopicmodels_LDA_Gibbs_alpha0.1_delta0.1_nb_topics16_nb_iter1000_nb_real100_meanPosteriorDistributedLlh_thin25_burnin2000_occurrence/posterior_sampled_logLiks.rds")
-  chains.allTaxa = readRDS(data_folder,"/Chains.allTaxa_nb_iter3000_nb_real100_occurrence.rds")
+  chains.allTaxa = readRDS(results_folder,"/Chains.allTaxa_nb_iter3000_nb_real100_occurrence.rds")
  
   x.samples = y.samples = vector(length = 100, mode = "numeric")
   for (i_chain in 1:100)
