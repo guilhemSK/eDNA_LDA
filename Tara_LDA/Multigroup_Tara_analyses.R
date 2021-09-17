@@ -2188,7 +2188,7 @@ if (mean_group_size)
 
 if (mean_travel_time_connectivity)
 {
-  travel.folder_name = paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone")
+  travel.folder_name = paste0(data_folder,"/Abiotic_data")
   
   if (particle_thres == 1000)
   {
@@ -7421,21 +7421,21 @@ if (environmental_data)
   # sample_ref$Latitude = abs(sample_ref$Latitude)
   
   # Adding seasonality_index:
-  # seasonality_index = read.table(paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone/seasonality_index_t_n.csv"),sep=",",header=T,row.names=1)
+  # seasonality_index = read.table(paste0(data_folder,"/Abiotic_data/seasonality_index_t_n.csv"),sep=",",header=T,row.names=1)
   # # Selecting the samples available in sample_ref:
   # seasonality_index = seasonality_index[sample_ref$Sample.id,c("Seasonality_index.Temperature","Seasonality_index.Nitrates")]
   # sample_ref = cbind(sample_ref,seasonality_index)
   
   # Loading the WOA13 averaged-interpolated abiotic data (data used by Watteaux-Iudicone):
-  # station_ref = read.table(paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone/WOA13_AMODIS_data.csv"),sep=",",header=T,row.names=1)
+  # station_ref = read.table(paste0(data_folder,"/Abiotic_data/WOA13_AMODIS_data.csv"),sep=",",header=T,row.names=1)
   
   # Loading the WOA13 averaged-interpolated abiotic data (data sent by Paul Frémont and Olivier Jaillon):
-  # station_ref_Arctic = read.table(paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone/Env_arctic_woa13.csv"),sep=";",header=T,row.names=1)
+  # station_ref_Arctic = read.table(paste0(data_folder,"/Abiotic_data/Env_arctic_woa13.csv"),sep=";",header=T,row.names=1)
   # Reordering station_ref_Arctic according to watteaux_selected_variables
   # station_ref_Arctic = station_ref_Arctic[,c("Temperature..degree.C.","Nitrate..micromol.L.","O2.dissolved..ml.L.","O2.Saturation....","Apparent.O2.utilization..ml.L.","Phosphate..micromol.L.","Silicate..micromol.L.","Distance.to.coast..kms.")]
   
   # Loading the WOA13 averaged-interpolated abiotic data (data sent by Paul Frémont and Olivier Jaillon):
-  station_ref_all = read.table(paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone/woa13_env_tara_all.csv"),sep=";",header=T,row.names=1)
+  station_ref_all = read.table(paste0(data_folder,"/Abiotic_data/woa13_env_tara_all.csv"),sep=";",header=T,row.names=1)
   # Reordering the variables as in watteaux_selected_variables
   station_ref_all = station_ref_all[,c("T","no3","O2","o2s","aou","po4","si")]
   
@@ -7682,7 +7682,7 @@ if (environmental_data)
   abiotic_data = abiotic_data[,colnames(abiotic_data) != "Depth.nominal"]
   
   ##############################################################
-  travel.folder_name = paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone")
+  travel.folder_name = paste0(data_folder,"/Abiotic_data")
   travel_time_matrix_SUR = read.table(paste0(travel.folder_name,"/minAijji_tarrive_min_surface_10.csv"),sep="\t",header=T,row.names=1)
   # travel_time_matrix = read.table(paste0(travel.folder_name,"/minAijji_tarrive_min_surface_1000.csv"),sep="\t",header=T,row.names=1)
   travel_time_matrix_SUR = travel_time_matrix_SUR[,-ncol(travel_time_matrix_SUR)]
@@ -7751,7 +7751,7 @@ if (environmental_data)
   #######################################
   # Building distance-based MEMs
   ##############################
-  geographic_distances = as.matrix(read.table(paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone/Geographic_distances.csv"),sep="\t",header=T,row.names=1))
+  geographic_distances = as.matrix(read.table(paste0(data_folder,"/Abiotic_data/Geographic_distances.csv"),sep="\t",header=T,row.names=1))
   geographic_distances = geographic_distances[,-ncol(geographic_distances)]
   selected_geographic_distances = geographic_distances[selected_stations,paste0("X",selected_stations)]
   diag(selected_geographic_distances) = NA
@@ -19700,7 +19700,7 @@ if (MEM_structure)
   ##############
   # Loading travel times:
   
-  travel.folder_name = paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone")
+  travel.folder_name = paste0(data_folder,"/Abiotic_data")
   travel_time_matrix_SUR = as.matrix(read.table(paste0(travel.folder_name,"/minAijji_tarrive_min_surface_10.csv"),sep="\t",header=T,row.names=1))
   # travel_time_matrix = read.table(paste0(travel.folder_name,"/minAijji_tarrive_min_surface_1000.csv"),sep="\t",header=T,row.names=1)
   travel_time_matrix_SUR = travel_time_matrix_SUR[,-ncol(travel_time_matrix_SUR)]
@@ -19835,7 +19835,7 @@ if (MEM_structure)
   ###############
   # Loading geographic distances:
   
-  geographic_distances = as.matrix(read.table(paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone/Geographic_distances.csv"),sep="\t",header=T,row.names=1))
+  geographic_distances = as.matrix(read.table(paste0(data_folder,"/Abiotic_data/Geographic_distances.csv"),sep="\t",header=T,row.names=1))
   geographic_distances = geographic_distances[,-ncol(geographic_distances)]
   selected_geographic_distances = geographic_distances[selected_stations,paste0("X",selected_stations)]
   diag(selected_geographic_distances) = NA
@@ -20175,7 +20175,7 @@ if (spatial_structure)
     optimalK_prevalence.min.crossValid = readRDS(paste0(results_folder,"/",short_marker,"optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds"))
   }
   
-  geographic_distances = read.table(paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone/Geographic_distances.csv"),sep="\t",header=T,row.names=1)
+  geographic_distances = read.table(paste0(data_folder,"/Abiotic_data/Geographic_distances.csv"),sep="\t",header=T,row.names=1)
   geographic_distances = geographic_distances[,-ncol(geographic_distances)]
   
   if (data_Federico)
@@ -26408,7 +26408,7 @@ if (Arctic_analyses)
   particle_thres = 1000
   travel_time_thres = max_travel_time_matrix
   
-  travel.folder_name = paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone")
+  travel.folder_name = paste0(data_folder,"/Abiotic_data")
   
   if (particle_thres == 1000 && travel_time_thres > 0)
   {

@@ -109,7 +109,7 @@ selected_groups_psbO[1:6] = T
 selected_groups_V4 = rep(F,length(taxo_groups_V4))
 selected_groups_V4[1:41] = T
 ######
-tot_reads = readRDS(results_folder,"/Total.read.numbers.rds")
+tot_reads = readRDS(paste0(results_folder,"/Total.read.numbers.rds"))
 
 ##########
 dominant_function = readRDS(paste0(results_folder,"/dominant_function_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
@@ -156,36 +156,36 @@ taxo_groups_unmodified = levels(as.factor(taxo_groups_OTUs))[sort.int(table(as.f
 #######
 
 #########
-optimalK_prevalence.min.crossValid.complete = readRDS(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds")
+optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
 optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
 optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]]   
 ####
-optimalK_prevalence.min.crossValid_psbO = readRDS(results_folder,"/psbO_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds")
+optimalK_prevalence.min.crossValid_psbO = readRDS(paste0(results_folder,"/psbO_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds"))
 ####
-optimalK_prevalence.min.crossValid_V4 = readRDS(results_folder,"/V4_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds")
+optimalK_prevalence.min.crossValid_V4 = readRDS(paste0(results_folder,"/V4_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-30t_iter1000thin25burnin2000_2plusOTUs_noLagoon.rds"))
 #######
 
 ######
-mean_sim = readRDS(results_folder,"/mean_sim_optimalK_Gibbs.prevalence.min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds")
+mean_sim = readRDS(paste0(results_folder,"/mean_sim_optimalK_Gibbs.prevalence.min.crossValid10sampleFolds_2plusOTUs_noLagoon.rds"))
 mean_sim.allTaxa = 0.894643970320553 
-normalized.VI.within.group = readRDS(results_folder,"/Normalized_VI_within.groups_100reals_different.stations.means.rds")
-mean.normalized.VI.within.group = readRDS(results_folder,"/Normalized_VI_mean.within.groups_100reals_different.stations.means.rds")
+normalized.VI.within.group = readRDS(paste0(results_folder,"/Normalized_VI_within.groups_100reals_different.stations.means.rds"))
+mean.normalized.VI.within.group = readRDS(paste0(results_folder,"/Normalized_VI_mean.within.groups_100reals_different.stations.means.rds"))
 mean.normalized.VI.allTaxa = 0.8196249
-R.hat.500.result = readRDS(results_folder,"/Rhat.burnin.500_nb_iter3000_nb_real100_occurrence.rds")
+R.hat.500.result = readRDS(paste0(results_folder,"/Rhat.burnin.500_nb_iter3000_nb_real100_occurrence.rds"))
 R.hat.500.allTaxa = R.hat.500.result[[1]]
 R.hat.500 = R.hat.500.result[[2]]
-R.hat.1000.result = readRDS(results_folder,"/Rhat.burnin.1000_nb_iter3000_nb_real100_occurrence.rds")
+R.hat.1000.result = readRDS(paste0(results_folder,"/Rhat.burnin.1000_nb_iter3000_nb_real100_occurrence.rds"))
 R.hat.1000.allTaxa = R.hat.1000.result[[1]]
 R.hat.1000 = R.hat.1000.result[[2]]
-R.hat.2000.result = readRDS(results_folder,"/Rhat.burnin.2000_nb_iter3000_nb_real100_occurrence.rds")
+R.hat.2000.result = readRDS(paste0(results_folder,"/Rhat.burnin.2000_nb_iter3000_nb_real100_occurrence.rds"))
 R.hat.2000.allTaxa = R.hat.2000.result[[1]]
 R.hat.2000 = R.hat.2000.result[[2]]
 # SUR.DCM_VI_over_K = readRDS(results_folder,"/VI.over.K_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
-SUR.DCM_Normalized.VI = readRDS(results_folder,"/Normalized.VI_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+SUR.DCM_Normalized.VI = readRDS(paste0(results_folder,"/Normalized.VI_SUR.DCM_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 ######
 
 #######
-Moran.I = readRDS(results_folder,"/Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I = readRDS(paste0(results_folder,"/Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean_allTaxa = Moran.I[[1]]
 I_square.observed_w.mean = Moran.I[[2]]
 I_square.p.value_w.mean_allTaxa = Moran.I[[3]]
@@ -196,21 +196,21 @@ charac_scale.allTaxa = autocorr.scale[[2]]
 slope.intercept = readRDS(paste0(results_folder,"/MoranI_slope.intercept_20increment_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 slope = slope.intercept[[1]]
 intercept = slope.intercept[[2]]
-basin_I.result = readRDS(results_folder,"/Basin_I_noLagoon.rds")
+basin_I.result = readRDS(paste0(results_folder,"/Basin_I_noLagoon.rds"))
 basin_I = basin_I.result[[1]]
 lat_I.result = readRDS(paste0(results_folder,"/Lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 lat_I = lat_I.result[[1]]
 #####
-Moran.I.104 = readRDS(results_folder,"/104_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.104 = readRDS(paste0(results_folder,"/104_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.104 = Moran.I.104[[1]]
 I_square.p.value_w.mean.104 = Moran.I.104[[2]]
-diversity.104 = readRDS(results_folder,"/Rarefied_diversity.104.105.106.rds")[[1]]
-Moran.I.105 = readRDS(results_folder,"/105_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+diversity.104 = readRDS(paste0(results_folder,"/Rarefied_diversity.104.105.106.rds"))[[1]]
+Moran.I.105 = readRDS(paste0(results_folder,"/105_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.105 = Moran.I.105[[1]]
 I_square.p.value_w.mean.105 = Moran.I.105[[2]]
-diversity.105 = readRDS(results_folder,"/Rarefied_diversity.104.105.106.rds")[[2]]
+diversity.105 = readRDS(paste0(results_folder,"/Rarefied_diversity.104.105.106.rds"))[[2]]
 ######
-mean_prevalence_results = readRDS(results_folder,"/mean_OTU.prevalence.200.250.300.350.500.1000.rds")
+mean_prevalence_results = readRDS(paste0(results_folder,"/mean_OTU.prevalence.200.250.300.350.500.1000.rds"))
 mean_prevalence = mean_prevalence_results[[1]]
 mean_prevalence.200 = mean_prevalence_results[[2]]
 mean_prevalence.250 = mean_prevalence_results[[3]]
@@ -218,7 +218,7 @@ mean_prevalence.300 = mean_prevalence_results[[4]]
 mean_prevalence.350 = mean_prevalence_results[[5]]
 mean_prevalence.500 = mean_prevalence_results[[6]]
 mean_prevalence.1000 = mean_prevalence_results[[7]]
-median_prevalence_results = readRDS(results_folder,"/median_OTU.prevalence.200.250.300.350.500.1000.rds")
+median_prevalence_results = readRDS(paste0(results_folder,"/median_OTU.prevalence.200.250.300.350.500.1000.rds"))
 median_prevalence = median_prevalence_results[[1]]
 median_prevalence.200 = median_prevalence_results[[2]]
 median_prevalence.250 = median_prevalence_results[[3]]
@@ -226,77 +226,77 @@ median_prevalence.300 = median_prevalence_results[[4]]
 median_prevalence.350 = median_prevalence_results[[5]]
 median_prevalence.500 = median_prevalence_results[[6]]
 median_prevalence.1000 = median_prevalence_results[[7]]
-Moran.I.200 = readRDS(results_folder,"/200_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.200 = readRDS(paste0(results_folder,"/200_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.200 = Moran.I.200[[1]]
 I_square.p.value_w.mean.200 = Moran.I.200[[2]]
-charac_scale.200 = readRDS(results_folder,"/200_MoranI_charach.autocorr.scale_20increment_2plusOTUs_noLagoon.rds")
-diversity.200 = readRDS(results_folder,"/Total.read.numbers.200_diversity.200.rds")[[2]]
-tot_reads.200 = readRDS(results_folder,"/Total.read.numbers.200_diversity.200.rds")[[1]]
-Moran.I.250 = readRDS(results_folder,"/250_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+charac_scale.200 = readRDS(paste0(results_folder,"/200_MoranI_charach.autocorr.scale_20increment_2plusOTUs_noLagoon.rds"))
+diversity.200 = readRDS(paste0(results_folder,"/Total.read.numbers.200_diversity.200.rds"))[[2]]
+tot_reads.200 = readRDS(paste0(results_folder,"/Total.read.numbers.200_diversity.200.rds"))[[1]]
+Moran.I.250 = readRDS(paste0(results_folder,"/250_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.250 = Moran.I.250[[1]]
 I_square.p.value_w.mean.250 = Moran.I.250[[2]]
-diversity.250 = readRDS(results_folder,"/Total.read.numbers.250_diversity.250.rds")[[2]]
-tot_reads.250 = readRDS(results_folder,"/Total.read.numbers.250_diversity.250.rds")[[1]]
-Moran.I.300 = readRDS(results_folder,"/300_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+diversity.250 = readRDS(paste0(results_folder,"/Total.read.numbers.250_diversity.250.rds"))[[2]]
+tot_reads.250 = readRDS(paste0(results_folder,"/Total.read.numbers.250_diversity.250.rds"))[[1]]
+Moran.I.300 = readRDS(paste0(results_folder,"/300_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.300 = Moran.I.300[[1]]
 I_square.p.value_w.mean.300 = Moran.I.300[[2]]
-diversity.300 = readRDS(results_folder,"/Total.read.numbers.300_diversity.300.rds")[[2]]
-tot_reads.300 = readRDS(results_folder,"/Total.read.numbers.300_diversity.300.rds")[[1]]
-Moran.I.350 = readRDS(results_folder,"/350_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+diversity.300 = readRDS(paste0(results_folder,"/Total.read.numbers.300_diversity.300.rds"))[[2]]
+tot_reads.300 = readRDS(paste0(results_folder,"/Total.read.numbers.300_diversity.300.rds"))[[1]]
+Moran.I.350 = readRDS(paste0(results_folder,"/350_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.350 = Moran.I.350[[1]]
 I_square.p.value_w.mean.350 = Moran.I.350[[2]]
-diversity.350 = readRDS(results_folder,"/Total.read.numbers.350_diversity.350.rds")[[2]]
-tot_reads.350 = readRDS(results_folder,"/Total.read.numbers.350_diversity.350.rds")[[1]]
-Moran.I.500 = readRDS(results_folder,"/500_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+diversity.350 = readRDS(paste0(results_folder,"/Total.read.numbers.350_diversity.350.rds"))[[2]]
+tot_reads.350 = readRDS(paste0(results_folder,"/Total.read.numbers.350_diversity.350.rds"))[[1]]
+Moran.I.500 = readRDS(paste0(results_folder,"/500_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.500 = Moran.I.500[[1]]
 I_square.p.value_w.mean.500 = Moran.I.500[[2]]
-diversity.500 = readRDS(results_folder,"/Total.read.numbers.500_diversity.500.rds")[[2]]
-tot_reads.500 = readRDS(results_folder,"/Total.read.numbers.500_diversity.500.rds")[[1]]
+diversity.500 = readRDS(paste0(results_folder,"/Total.read.numbers.500_diversity.500.rds"))[[2]]
+tot_reads.500 = readRDS(paste0(results_folder,"/Total.read.numbers.500_diversity.500.rds"))[[1]]
 #######
 # Moran.I.200.random = readRDS(results_folder,"/200.random.1-5_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
 # I_square.observed_w.mean.200.random.5reals = Moran.I.200.random[[1]]
 # I_square.p.value_w.mean.200.random.5reals = Moran.I.200.random[[2]]
-Moran.I.250.random = readRDS(results_folder,"/250.random_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.250.random = readRDS(paste0(results_folder,"/250.random_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.250.random = Moran.I.250.random[[1]]
 I_square.p.value_w.mean.250.random = Moran.I.250.random[[2]]
-Moran.I.350.random = readRDS(results_folder,"/350.random_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.350.random = readRDS(paste0(results_folder,"/350.random_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.350.random = Moran.I.350.random[[1]]
 I_square.p.value_w.mean.350.random = Moran.I.350.random[[2]]
-Moran.I.200.random = readRDS(results_folder,"/200.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.200.random = readRDS(paste0(results_folder,"/200.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.200.random.10reals = Moran.I.200.random[[1]]
 I_square.p.value_w.mean.200.random.10reals = Moran.I.200.random[[2]]
-Moran.I.400.random = readRDS(results_folder,"/400.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.400.random = readRDS(paste0(results_folder,"/400.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.400.random.10reals = Moran.I.400.random[[1]]
 I_square.p.value_w.mean.400.random.10reals = Moran.I.400.random[[2]]
-Moran.I.800.random = readRDS(results_folder,"/800.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.800.random = readRDS(paste0(results_folder,"/800.random.1-10_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.800.random.10reals = Moran.I.800.random[[1]]
 I_square.p.value_w.mean.800.random.10reals = Moran.I.800.random[[2]]
-mean_prevalence_results = readRDS(results_folder,"/mean_OTU.prevalence.250.350.random.rds")
+mean_prevalence_results = readRDS(paste0(results_folder,"/mean_OTU.prevalence.250.350.random.rds"))
 mean_prevalence.250.random = mean_prevalence_results[[1]]
 mean_prevalence.350.random = mean_prevalence_results[[1]]
-median_prevalence_results = readRDS(results_folder,"/median_OTU.prevalence.250.350.random.rds")
+median_prevalence_results = readRDS(paste0(results_folder,"/median_OTU.prevalence.250.350.random.rds"))
 median_prevalence.250.random = median_prevalence_results[[1]]
 median_prevalence.350.random = median_prevalence_results[[1]]
 #####
-Moran.I.random.groups = readRDS(results_folder,"/random.group.div_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Moran.I.random.groups = readRDS(paste0(results_folder,"/random.group.div_Moran.I_inverse.squares_weighted.mean.over.topics_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 I_square.observed_w.mean.random.groups = Moran.I.random.groups[[1]]
 I_square.p.value_w.mean.random.groups = Moran.I.random.groups[[2]]
-lat_I_random.groups = readRDS(results_folder,"/random.group.div_lat_I_sigma2.25_noLagoon.rds")[[1]]
-basin_I_random.groups = readRDS(results_folder,"/random.group.div_basin_I_noLagoon.rds")[[1]]
+lat_I_random.groups = readRDS(paste0(results_folder,"/random.group.div_lat_I_sigma2.25_noLagoon.rds"))[[1]]
+basin_I_random.groups = readRDS(paste0(results_folder,"/random.group.div_basin_I_noLagoon.rds"))[[1]]
 #####
-shannon_results = readRDS(results_folder,"/Shannon.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+shannon_results = readRDS(paste0(results_folder,"/Shannon.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 shannon_SUR = unlist(lapply(shannon_results[[2]],mean))
 shannon_DCM = unlist(lapply(shannon_results[[3]],mean))
-simpson_results = readRDS(results_folder,"/Simpson.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+simpson_results = readRDS(paste0(results_folder,"/Simpson.per.station_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 simpson_SUR = 1-unlist(lapply(simpson_results[[2]],mean))
 invsimpson_SUR = 1/unlist(lapply(simpson_results[[2]],mean))
-shannon_total_results = readRDS(results_folder,"/Shannon.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+shannon_total_results = readRDS(paste0(results_folder,"/Shannon.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 shannon_total_SUR = shannon_total_results[[2]]
 shannon_total_DCM = shannon_total_results[[3]]
-simpson_total_results = readRDS(results_folder,"/Simpson.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+simpson_total_results = readRDS(paste0(results_folder,"/Simpson.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 simpson_total_SUR = 1-simpson_total_results[[2]]
 invsimpson_total_SUR = 1/simpson_total_results[[2]]
-nb_dominants_results = readRDS(results_folder,"/Nb.dominant.assemblages.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+nb_dominants_results = readRDS(paste0(results_folder,"/Nb.dominant.assemblages.per.group_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 nb_dominants = nb_dominants_results[[1]]
 nb_absolute_dominants = nb_dominants_results[[2]]
 ######
@@ -328,10 +328,10 @@ charac_scale_V4 = readRDS(paste0(results_folder,"/V4_MoranI_charach.autocorr.sca
 lat_I_V4 = readRDS(paste0(results_folder,"/V4_lat_I_sigma2.25",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 basin_I_V4 = readRDS(paste0(results_folder,"/V4_basin_I",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
 ######
-Normalized_VI_V9.V4.psbO = readRDS(results_folder,"/Normalized.VI_marker.comparison.SUR_V9-V4_V9-psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Normalized_VI_V9.V4.psbO = readRDS(paste0(results_folder,"/Normalized.VI_marker.comparison.SUR_V9-V4_V9-psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 Normalized_VI_V9.V4 = Normalized_VI_V9.V4.psbO[[1]]
 Normalized_VI_V9.psbO = Normalized_VI_V9.V4.psbO[[2]]
-Normalized_VI_V4.psbO = readRDS(results_folder,"/Normalized.VI_group.comparison.SUR_V4.psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Normalized_VI_V4.psbO = readRDS(paste0(results_folder,"/Normalized.VI_group.comparison.SUR_V4.psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 Normalized_VI_V4 = Normalized_VI_V4.psbO[[1]]
 Normalized_VI_psbO = Normalized_VI_V4.psbO[[2]]
 
@@ -375,7 +375,7 @@ varpart.biotic.abiotic[[2]][varpart.biotic.abiotic[[2]]<0] = 0
 varpart.biotic.abiotic.pval = varpart.indSelec[[6]]
 
 #########
-Normalized_VI = readRDS(results_folder,"/Normalized.VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+Normalized_VI = readRDS(paste0(results_folder,"/Normalized.VI_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 div_threshold = 100
 NormalizedVI_pcoa = vector(length = 3, mode = "list")
 names(NormalizedVI_pcoa) = c("SUR","DCM","All")
@@ -391,7 +391,7 @@ normalized.VI.reals = readRDS(paste0(results_folder,"/Normalized_VI_10reals_diff
 normalized.VI.best.real = normalized.VI.reals[[1]] 
 normalized.VI.10.reals = normalized.VI.reals[[2]]
 
-# Normalized_VI_consistenbasin_I_withint = readRDS(data_folder,"/Normalized.VI.consistent_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds")
+# Normalized_VI_consistenbasin_I_withint = readRDS(paste0(data_folder,"/Normalized.VI.consistent_group.comparison_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 # NormalizedVI.consistent_pcoa = vector(length = 3, mode = "list")
 # names(NormalizedVI.consistent_pcoa) = c("SUR","DCM","All")
 # for (i_case in 3)
@@ -1697,7 +1697,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   dev.off()
   
   ########
-  plot.VI.consitent.PCoA.biplot = ggplot(data = data.frame(x = NormalizedVI.consistent_pcoa[[3]][,1], y = NormalizedVI.consistent_pcoa[[3]][,2], 
+  plot.VI.consistent.PCoA.biplot = ggplot(data = data.frame(x = NormalizedVI.consistent_pcoa[[3]][,1], y = NormalizedVI.consistent_pcoa[[3]][,2], 
                                                  col = log10(size_relativeAbund)[selected_groups & diversity>div_threshold],
                                                  size = log10(as.vector(diversity))[selected_groups & diversity>div_threshold])) + 
     geom_point(aes(x,y, colour = col, size = size), na.rm=T) +
@@ -1736,7 +1736,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   
   pdf(paste0(figure_folder,"/Fig2_VI.consistent_PCoA.axes.only.with.vert.legend_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected100+1.pdf"),
       width=7.5*2.2/1.2/2,height=12/3*4/1.2/2,onefile=F)
-  print(plot.VI.consitent.PCoA.biplot)
+  print(plot.VI.consistent.PCoA.biplot)
   dev.off()
 }  
  
@@ -2619,13 +2619,13 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   plot.norm.VI.PCoA.axis1.vs.diversity = cor.plot(x = x,
                                                   y = y,
                                                   x.lab ="Diversity (#OTUs), log scale",
-                                                  y.lab = "PCoA axis 1",
+                                                  y.lab = "Biogeographic axis 1",
                                                   y.lab.hjust = 0.5,
                                                   size.factor = size,
                                                   x.log = T,
                                                   y.log = F,
                                                   fit = F,
-                                                  mar.vect = c(5,15,1,5)) +
+                                                  mar.vect = c(5,15,5.5,5)) +
     geom_smooth(data = data.frame(x = x.2000, y = y.2000),aes(x,y),method='lm',col="black",se=T) +
     # geom_smooth(aes(x[x<2000], y[x<2000]),method='lm',col="black",se=T, inherit.aes = T) +
     geom_segment(aes(x = 2000, xend = 2000, y = min(y), yend = max(y)), linetype="dashed", inherit.aes = T) +
@@ -2642,7 +2642,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                   y = y,
                                                   # excluded.points = which(taxo_groups[selected_groups] %in% excluded_groups),
                                                   x.lab = expression("Body size ("*mu*"m), log scale"),
-                                                  y.lab = "PCoA axis 2",
+                                                  y.lab = "Biogeographic axis 2",
                                                   y.lab.hjust = 0.5,
                                                   size.factor = size,
                                                   x.log = T,
@@ -2652,7 +2652,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                   fit.size.factor = 0.9,
                                                   x.cor.pos = 0.8,
                                                   y.cor.pos = 0.05,
-                                                  mar.vect = c(5,5,1,5))
+                                                  mar.vect = c(5,5,3,5))
   
   excluded_groups = "Porifera"
   detached_groups = c("RAD-C","Ascomycota")
@@ -2660,15 +2660,16 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                             values = NormalizedVI_pcoa[[3]][!names(NormalizedVI_pcoa[[3]][,2]) %in% c("Dinophyceae","Collodaria"),2],
                                                             detached.points = which(names(dominant_function1) %in% detached_groups),
                                                             excluded.points = which(names(dominant_function1) %in% excluded_groups),
-                                                            y.lab = "PCoA axis 2",
+                                                            y.lab = "Biogeographic axis 2",
                                                             y.lab.hjust = 0.39,
                                                             size.factor = size,
+                                                            x.angle = 16,
                                                             fit = T,
                                                             fit.size.factor = 0.85,
                                                             x.cor.pos=0.85,y.cor.pos=0.1,
                                                             mar.vect = c(5,5,1,5)) +
-    theme(axis.title.y = element_blank())
-    # ylim(min(NormalizedVI_pcoa[[3]][!names(NormalizedVI_pcoa[[3]][,2]) %in% c("Dinophyceae","Collodaria"),2]),0.23)
+    theme(axis.title.y = element_blank(),
+          axis.text.x = element_text(vjust = 0.8, hjust = 0.7))
   
   pdf(paste0(figure_folder,"/Fig3_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected100+1_excluded.groups.pdf"),
       width=7.5*2.2/1.2/2*3,height=12/3*4/1.2/2,onefile=F)
@@ -3293,7 +3294,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
     plot.tot.var.vs.PCoA.axis1 = cor.plot(x = x,
                                           y = y,
                                           excluded.points = if (!is.null(excluded_groups)) which(taxo_groups[selected_groups] %in% excluded_groups) else NULL, 
-                                          y.lab = paste("Total variance explained\n by connectivity and local environment"),#c("","(DCM)")[i_case]),
+                                          y.lab = paste("Total variance explained\n by Moran maps and environment"),#c("","(DCM)")[i_case]),
                                           x.lab = "PCoA axis 1",
                                           y.lab.hjust = 0.5,
                                           x.log = F,
@@ -3333,7 +3334,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                          y = y,
                                                          excluded.points = if (!is.null(excluded_groups)) which(taxo_groups[selected_groups] %in% excluded_groups) else NULL,
                                                          # y.lab = paste("Ratio of variance purely explained\n by connectivity over local environment"),#c("","(DCM)")[i_case]),
-                                                         y.lab = paste("Ratio of variance explained\n by connectivity over environment (log scale)"),#c("","(DCM)")[i_case]),
+                                                         y.lab = paste("Ratio of variance explained\n by Moran maps over environment (log scale)"),#c("","(DCM)")[i_case]),
                                                          x.lab = "PCoA axis 2",
                                                          y.lab.hjust = 0.5,
                                                          x.log = F,
@@ -3361,7 +3362,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                       y = y,
                                       excluded.points = if (!is.null(excluded_groups)) which(taxo_groups[selected_groups] %in% excluded_groups) else NULL,
                                       # y.lab = paste("Ratio of variance purely explained\n by connectivity over local environment"),#c("","(DCM)")[i_case]),
-                                      y.lab = paste("Ratio of variance explained\n by connectivity over environment (log scale)"),#c("","(DCM)")[i_case]),
+                                      y.lab = paste("Ratio of variance explained\n by Moran maps over environment (log scale)"),#c("","(DCM)")[i_case]),
                                       x.lab = expression("Body size ("*mu*"m), log scale"),
                                       y.lab.hjust = 0.5,
                                       x.log = T,
@@ -3388,9 +3389,10 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                           values = values,
                                           excluded.points = if (!is.null(excluded_groups)) which(names(dominant_function1) %in% excluded_groups) else NULL, 
                                           # y.lab = paste("Ratio of variance purely explained\n by connectivity over local environment"),#c("","(DCM)")[i_case]),
-                                          y.lab = paste("Ratio of variance explained\n by connectivity over environment (log scale)"),#c("","(DCM)")[i_case]),
+                                          y.lab = paste("Ratio of variance explained\n by Moran maps over environment (log scale)"),#c("","(DCM)")[i_case]),
                                           y.log = T,
-                                          y.lim = if (i_case == 1) c(min(values),4) else NULL,
+                                          # y.lim = if (i_case == 1) c(min(values),4) else NULL,
+                                          x.angle = 14,
                                           fit = T,
                                           x.cor.pos=0.7,
                                           y.cor.pos = 0.1,
@@ -3409,7 +3411,8 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
     
     g4[[i_case]] = ggplotGrob(fraction.ratio.vs.function + 
                                 geom_hline(yintercept = 1, linetype="dashed") +
-                                theme(axis.title.y = element_blank()))
+                                theme(axis.title.y = element_blank(),
+                                      axis.text.x = element_text(vjust = 0.8, hjust = 0.7)))
   }
   
   # pdf(paste0(figure_folder,"/Fig4_pure+mixed_",div_threshold,"plusOTUs_PCoA.axis.1.x_selected100+1_apusozoans_(0).pdf"),
@@ -3780,7 +3783,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
     plot.pcoa1.vs.autocorr[[i_case]] = cor.plot(y = NormalizedVI_pcoa[[3]][,1],
                                                 x = I_square.observed_w.mean[selected_groups,i_case],
                                                 # y.lab = paste0("Amount of biogeographic structure",ifelse(i_case == 1,""," (DCM)")),
-                                                y.lab = "PCoA axis 1",
+                                                y.lab = "Biogeographic axis 1",
                                                 x.lab = "Short-distance spatial autocorrelation",
                                                 x.log = F,
                                                 y.log = F,
@@ -3796,7 +3799,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                x = if (i_case == 1) shannon_SUR[selected_groups] 
                                                else if (i_case == 2) shannon_DCM[selected_groups],
                                                # excluded.points = which(taxo_groups[selected_groups] == "Porifera"),
-                                               y.lab = "PCoA axis 1",
+                                               y.lab = "Biogeographic axis 1",
                                                x.lab = "Mean Shannon entropy of\nassemblage proportions across stations",
                                                y.lab.hjust = 0.5,
                                                x.log = F,
@@ -3813,7 +3816,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
     plot.pcoa1.vs.shannon.total[[i_case]] = cor.plot(y = NormalizedVI_pcoa[[3]][,1],
                                                      x = if (i_case == 1) shannon_total_SUR[selected_groups]
                                                      else if  (i_case == 2) shannon_total_DCM[selected_groups],
-                                                     y.lab = "PCoA axis 1",
+                                                     y.lab = "Biogeographic axis 1",
                                                      x.lab = "Overall Shannon entropy of\nassemblage proportions in the biogeography     ",
                                                      y.lab.hjust = 0.5,
                                                      x.log = F,
@@ -3894,7 +3897,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                                    # y.lab = paste(ifelse(i_case == 1,"Scale of biogeographic organization (km)",
                                                                    #                      "Scale of biogeo. organization(km; DCM)")),
                                                                    x.lab = "Scale of biogeographic organization (km)",
-                                                                   y.lab = "PCoA axis 2",
+                                                                   y.lab = "Biogeographic axis 2",
                                                                    x.log = F,
                                                                    y.log = F,
                                                                    fit = T,
@@ -3910,7 +3913,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                                    y = NormalizedVI_pcoa[[3]][,2],
                                                                    # y.lab = paste0("Within-basin homogeneity",ifelse(i_case == 1,""," (DCM)")),
                                                                    x.lab = "Within-basin autocorrelation",
-                                                                   y.lab = "PCoA axis 2",
+                                                                   y.lab = "Biogeographic axis 2",
                                                                    x.log = F,
                                                                    y.log = F,
                                                                    fit = T,
@@ -3928,7 +3931,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                               y = NormalizedVI_pcoa[[3]][,2],
                                                               # y.lab = paste0("Latitudinal symmetry",ifelse(i_case == 1,""," (DCM)")),
                                                               x.lab = "Latitudinal autocorrelation",
-                                                              y.lab = "PCoA axis 2",
+                                                              y.lab = "Biogeographic axis 2",
                                                               x.log = F,
                                                               y.log = F,
                                                               fit = T,
@@ -4214,7 +4217,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                                     # y.lab = paste(ifelse(i_case == 1,"Scale of biogeographic organization (km)",
                                                                     #                      "Scale of biogeo. organization(km; DCM)")),
                                                                     excluded.points = which(taxo_groups[selected_groups] %in% "RAD-A"),
-                                                                    y.lab = "Scale of surface biogeographic organization\n- residuals after regression on PCoA1",
+                                                                    y.lab = "Scale of surface biogeographic organization\n- residuals after regression on axis 1",
                                                                     x.lab = expression("Body size ("*mu*"m), log scale"),
                                                                     x.log = T,
                                                                     y.log = F,
@@ -4228,7 +4231,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                                     x = log(size_relativeAbund[selected_groups]),
                                                                     excluded.points = which(taxo_groups[selected_groups] %in% "RAD-C"),
                                                                     # y.lab = paste0("Within-basin homogeneity",ifelse(i_case == 1,""," (DCM)")),
-                                                                    y.lab = "Surface within-basin autocorrelation\n- residuals after regression on PCoA1",
+                                                                    y.lab = "Surface within-basin autocorrelation\n- residuals after regression on axis 1",
                                                                     x.lab = expression("Body size ("*mu*"m), log scale"),
                                                                     x.log = T,
                                                                     y.log = F,
@@ -4242,7 +4245,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                                x = log(size_relativeAbund[selected_groups]),
                                                                excluded.points = which(taxo_groups[selected_groups] %in% c("RAD-A","RAD-C")),
                                                                # y.lab = paste0("Latitudinal symmetry",ifelse(i_case == 1,""," (DCM)")),
-                                                               y.lab = "Surface latitudinal autocorrelation\n- residuals after regression on PCoA1",
+                                                               y.lab = "Surface latitudinal autocorrelation\n- residuals after regression on axis 1",
                                                                x.lab = expression("Body size ("*mu*"m), log scale"),
                                                                x.log = T,
                                                                y.log = F,
@@ -4286,11 +4289,13 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                   # detached.points = which(names(dominant_function1) %in% detached_groups),
                                                   # excluded.points = which(names(dominant_function1) %in% excluded_groups),
                                                   excluded.points = which(names(dominant_function1) %in% "RAD-A"),
-                                                  y.lab = "Scale of biogeographic organization\n- residuals after regression on PCoA1",
+                                                  y.lab = "Scale of biogeographic organization\n- residuals after regression on axis 1",
                                                   # y.lab.hjust = 0.39,
+                                                  x.angle = 14,
                                                   fit = T,
                                                   y.cor.pos = 0.9,
-                                                  mar.vect = c(5,5,5,5))
+                                                  mar.vect = c(5,5,5,5)) +
+    theme(axis.text.x = element_text(vjust = 0.8, hjust = 0.7))
   
   boxplot.res.basin.I.within[[i_case]] = box.plot(classes = factor(dominant_function1, c("Phototrophs","Phagotrophs","Metazoans","Parasites")),
                                                   values = lm(basin_I[selected_groups & !taxo_groups %in% c("Dinophyceae","Collodaria"),i_case]/
@@ -4299,11 +4304,13 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                   # detached.points = which(names(dominant_function1) %in% detached_groups),
                                                   # excluded.points = which(names(dominant_function1) %in% excluded_groups),
                                                   excluded.points = which(names(dominant_function1) %in% "RAD-C"),
-                                                  y.lab = "Within-basin autocorrelation\n- residuals after regression on PCoA1",
+                                                  y.lab = "Within-basin autocorrelation\n- residuals after regression on axis 1",
                                                   # y.lab.hjust = 0.39,
+                                                  x.angle = 14,
                                                   fit = T,
                                                   y.cor.pos = 0.95,
-                                                  mar.vect = c(5,5,5,5))
+                                                  mar.vect = c(5,5,5,5)) +
+    theme(axis.text.x = element_text(vjust = 0.8, hjust = 0.7))
   
   boxplot.res.lat.I.sym[[i_case]] = box.plot(classes = factor(dominant_function1, c("Phototrophs","Phagotrophs","Metazoans","Parasites")),
                                              values = lm(lat_I[selected_groups & !taxo_groups %in% c("Dinophyceae","Collodaria"),i_case]/
@@ -4312,11 +4319,13 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                              # detached.points = which(names(dominant_function1) %in% detached_groups),
                                              # excluded.points = which(names(dominant_function1) %in% excluded_groups),
                                              excluded.points = which(names(dominant_function1) %in% c("RAD-A","RAD-C")),
-                                             y.lab = "Latitudinal autocorrelation\n- residuals after regression on PCoA1",
+                                             y.lab = "Latitudinal autocorrelation\n- residuals after regression on axis 1",
                                              # y.lab.hjust = 0.39,
+                                             x.angle = 14,
                                              fit = T,
                                              y.cor.pos = 0.9,
-                                             mar.vect = c(5,5,5,5))   
+                                             mar.vect = c(5,5,5,5)) +
+    theme(axis.text.x = element_text(vjust = 0.8, hjust = 0.7))
   
   # pdf(paste0(figure_folder,"/Fig.SI_residuals.biographic.descriptors.vs.ecological.function_",ifelse(i_case==1,"","DCM_"),"excluded.points.pdf"),
   #     width=7.5*2.2/1.2*2/2,height=12/3*2/1.2*2,onefile=F)
@@ -4462,7 +4471,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
     
     # "Pure biotic","Mixed biotic-abiotic","Mixed biotic-currents","Mixed biotic-abiotic-currents","Pure abiotic","Mixed abiotic-currents","Pure currents"
     barplot_data.frame = rbind(varpart.env.spatial[[i_case]][3,],varpart.env.spatial[[i_case]][2,],varpart.env.spatial[[i_case]][1,])
-    dimnames(barplot_data.frame) = list(c("Purely by connectivity","Jointly by connectivity and local environment","Purely by local environment"), taxo_groups_unmodified)
+    dimnames(barplot_data.frame) = list(c("Purely by Moran maps","Jointly by Moran maps and local environment","Purely by local environment"), taxo_groups_unmodified)
     barplot_data.frame = barplot_data.frame[,selected_groups & diversity > div_threshold][,tot_sorting]
     #
     barplot.env.connectivity = bar.plot(barplot_data.frame, 
@@ -4821,7 +4830,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   plot.norm.VI.PCoA.axis1.vs.body.size = cor.plot(x = x,
                                                   y = lm(y ~ log(as.vector(diversity[selected_groups])))$residuals,
                                                   x.lab = expression("Body size ("*mu*"m), log scale"),
-                                                  y.lab = "PCoA axis 1\n- residuals after regr. on log diversity",
+                                                  y.lab = "Biogeographic axis 1\n- residuals after regr. on log diversity",
                                                   y.lab.hjust = 0.5,
                                                   size.factor = size,
                                                   x.log = T,
@@ -4836,8 +4845,8 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   values.res = lm(values ~ log(as.vector(diversity[selected_groups & !taxo_groups %in% c("Dinophyceae","Collodaria")])))$residuals
   boxplot.norm.VI.PCoA.axis1.functions = box.plot(classes = factor(dominant_function1, c("Phototrophs","Phagotrophs","Metazoans","Parasites")),
                                                   values = values.res,
-                                                  y.lab = "PCoA axis 1\n- residuals after regr. on log diversity",
-                                                  y.lab.hjust = 0.39,
+                                                  y.lab = "Biogeographic axis 1\n- residuals after regr. on log diversity",
+                                                  # y.lab.hjust = 0.39,
                                                   size.factor = size,
                                                   fit = T,
                                                   fit.size.factor = 0.85,
@@ -4855,7 +4864,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                   y = lm(y ~ log(size_relativeAbund[selected_groups]))$residuals,
                                                   # excluded.points = which(names(NormalizedVI_pcoa[[3]][,2]) == excluded_groups),
                                                   x.lab ="Diversity (#OTUs), log scale",
-                                                  y.lab = "PCoA axis 2\n- residuals after regr. on log body size  ",
+                                                  y.lab = "Biogeographic axis 2\n- residuals after regr. on log body size  ",
                                                   y.lab.hjust = 0.5,
                                                   size.factor = size,
                                                   x.log = T,
@@ -4895,7 +4904,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   plot.norm.VI.PCoA.axis1.vs.body.size = cor.plot(x = x,
                                                   y = y,
                                                   x.lab = expression("Body size ("*mu*"m), log scale"),
-                                                  y.lab = "PCoA axis 1",
+                                                  y.lab = "Biogeographic axis 1",
                                                   y.lab.hjust = 0.5,
                                                   size.factor = size,
                                                   x.log = T,
@@ -4911,7 +4920,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   plot.norm.VI.PCoA.axis1.res.vs.body.size = cor.plot(x = x,
                                                   y = lm(y ~ log(as.vector(diversity[selected_groups])))$residuals,
                                                   x.lab = expression("Body size ("*mu*"m), log scale"),
-                                                  y.lab = "PCoA axis 1\n- residuals after regres. on log diversity",
+                                                  y.lab = "Biogeographic axis 1\n- residuals after regres. on log diversity",
                                                   y.lab.hjust = 0.5,
                                                   size.factor = size,
                                                   x.log = T,
@@ -4924,25 +4933,29 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   
   boxplot.norm.VI.PCoA.axis1.functions = box.plot(classes = factor(dominant_function1, c("Phototrophs","Phagotrophs","Metazoans","Parasites")),
                                                   values = NormalizedVI_pcoa[[3]][!names(NormalizedVI_pcoa[[3]][,1]) %in% c("Dinophyceae","Collodaria"),1],
-                                                  y.lab = "PCoA axis 1",
-                                                  y.lab.hjust = 0.39,
+                                                  y.lab = "Biogeographic axis 1",
+                                                  # y.lab.hjust = 0.39,
                                                   size.factor = size,
+                                                  x.angle = 14,
                                                   fit = T,
                                                   # fit.size.factor = 0.85,
                                                   y.cor.pos=0.9,
-                                                  mar.vect = c(5,5,1,5))
+                                                  mar.vect = c(5,5,1,5)) +
+    theme(axis.text.x = element_text(vjust = 0.8, hjust = 0.7))
   
   values = NormalizedVI_pcoa[[3]][!names(NormalizedVI_pcoa[[3]][,1]) %in% c("Dinophyceae","Collodaria"),1]
   values.res = lm(values ~ log(as.vector(diversity[selected_groups & !taxo_groups %in% c("Dinophyceae","Collodaria")])))$residuals
   boxplot.norm.VI.PCoA.axis1.res.functions = box.plot(classes = factor(dominant_function1, c("Phototrophs","Phagotrophs","Metazoans","Parasites")),
                                                       values = values.res,
-                                                      y.lab = "PCoA axis 1\n- residuals after regres. on log diversity",
-                                                      y.lab.hjust = 0.39,
+                                                      y.lab = "Biogeographic axis 1\n- residuals after regres. on log diversity",
+                                                      # y.lab.hjust = 0.39,
                                                       size.factor = size,
+                                                      x.angle = 14,
                                                       fit = T,
                                                       # fit.size.factor = 0.85,
                                                       y.cor.pos=0.2,
-                                                      mar.vect = c(5,5,1,5))
+                                                      mar.vect = c(5,5,1,5)) +
+    theme(axis.text.x = element_text(vjust = 0.8, hjust = 0.7))
   
   x = as.vector(diversity)[selected_groups]
   y = NormalizedVI_pcoa[[3]][,2]
@@ -4955,7 +4968,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                   y = y,
                                                   # excluded.points = which(names(NormalizedVI_pcoa[[3]][,2]) == excluded_groups),
                                                   x.lab ="Diversity (#OTUs), log scale",
-                                                  y.lab = "PCoA axis 2",
+                                                  y.lab = "Biogeographic axis 2",
                                                   y.lab.hjust = 0.5,
                                                   size.factor = size,
                                                   x.log = T,
@@ -4977,7 +4990,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                   y = lm(y ~ log(size_relativeAbund[selected_groups]))$residuals,
                                                   # excluded.points = which(names(NormalizedVI_pcoa[[3]][,2]) == excluded_groups),
                                                   x.lab ="Diversity (#OTUs), log scale",
-                                                  y.lab = "PCoA axis 2\n- residuals after regression on log body size  ",
+                                                  y.lab = "Biogeographic axis 2\n- residuals after regression on log body size  ",
                                                   y.lab.hjust = 0.5,
                                                   size.factor = size,
                                                   x.log = T,
@@ -5009,8 +5022,10 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                                                   y.lab = expression("Body size ("*mu*"m), log scale"),
                                                   size.factor = 0.8,
                                                   y.log = T,
+                                                  x.angle = 14,
                                                   y.lab.hjust = 0.5,
-                                                  mar.vect = c(5,5,1,5))
+                                                  mar.vect = c(5,5,1,5)) +
+    theme(axis.text.x = element_text(vjust = 0.8, hjust = 0.7))
   
   pdf(paste0(figure_folder,"/FigS_body.size.diff.across.ecological.categories_",div_threshold,"plusOTUs_PCoA.axes.x_selected100+1_apusozoans.pdf"),
       width=7.5*2.2/1.2/2,height=12/3*4/1.2/2)
@@ -5249,7 +5264,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   y = NormalizedVI_pcoa[[3]][,2][!rownames(NormalizedVI_pcoa[[3]]) %in% c("Dinophyceae","Collodaria")][dominant_function1 == "Phototrophs"]
   plot.phototrophs.norm.VI.PCoA.axis2.vs.size = cor.plot(x = x,
                                                        y = y,
-                                                       y.lab = "PCoA axis 2",
+                                                       y.lab = "Biogeographic axis 2",
                                                        x.lab = expression("Body size ("*mu*"m), log scale"),
                                                        y.lab.hjust = 0.5,
                                                        x.log = T,
@@ -5270,7 +5285,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   plot.phagotrophs.norm.VI.PCoA.axis2.vs.size = cor.plot(x = x,
                                                          y = y,
                                                          # excluded.points = which(names(dominant_function1[dominant_function1 == "Phagotrophs"]) == "Phaeodaria"),
-                                                         y.lab = "PCoA axis 2",
+                                                         y.lab = "Biogeographic axis 2",
                                                          x.lab = expression("Body size ("*mu*"m), log scale"),
                                                          y.lab.hjust = 0.5,
                                                          x.log = T,
@@ -5292,7 +5307,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   plot.metazoans.norm.VI.PCoA.axis2.vs.size = cor.plot(x = x,
                                                          y = y,
                                                          excluded.points = which(names(dominant_function1[dominant_function1 == "Metazoans"]) == "Porifera"),# c("Porifera","Chaetognatha")),
-                                                         y.lab = "PCoA axis 2",
+                                                         y.lab = "Biogeographic axis 2",
                                                          x.lab = expression("Body size ("*mu*"m), log scale"),
                                                          y.lab.hjust = 0.5,
                                                          x.log = T,
@@ -5313,7 +5328,7 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   plot.parasites.norm.VI.PCoA.axis2.vs.size = cor.plot(x = x,
                                                        y = y,
                                                        # excluded.points = which(names(dominant_function1[dominant_function1 == "Parasites"]) == "MALV-IV"),
-                                                       y.lab = "PCoA axis 2",
+                                                       y.lab = "Biogeographic axis 2",
                                                        x.lab = expression("Body size ("*mu*"m), log scale"),
                                                        y.lab.hjust = 0.5,
                                                        x.log = T,
@@ -6092,9 +6107,10 @@ dev.off()
 {
   data.folder_name = paste0(data_folder,"/18S_V9_TARA_CompleteSizeRange_byStationByDepth_AllTAxa",noArcticNoBiomark_insert,noLagoon_insert)
   load(paste0(data.folder_name,"/coord.Rdata"))
+  load(paste0(data.folder_name,"/sample_ref.Rdata"))
   
   # Loading the WOA13 averaged-interpolated abiotic data (data sent by Paul Frémont and Olivier Jaillon):
-  station_ref_all = read.table(data_folder,"/Abiotic_data_Watteaux-Iudicone/woa13_env_tara_all.csv",sep=";",header=T,row.names=1)
+  station_ref_all = read.table(paste0(data_folder,"/Abiotic_data/woa13_env_tara_all.csv"),sep=";",header=T,row.names=1)
   # Reordering the variables as in watteaux_selected_variables
   station_ref_all = station_ref_all[,c("T","no3","O2","o2s","aou","po4","si")]
   
@@ -6135,7 +6151,7 @@ dev.off()
   blues = c("lightsteelblue4", "lightsteelblue3", "lightsteelblue2", "lightsteelblue1")
   greys = c(grey(0.6), grey(0.93), grey(0.99))
   
-  pie_positions.SUR = read.table(paste0(results_folder,"Surf_pies_modified.txt"),sep=",",header=F)
+  pie_positions.SUR = read.table(paste0(results_folder,"/Surf_pies_modified.txt"),sep=",",header=F)
   # pie_positions.SUR[c(55,57) - 1,] = pie_positions.SUR[c(57,55) - 1,]
   pie_positions.SUR[55:57 - 1,] = pie_positions.SUR[c(56,57,55) - 1,]
   pie_positions.SUR[56 - 1,] = pie_positions.SUR[56 - 1,] + c(1.5,0)
@@ -6218,6 +6234,45 @@ dev.off()
   }
   dev.off()
   
+  temperature = list()
+  for (case in c("SUR","DCM"))
+  {
+    i_case = which(c("SUR","DCM") == case)
+    abiotic_data = abiotic_data_all[stations_depths[,2] == case,]
+    
+    if (any(apply(abiotic_data,2,is.na)))
+    {
+      abiotic_data_trans = abiotic_data[,!(as.vector(unlist(lapply(apply(apply(abiotic_data,2,is.na),2,which),length))) > 3)]
+    } else 
+      abiotic_data_trans = abiotic_data
+    
+    abiotic_data_trans = scale(abiotic_data_trans)
+    
+    # PCA on standardized ("normed") data, ie centered and divided by std. dev. for each column 
+    # Removing stations where one abiotic value is missing:
+    stations_to_remove = apply(apply(abiotic_data_trans,2,is.na),1,any)
+    temperature[[i_case]] = abiotic_data_trans[!stations_to_remove,colnames(abiotic_data_trans)=="Temperature"]
+    names(temperature[[i_case]]) = rownames(abiotic_data_trans[!stations_to_remove,])
+  }
+  
+  pdf(paste0(figure_folder,"/FigS_temperature_marmap.pdf"),
+      width=7.5*2.2/1.2,height=12/3*4/1.2/2*3,onefile=T)
+  for (i_case in 1)
+  {
+  # Plotting Surface:
+  plot(bat, image = T, land = T, lty = 0, bty = "n", xaxt = "n", yaxt = "n", ann = F, bpal = list(c(0, max(bat), greys[1]), c(min(bat), 0, blues[3]))) #plot map without isobaths
+  plot(bat, lwd = 0.2, deep = 0, shallow = 0, step = 0, add = TRUE) # highlight coastline
+  z = temperature[[i_case]][names(temperature[[i_case]]) %in% rownames(pie_positions.SUR)]
+  col = rgb(colorRamp(c("blue","grey","red"),space = "Lab")(rescale(z,to=c(0,1),from=c(-max(range(abs(z))),max(range(abs(z)))))),maxColorValue = 255)
+  pies.coord = pie_positions.SUR[rownames(pie_positions.SUR) %in% names(temperature[[i_case]]),]
+  stations.coord = coord[rownames(coord) %in% rownames(pie_positions.SUR) & rownames(coord) %in% names(temperature[[i_case]]),]
+  segments(x0=stations.coord[,2],y0=stations.coord[,1],x1=pies.coord[,1],y1=pies.coord[,2])
+  points(pies.coord,
+         pch = 21, cex=5, bg = col)
+  # title(paste("Abiotic PCA axis",k), cex.main = 2)
+  }
+  dev.off()
+  
   # biotic
   ##########
   relativeAbund_file = paste0(results_folder,"/groups_relativeAbund",noArcticNoBiomark_insert,noLagoon_insert,".rds")
@@ -6260,7 +6315,7 @@ dev.off()
   ##########
   # Need to compute the MEMs first (code from Multigroup_Tara_analyses.R)
   
-  travel.folder_name = paste0(data_folder,"/Abiotic_data_Watteaux-Iudicone")
+  travel.folder_name = paste0(data_folder,"/Abiotic_data")
   travel_time_matrix_SUR = read.table(paste0(travel.folder_name,"/minAijji_tarrive_min_surface_10.csv"),sep="\t",header=T,row.names=1)
   travel_time_matrix_SUR = travel_time_matrix_SUR[,-ncol(travel_time_matrix_SUR)]
   travel_time_matrix_DCM = read.table(paste0(travel.folder_name,"/tarrive_min_75m_10.csv"),sep=";",header=T,row.names=1)
@@ -10679,7 +10734,7 @@ dev.off()
     scale_fill_viridis(name = "Count") +
     # scale_fill_gradient(name = "count", trans = "log") +
                         # breaks = my_breaks, labels = my_breaks) +
-    labs(y = "PCoA axis 2", 
+    labs(y = "Biogeographic axis 2", 
          x = expression("Sampled body size ("*mu*"m), log scale")) +
     theme_bw() +
     theme(axis.title=element_text(size=22),
@@ -10706,7 +10761,7 @@ dev.off()
     stat_binhex(aes(x,y), show.legend=T) +
     scale_fill_viridis(name = "Count") +
     # scale_fill_gradient(name = "count", trans = "log") +
-    labs(y = "Surface connectivity-environment\n explained variance ratio", 
+    labs(y = "Surface Moran maps-environment\n explained variance ratio", 
          x = expression("Sampled body size ("*mu*"m), log scale")) +
     theme_bw() +
     theme(axis.title=element_text(size=22),
@@ -10734,7 +10789,7 @@ dev.off()
     # scale_fill_manual(values = function_colors) +
     # ylim(c(0,16)) +
     # ylim(c(0,8)) +
-    labs(y="Randomly sampled sets of group body sizes", x="Spearman correlation between PCoA axis 2\n and log body size") +
+    labs(y="Randomly sampled sets of group body sizes", x="Spearman correlation between biogeo. axis 2\n and log body size") +
     theme_bw() +
     # ggtitle(paste("MEM",k)) +
     # ggtitle(paste("MEM",k,"- Char.sc. =",
@@ -10753,7 +10808,7 @@ dev.off()
   cor.spear.pcoa2.varpart.hist.plot = ggplot(data = data.frame(x = cor.spear.pcoa2.varpart)) +
     geom_histogram(aes(x),
                    binwidth = 0.01, center = 0.005) +
-    labs(y="Randomly sampled sets of group body sizes", x="Spearman correlation btw. PCoA axis 2 and\n surf. connectivity-environment expl. var. ratio") +
+    labs(y="Randomly sampled sets of group body sizes", x="Spearman correlation btw. biogeo. axis 2 and\n surf. Moran maps-environment expl. var. ratio") +
     theme_bw() +
     theme(axis.title=element_text(size=22),
           axis.text = element_text(size=22),
@@ -10782,7 +10837,7 @@ dev.off()
     geom_histogram(aes(x),
                    bins = 100) +
                    # binwidth = 0.01, center = 0.005) +
-    labs(y="Randomly sampled sets of group body sizes", x="Spearman p-val. (log scale) btw. PCoA axis 2\nand surf. connectivity-environment expl. var. ratio   ") +
+    labs(y="Randomly sampled sets of group body sizes", x="Spearman p-val. (log scale) btw. PCoA axis 2\nand surf. Moran maps-environment expl. var. ratio   ") +
     theme_bw() +
     theme(axis.title=element_text(size=22),
           axis.text = element_text(size=22),
@@ -10958,8 +11013,8 @@ dev.off()
 
 # Comparison across reals AllTaxa
 {
-  sampled_logLiks = readRDS(data_folder,"/18S_V9_TARA_CompleteSizeRange_byStationByDepth_AllTaxa_noLagoon/Rtopicmodels_LDA_Gibbs_alpha0.1_delta0.1_nb_topics16_nb_iter1000_nb_real100_meanPosteriorDistributedLlh_thin25_burnin2000_occurrence/posterior_sampled_logLiks.rds")
-  chains.allTaxa = readRDS(results_folder,"/Chains.allTaxa_nb_iter3000_nb_real100_occurrence.rds")
+  sampled_logLiks = readRDS(paste0(data_folder,"/18S_V9_TARA_CompleteSizeRange_byStationByDepth_AllTaxa_noLagoon/Rtopicmodels_LDA_Gibbs_alpha0.1_delta0.1_nb_topics16_nb_iter1000_nb_real100_meanPosteriorDistributedLlh_thin25_burnin2000_occurrence/posterior_sampled_logLiks.rds"))
+  chains.allTaxa = readRDS(paste0(results_folder,"/Chains.allTaxa_nb_iter3000_nb_real100_occurrence.rds"))
  
   x.samples = y.samples = vector(length = 100, mode = "numeric")
   for (i_chain in 1:100)
