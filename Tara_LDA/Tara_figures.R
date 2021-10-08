@@ -1,5 +1,6 @@
-# See lines 67-77 to specify paths to figure, code and data folders.
+# See lines 69-77 to specify paths to figure, code and data folders.
 
+library(grid)
 library(gridExtra)
 library(ggplot2)
 library(ggforce)
@@ -1778,13 +1779,14 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
     if (variable_groups)
     {
     # group_vect = c("Chordata","Diplonemida","Arthropoda","Bacillariophyta","Dinophyceae","Collodaria","Haptophyta","MAST-3,_12")
+      group_vect = c("Diplonemida","Arthropoda","Chordata","Mamiellophyceae","Collodaria","Bacillariophyta","MAST-3,_12","Dinophyceae","MALV-II","Haptophyta")
     # group_vect = taxo_groups[selected_groups][sort.int(as.vector(I_square.observed_w.mean[selected_groups,1]),decreasing = T,index.return = T)$ix]
     # group_vect = taxo_groups[selected_groups][sort.int(as.vector(NormalizedVI_pcoa[[3]][,1]),decreasing = T,index.return = T)$ix]
     # group_vect = taxo_groups[selected_groups][sort.int(as.vector(NormalizedVI_pcoa[[3]][,2]),decreasing = T,index.return = T)$ix]
     # group_vect = taxo_groups[selected_groups & diversity > 1000][sort.int(as.vector(NormalizedVI_pcoa[[3]][diversity[selected_groups] > 1000, 2]), decreasing = T,index.return = T)$ix]
     # group_vect = taxo_groups_V4[Normalized_VI_V9.V4 != 0][sort.int(Normalized_VI_V9.V4[Normalized_VI_V9.V4 != 0], decreasing = F,index.return = T)$ix]
     # group_vect = taxo_groups_psbO[Normalized_VI_V9.psbO != 0][sort.int(Normalized_VI_V9.psbO[Normalized_VI_V9.psbO != 0], decreasing = F,index.return = T)$ix]
-      group_vect = c("Diplonemida","Mamiellophyceae","Collodaria","MALV-II")
+      # group_vect = c("Diplonemida","Mamiellophyceae","Collodaria","MALV-II")
     } else if (variable_reals)
     {
     # real.number.vect = c(1,37,64)
@@ -1799,11 +1801,12 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
                              c(1,1),
                              c(0.1,1), # Not available
                              c(0.05/nb_topics,9.4-nb_topics/5)) #1st_best_realization
-    } else if (k_by_k)
-    {
-      group = "AllTaxa"
-      nb_topics = 16
     }
+    # } else if (k_by_k)
+    # {
+    #   group = "AllTaxa"
+    #   nb_topics = 16
+    # }
   # psbO groups:
   } else if (data_psbO)
   {
@@ -1816,10 +1819,10 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   # group_vect = c("Phaeodaria","Annelida","Mollusca","Bacillariophyta","Dinophyceae","Chlorophyceae")
   # group_vect = "AllTaxa"
   
-  monochrom = T # For groups other than AllTaxa, shows assemblages in variations of a single color
+  monochrom = F # For groups other than AllTaxa, shows assemblages in variations of a single color
   manual = F # Manual setting of colors; if both monochrom = F and manual = F, attempts automatic setting of colors based on latitude
   dominant = F # Show one assemablage per station only (the dominant one)
-  k_by_k = F # Plot each assemblage individually on a color gradient
+  k_by_k = T # Plot each assemblage individually on a color gradient
   
   # Only relevant for monochrom = T:
   fixed_nb_colors = T
@@ -2015,7 +2018,11 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   # plot.map.group = list()
   if (variable_groups)
   {
-    page_length = ifelse(length(group_vect) %/% 4 == 0,length(group_vect),4)
+    if (!k_by_k)
+      page_length = ifelse(length(group_vect) %/% 4 == 0,length(group_vect),4)
+    else
+      # page_length = ifelse(nb_topics %/% 6 == 0,length(nb_topics),6)
+      page_length = 6
   } else if (variable_reals)
   {
     page_length = ifelse(length(real.number.vect) %/% 4 == 0,length(real.number.vect),4)
@@ -2025,9 +2032,6 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   } else if (variable_alpha.delta)
   {
     page_length = ifelse(length(alpha.delta.vect) %/% 4 == 0,length(alpha.delta.vect),4)
-  } else if (k_by_k)
-  {
-    page_length = ifelse(nb_topics %/% 6 == 0,length(nb_topics),6)
   }
   # pdf(paste0(figure_folder.marker,"/Fig2_",short_marker,V9_Ks_insert,if (monochrom) SUR.sorted_insert else "","maps.only.unif.bg",dominant_insert,"_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected100+1_alt7.pdf"),
   # pdf(paste0(figure_folder.marker,"/FigS.all.selected.groups.decreasing.V9.similarity_",short_marker,V9_Ks_insert,if (monochrom) SUR.sorted_insert else "","maps.only.unif.bg",dominant_insert,"_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected100+1.pdf"),
@@ -2036,17 +2040,26 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
   # pdf(paste0(figure_folder.marker,"/FigS.allTaxa_K3-5-8-12_real1_alpha0.1_delta0.1.pdf"),
   # pdf(paste0(figure_folder.marker,"/FigS.allTaxa_K16_real1_variable.alpha-delta.pdf"),
   # pdf(paste0(figure_folder.marker,"/FigS.allTaxa_K16_k.by.k.pdf"),
-  pdf(paste0(figure_folder.marker,"/FigS_Diplo-Mamiel-Collo-MALV.II.pdf"),
+  pdf(paste0(figure_folder.marker,"/FigS_k_by_k_10groups.pdf"),
+  # pdf(paste0(figure_folder.marker,"/FigS_Diplo-Mamiel-Collo-MALV.II.pdf"),
   # pdf(paste0(figure_folder.marker,"/FigS.all.selected.groups.decreasing.V4.similarity_",short_marker,V9_Ks_insert,if (monochrom) SUR.sorted_insert else "","maps.only.unif.bg",dominant_insert,"_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected100+1.pdf"),
   # pdf(paste0(figure_folder.marker,"/FigS.all.selected.groups.decreasing.Moran.I_",short_marker,V9_Ks_insert,if (monochrom) SUR.sorted_insert else "","maps.only.unif.bg",dominant_insert,"_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected100+1.pdf"), 
   # pdf(paste0(figure_folder.marker,"/FigS.all.selected.groups.decreasing.PCoA1_",short_marker,V9_Ks_insert,if (monochrom) SUR.sorted_insert else "","maps.only.unif.bg",dominant_insert,"_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected100+1.pdf"), 
   # pdf(paste0(figure_folder.marker,"/FigS.>1000.groups.decreasing.PCoA2_",short_marker,V9_Ks_insert,if (monochrom) SUR.sorted_insert else "","maps.only.unif.bg",dominant_insert,"_",div_threshold,"plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,"_selected100+1.pdf"),
       # width=7.5*2.2/1.2/2*1.9*3,height=12/3*4/1.2/2*page_length,onefile=T)
-  width=7.5*2.2/1.2/2*1.9,height=12/3*4/1.2/2*page_length,onefile=T)
+  width = if (k_by_k) 7.5*2.2/1.2/2*1.9*3 else 7.5*2.2/1.2/2*1.9,
+  height = 12/3*4/1.2/2*page_length,
+  onefile=T)
   # width=7.5*2.2/1.2/2*3,height=12/3*4/1.2/2
       # colormodel = "cmyk")
-  # layout(mat=matrix(rep(1:(page_length*3),each=2),nrow=page_length,byrow = T))
-  layout(mat=matrix(rep(1:page_length,each=2),nrow=page_length,byrow = T))
+  if (k_by_k)
+  {
+    # layout_mat = matrix(rep(1:(page_length*3),each=2),nrow=page_length,byrow = T)
+    # for (i in 1:nrow(layout_mat))
+    #   rep(1:(page_length*3),each=2)
+    layout(mat=matrix(rep(1:(page_length*3),each=2),nrow=page_length,byrow = T))
+  } else
+    layout(mat=matrix(rep(1:page_length,each=2),nrow=page_length,byrow = T))
   # i_group = 0
   for (group in group_vect)
   # for (real.number in real.number.vect)
@@ -2068,11 +2081,11 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
       alpha = alpha.delta.vect[i_param,1]
       delta = alpha.delta.vect[i_param,2]
       cat("alpha =",alpha,"- delta =",delta,"\n")
-    } else if (k_by_k)
-      cat(k,"\n")
+    }
+      
     # i_group = i_group+1
       
-    if (!variable_Ks && !variable_alpha.delta && !k_by_k)
+    if (!variable_Ks && !variable_alpha.delta)
     {
       if (data_Federico || V9_Ks)
       {
@@ -2138,18 +2151,15 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
         documents = documents_real1
     } else if (file.exists(save.file_name))
     {
-      if (!k_by_k || k_by_k && k == 1)
-      {
-        spatial_topicmix_kriged = readRDS(save.file_name)
-        # selecting the z.pred columns in all topics:
-        documents = unlist(lapply(spatial_topicmix_kriged,function(g) g$z.pred))
-        # setting one topic per column
-        documents = matrix(documents,ncol=nb_topics,dimnames=list(rownames(spatial_topicmix_kriged[[1]]),paste0("assemblage",1:nb_topics)))
-      }
+      spatial_topicmix_kriged = readRDS(save.file_name)
+      # selecting the z.pred columns in all topics:
+      documents = unlist(lapply(spatial_topicmix_kriged,function(g) g$z.pred))
+      # setting one topic per column
+      documents = matrix(documents,ncol=nb_topics,dimnames=list(rownames(spatial_topicmix_kriged[[1]]),paste0("assemblage",1:nb_topics)))
     } else if (variable_alpha.delta)
     {
       save.file.allReals_name = paste0(data.folder_name,"/",param.folder_name,"/",param.folder_name,".Rdata")
-  
+      
       local.data.folder_name = paste0(data_folder,"/",marker,"_TARA_CompleteSizeRange_byStationByDepth_",group,"_noLagoon")
       local.save.file_name = paste0(local.data.folder_name,"/",param.folder_name,"/documents_1st_real.rds")
       if (file.exists(local.save.file_name))
@@ -2181,16 +2191,10 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
       next
     }
     
-    if (!k_by_k || k_by_k && k == 1)
-    {
-      # Concatenating the spatial coord. with documents into spatial_topicmix_kriged_all_topics:
-      # spatial_topicmix_kriged_all_topics = cbind(data.frame(x = spatial_topicmix_kriged[[1]]$x, y = spatial_topicmix_kriged[[1]]$y),documents)
-      spatial_topicmix_kriged_all_topics = cbind(data.frame(x = coord$x[rownames(coord) %in% rownames(documents)],
-                                                            y = coord$y[rownames(coord) %in% rownames(documents)]),documents)
-    }
-    
-    if (k_by_k && k == 1)
-      par(mar = c(1,1,1,1))
+    # Concatenating the spatial coord. with documents into spatial_topicmix_kriged_all_topics:
+    # spatial_topicmix_kriged_all_topics = cbind(data.frame(x = spatial_topicmix_kriged[[1]]$x, y = spatial_topicmix_kriged[[1]]$y),documents)
+    spatial_topicmix_kriged_all_topics = cbind(data.frame(x = coord$x[rownames(coord) %in% rownames(documents)],
+                                                          y = coord$y[rownames(coord) %in% rownames(documents)]),documents)
     
     # # Storing all assemblages into a single dataframe:
     # spatial_topicmix_kriged_all_topics = data.frame(x = spatial_topicmix_kriged[[1]]$x, y = spatial_topicmix_kriged[[1]]$y)
@@ -2206,386 +2210,407 @@ devtools::source_url("https://github.com/guilhemSK/Useful_functions/raw/main/Plo
     
     # plot.map.group[[i_group]] = plot.map(pie_positions.SUR,spatial_topicmix_kriged_all_topics,nb_topics,bat) 
     
-    blues = c("lightsteelblue4", "lightsteelblue3", "lightsteelblue2", "lightsteelblue1")
-    greys = c(grey(0.6), grey(0.93), grey(0.99))
-    # plot(bat, image = T, land = T, lty = 0, bty = "n", xaxt = "n", yaxt = "n", ann = F, bpal = list(c(0, max(bat), greys[1]), c(min(bat), 0, blues))) #plot map without isobaths
-    plot(bat, image = T, land = T, lty = 0, bty = "n", xaxt = "n", yaxt = "n", ann = F, bpal = list(c(0, max(bat), greys[1]), c(min(bat), 0, blues[3])))
-    plot(bat, lwd = 0.2, deep = 0, shallow = 0, step = 0, add = TRUE) # highlight coastline
-    # par(mar = c(0,0,0,0))
-    # present_topics = apply(spatial_topicmix_kriged_all_topics[,3:(2+(nb_topics0))],1,function(g) which(g>0))
-    # pure_stations = unlist(lapply(present_topics,function(g) length(g))) == 1
-    # points(cbind(spatial_topicmix_kriged_all_topics$x[stations_depths[,2] == "SUR" & pure_stations],spatial_topicmix_kriged_all_topics$y[stations_depths[,2] == "SUR" & pure_stations]),
-    #        pch = 21, cex=1.2, bg = col[unlist(present_topics[stations_depths[,2] == "SUR" & pure_stations])])
-    # pie.colors.matrix = data.frame(matrix(nrow = length(which(stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR")), ncol=nb_topics0, data = NA))
-    # pie.slices.matrix = data.frame(matrix(nrow = length(which(stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR")), ncol=nb_topics0, data = NA))
-    
-    if (variable_groups)
-      title(group, cex.main = 2)
-    else if (variable_Ks)
-      title(paste(nb_topics,"assemblages"), cex.main = 2)
-    else if (variable_alpha.delta)
-      title(paste("alpha =",alpha,"- delta =",delta), cex.main = 2)
-    # else if (k_by_k)
-    #   title(paste("Assemblage",k), cex.main = 5)
-    # title(paste(group,"-", nb_absolute_dominants[taxo_groups == group,1], "dominant assemblages"), cex.main = 2)
-    # title(paste(group,"- V9 dissimilarity =", format(Normalized_VI_V9.V4[taxo_groups_V4 == group],digits=3)), cex.main = 2)
-    # title(paste(group,"- V9 dissimilarity =", format(Normalized_VI_V9.psbO[taxo_groups_psbO == group],digits=3)), cex.main = 2)
-    
     # Sorting topics by their abundance in surface samples:
     documents_SUR = documents[rownames(documents) %in% rownames(pie_positions.SUR),]
     sorted_SUR_assemblages = sort.int(colSums(documents_SUR),decreasing=T,index.return=T)
-    if (!dominant && !k_by_k)
-    {  
-      if (monochrom)
-      {
-        col = vector(length = nb_topics, mode = "character")
-        col.pal = groups_col.pal[[which(names(groups_col.pal) == group)]]
-        if (fixed_nb_colors)
+    
+    blues = c("lightsteelblue4", "lightsteelblue3", "lightsteelblue2", "lightsteelblue1")
+    greys = c(grey(0.6), grey(0.93), grey(0.99))
+    
+    if (!k_by_k)
+    {
+      # plot(bat, image = T, land = T, lty = 0, bty = "n", xaxt = "n", yaxt = "n", ann = F, bpal = list(c(0, max(bat), greys[1]), c(min(bat), 0, blues))) #plot map without isobaths
+      plot(bat, image = T, land = T, lty = 0, bty = "n", xaxt = "n", yaxt = "n", ann = F, bpal = list(c(0, max(bat), greys[1]), c(min(bat), 0, blues[3])))
+      plot(bat, lwd = 0.2, deep = 0, shallow = 0, step = 0, add = TRUE) # highlight coastline
+      # par(mar = c(0,0,0,0))
+      # present_topics = apply(spatial_topicmix_kriged_all_topics[,3:(2+(nb_topics0))],1,function(g) which(g>0))
+      # pure_stations = unlist(lapply(present_topics,function(g) length(g))) == 1
+      # points(cbind(spatial_topicmix_kriged_all_topics$x[stations_depths[,2] == "SUR" & pure_stations],spatial_topicmix_kriged_all_topics$y[stations_depths[,2] == "SUR" & pure_stations]),
+      #        pch = 21, cex=1.2, bg = col[unlist(present_topics[stations_depths[,2] == "SUR" & pure_stations])])
+      # pie.colors.matrix = data.frame(matrix(nrow = length(which(stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR")), ncol=nb_topics0, data = NA))
+      # pie.slices.matrix = data.frame(matrix(nrow = length(which(stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR")), ncol=nb_topics0, data = NA))
+      
+      if (variable_groups)
+        title(group, cex.main = 2)
+      else if (variable_Ks)
+        title(paste(nb_topics,"assemblages"), cex.main = 2)
+      else if (variable_alpha.delta)
+        title(paste("alpha =",alpha,"- delta =",delta), cex.main = 2)
+      # else if (k_by_k)
+      #   title(paste("Assemblage",k), cex.main = 5)
+      # title(paste(group,"-", nb_absolute_dominants[taxo_groups == group,1], "dominant assemblages"), cex.main = 2)
+      # title(paste(group,"- V9 dissimilarity =", format(Normalized_VI_V9.V4[taxo_groups_V4 == group],digits=3)), cex.main = 2)
+      # title(paste(group,"- V9 dissimilarity =", format(Normalized_VI_V9.psbO[taxo_groups_psbO == group],digits=3)), cex.main = 2)
+      
+      if (!dominant)
+      {  
+        if (monochrom)
         {
-          nb_colors = groups_nb_colors[names(groups_nb_colors) == group]
-          if (SUR_sorted_assemblages)
+          col = vector(length = nb_topics, mode = "character")
+          col.pal = groups_col.pal[[which(names(groups_col.pal) == group)]]
+          if (fixed_nb_colors)
           {
-            col[sorted_SUR_assemblages$ix[1:nb_colors]] = if (new_colors) col.pal else col.pal(nb_colors)
-            col[sorted_SUR_assemblages$ix[(nb_colors+1):nb_topics]] = rep("grey",nb_topics - nb_colors)
+            nb_colors = groups_nb_colors[names(groups_nb_colors) == group]
+            if (SUR_sorted_assemblages)
+            {
+              col[sorted_SUR_assemblages$ix[1:nb_colors]] = if (new_colors) col.pal else col.pal(nb_colors)
+              col[sorted_SUR_assemblages$ix[(nb_colors+1):nb_topics]] = rep("grey",nb_topics - nb_colors)
+            } else
+            {
+              col[1:nb_colors] = if (new_colors) col.pal else col.pal(nb_colors)
+              col[(nb_colors+1):nb_topics] = rep("grey",nb_topics - nb_colors)
+            } 
+            
+            if (data_psbO)
+            {
+              if (V9_Ks)
+              {
+                if (group == "Bacillariophyta")
+                {
+                  col[1:8] = c(col[c(2,3,1)],
+                               "grey",
+                               col[c(6,5,7)],
+                               col[4]) # 7 colors
+                  # col[8:10] = c("red","blue","green")
+                } else if (group == "Haptophyta")
+                {
+                  col[1:6] = c(col[c(2,1,3,5,4)],
+                               "grey")
+                } else if (group == "Dinophyceae")   
+                  col = col
+              } else
+              {
+                if (group == "Bacillariophyta")
+                {
+                  col[1:8] = col[c(3,2,1,6,8,5,7,4)]
+                } else if (group == "Haptophyta")
+                {
+                  col[1:7] = c(col[c(2,1,4)],"grey",col[c(3,5,7)]) # 6
+                } else if (group == "Dinophyceae")  
+                  col = col
+              }
+            } else if (data_V4)
+            {
+              if (V9_Ks)
+              {
+                if (group == "Bacillariophyta")
+                {
+                  # col[1:7] = col[c(1,2,3,6,7,4,5)]
+                  col[1:7] = c(col[c(1,2,3,6)],"grey",col[c(4,5)])
+                } else if (group == "Haptophyta")
+                {
+                  col[1:7] = c(col[c(1,2)],"grey",col[c(3,4,5)],
+                               col[6])
+                } else if (group == "Dinophyceae")
+                {
+                  col[1:6] = c(col[c(1,2,5,3)],rep("grey",2))
+                }
+              } else
+              {
+                if (group == "Bacillariophyta")
+                {
+                  col[1:9] = col[c(1,3,2,6,4,7,5,8,9)]
+                } else if (group == "Haptophyta")
+                {
+                  col[1:7] = c(col[c(1,2)],"grey",col[c(6,5,3,4)])
+                } else if (group == "Dinophyceae")
+                {
+                  col[1:14] = c(col[c(1,2,3,6,10,4,5,8,12)],"grey",col[11],rep("grey",3))
+                } else if (group == "Collodaria")
+                {
+                  col[1:13] = c(col[c(1,2,10,6,5)],rep("grey",3),col[c(3,9)],rep("grey",2),col[13])
+                  # col[1:9] = c(col[c(1,6,7,2,5,4)],"grey","grey","grey") #(3),9,8
+                } else if (group == "MAST-3,_12")
+                  col[1:8] = col[1:8]
+                # col = col
+              }
+            }
           } else
           {
-            col[1:nb_colors] = if (new_colors) col.pal else col.pal(nb_colors)
-            col[(nb_colors+1):nb_topics] = rep("grey",nb_topics - nb_colors)
-          } 
+            col[sorted_SUR_assemblages$ix[sorted_SUR_assemblages$x > 1]] = col.pal(length(which(sorted_SUR_assemblages$x > 1)))#[sample(length(which(sorted_SUR_assemblages$x > 1)))]
+            col[sorted_SUR_assemblages$ix[sorted_SUR_assemblages$x < 1]] = rep("grey",length(which(sorted_SUR_assemblages$x < 1)))
+            
+            cat(length(which(sorted_SUR_assemblages$x > 1)),"colors\n")
+          }
+        } else if (manual)
+        {
+          # col = c(color.pal1(6),color.pal2(3),color.pal3(3),rev(color.pal4(4)))
+          # col = c("#7e170f","#e30a14","#eb611d","#f4961b",
+          #         "#fdc611","#f3e600","#94c56a","#47ad42",
+          #         "#06652e","#838b8b","#ccbfb0","#f0f8fe",
+          #         "#6cc6d9","#509fd8","#2e58a5","#282e67")
           
-          if (data_psbO)
+          if (nb_topics == 16)
           {
-            if (V9_Ks)
+            col = c("#7e170f","#e30a14","#eb611d","#f4961b",
+                    muted("#fdc611",l=83,c=200),"#f3e600",muted("#94c56a",l=83,c=60),"#47ad42",
+                    "#06652e","#838b8b","#ccbfb0","#f0f8fe",
+                    "#6cc6d9","#509fd8","#2e58a5","#282e67")
+          } else if (nb_topics == 14)
+            col = c("#7e170f","#eb611d","#f4961b",
+                    muted("#fdc611",l=83,c=200),"#f3e600",muted("#94c56a",l=83,c=60),"#47ad42",
+                    "#06652e","#838b8b","#ccbfb0","#f0f8fe",
+                    "#6cc6d9","#509fd8","#2e58a5")
+          
+          
+          # col[sorted_SUR_assemblages$ix] = col
+          if (variable_alpha.delta)
+          {
+            if (alpha == 50/nb_topics && delta == 0.1)
             {
-              if (group == "Bacillariophyta")
-              {
-                col[1:8] = c(col[c(2,3,1)],
-                             "grey",
-                             col[c(6,5,7)],
-                             col[4]) # 7 colors
-                # col[8:10] = c("red","blue","green")
-              } else if (group == "Haptophyta")
-              {
-                col[1:6] = c(col[c(2,1,3,5,4)],
-                        "grey")
-              } else if (group == "Dinophyceae")   
-                col = col
-            } else
+              col = col[c(14,7,9,12,
+                          5,3,6,10,
+                          4,11,13,8,
+                          1,2)]
+            } else if (alpha == 0.05/nb_topics && delta == 0.1)
             {
-              if (group == "Bacillariophyta")
-              {
-                col[1:8] = col[c(3,2,1,6,8,5,7,4)]
-              } else if (group == "Haptophyta")
-              {
-                col[1:7] = c(col[c(2,1,4)],"grey",col[c(3,5,7)]) # 6
-              } else if (group == "Dinophyceae")  
-                col = col
+              col = col[c(1,12,2,6,
+                          14,4,3,5,
+                          7,13,11,8,
+                          9,10)]
+            } else if (alpha == 1 && delta == 1)
+            {
+              col = col[c(1,12,11,10,
+                          8,3,7,9,
+                          5,2,4,6,
+                          13,14)]
             }
-          } else if (data_V4)
+          } else if (variable_reals)
           {
-            if (V9_Ks)
+            if (real.number == 1)
             {
-              if (group == "Bacillariophyta")
-              {
-                # col[1:7] = col[c(1,2,3,6,7,4,5)]
-                col[1:7] = c(col[c(1,2,3,6)],"grey",col[c(4,5)])
-              } else if (group == "Haptophyta")
-              {
-                col[1:7] = c(col[c(1,2)],"grey",col[c(3,4,5)],
-                             col[6])
-              } else if (group == "Dinophyceae")
-              {
-                col[1:6] = c(col[c(1,2,5,3)],rep("grey",2))
-              }
-            } else
+              col = col[c(1,13,2,7,
+                          15,8,4,6,
+                          3,5,9,12,
+                          14,16,11,10)]
+            } else if (real.number == 37)
             {
-              if (group == "Bacillariophyta")
-              {
-                col[1:9] = col[c(1,3,2,6,4,7,5,8,9)]
-              } else if (group == "Haptophyta")
-              {
-                col[1:7] = c(col[c(1,2)],"grey",col[c(6,5,3,4)])
-              } else if (group == "Dinophyceae")
-              {
-                col[1:14] = c(col[c(1,2,3,6,10,4,5,8,12)],"grey",col[11],rep("grey",3))
-              } else if (group == "Collodaria")
-              {
-                col[1:13] = c(col[c(1,2,10,6,5)],rep("grey",3),col[c(3,9)],rep("grey",2),col[13])
-                # col[1:9] = c(col[c(1,6,7,2,5,4)],"grey","grey","grey") #(3),9,8
-              } else if (group == "MAST-3,_12")
-                col[1:8] = col[1:8]
-              # col = col
+              col = col[c(14,7,10,13,
+                          12,11,5,16,
+                          6,8,3,9,
+                          2,15,1,4)]
+            } else if (real.number == 64)
+            {
+              col = col[c(10,8,5,15,
+                          14,11,3,1,
+                          4,12,9,6,
+                          7,13,2,16)]
+            }
+          } else if (variable_Ks)
+          {
+            if (nb_topics == 3)
+              col = col[c(1,13,3)]
+            else if (nb_topics == 5)
+              col = col[c(1,13,8,3,
+                          15)]
+            else if (nb_topics == 8)
+              col = col[c(1,13,15,3,
+                          8,4,7,12)]
+            else if (nb_topics == 12)
+              col = col[c(1,13,3,15,
+                          7,8,4,6,
+                          14,12,11,10)]
+          }
+          # } else
+          #   topic_reordering = 1:9
+        } else
+        {  
+          # spatial_topicmix_kriged_all_topics[,2+(1:nb_topics)] = spatial_topicmix_kriged_all_topics[,2 + sorted_SUR_assemblages$ix[1:nb_topics]]
+          
+          # Computing the latitude of topics' barycentres in surface:
+          mean_abs_latitude = vector(length = ncol(documents), mode = "numeric")
+          for (k in 1:ncol(documents))
+          {
+            # mean_latitude[k] = weighted.mean(coord$y[rownames(coord) %in% rownames(documents) & stations_depths[,2] == "SUR"],
+            #                                  w=documents[stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR",k]/sum(documents[stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR",k]))
+            mean_abs_latitude[k] = weighted.mean(abs(coord$y)[rownames(coord) %in% rownames(documents) & stations_depths[,2] == "SUR"],
+                                                 w=documents[stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR",k]/sum(documents[stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR",k]))  
+          }
+          
+          col = vector(length = nb_topics, mode = "character")
+          # Dark red color for the most abundant topic:
+          col[1] = "#7F0000"
+          # sorted_latitudes = sort.int(mean_latitude[sorted_SUR_assemblages$ix[1:nb_topics1]][-1],decreasing=T,index.return=T)
+          # Sorting the nb_topics1 most abundant topics by the absolute latitude of their barycentre, excluding the most abundant one:
+          sorted_abs_latitudes = sort.int(mean_abs_latitude[sorted_SUR_assemblages$ix[1:nb_topics]][-1],decreasing=T,index.return=T)
+          # Blue palette for the topics above 50°:
+          if (length(which(sorted_abs_latitudes$x>arctic_bound)) == 1)
+          {
+            col[sorted_abs_latitudes$ix[sorted_abs_latitudes$x>arctic_bound]+1] = "cyan"
+          } else if (length(which(sorted_abs_latitudes$x>arctic_bound)) == 2)
+          {
+            col[sorted_abs_latitudes$ix[sorted_abs_latitudes$x>arctic_bound]+1] = c("cyan","#007FFF")
+          } else if (length(which(sorted_abs_latitudes$x>arctic_bound)) > 2)
+            col[sorted_abs_latitudes$ix[sorted_abs_latitudes$x>arctic_bound]+1] = color.pal.blue(length(which(sorted_abs_latitudes$x>arctic_bound)))
+          # Red-yellow palette for topics between 50° and 20°, exclusing the dark red color already used for the most abundant topic:
+          if (length(which(sorted_abs_latitudes$x<arctic_bound & sorted_abs_latitudes$x>tropic_bound)) > 0)
+            col[sorted_abs_latitudes$ix[sorted_abs_latitudes$x<arctic_bound & sorted_abs_latitudes$x>tropic_bound]+1] = color.pal.warm(length(which(sorted_abs_latitudes$x<arctic_bound & sorted_abs_latitudes$x>tropic_bound))+1)[-1]
+          # Green palette for topics between 0° and 20°:
+          if (length(which(sorted_abs_latitudes$x<tropic_bound)) > 0)
+            col[sorted_abs_latitudes$ix[sorted_abs_latitudes$x<tropic_bound]+1] = color.pal.green(length(which(sorted_abs_latitudes$x<tropic_bound)))
+        }
+        
+        pie.colors.matrix = matrix(nrow = length(which(rownames(pie_positions.SUR) %in% rownames(documents))), 
+                                   ncol=nb_topics, 
+                                   data = NA,
+                                   dimnames = list(rownames(pie_positions.SUR)[rownames(pie_positions.SUR) %in% rownames(documents)],
+                                                   NULL))
+        pie.slices.matrix = matrix(nrow = length(which(rownames(pie_positions.SUR) %in% rownames(documents))), 
+                                   ncol=nb_topics, 
+                                   data = NA,
+                                   dimnames = list(rownames(pie_positions.SUR)[rownames(pie_positions.SUR) %in% rownames(documents)],
+                                                   NULL))
+        # pie.colors.matrix = matrix(nrow = 2, 
+        #                            ncol=nb_topics, 
+        #                            data = NA,
+        #                            dimnames = list(c("TARA_148 SUR","TARA_149 SUR"),
+        #                                            NULL))
+        # pie.slices.matrix = matrix(nrow = 2, 
+        #                            ncol=nb_topics, 
+        #                            data = NA,
+        #                            dimnames = list(c("TARA_148 SUR","TARA_149 SUR"),
+        #                                            NULL))
+        
+        ii_pie = 0
+        for (i_pie in which(rownames(documents) %in% rownames(pie_positions.SUR)))
+          # for (i_pie in which(row.names %in% c("TARA_148 SUR","TARA_149 SUR")))
+          # for (i_pie in which(stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR"))
+        {
+          ii_pie = ii_pie+1
+          station_topics = which(documents[i_pie,1:nb_topics] > 0)
+          pie.colors.matrix[ii_pie,] = c(col[station_topics],rep(NA,(nb_topics)-length(station_topics)))
+          pie.slices.matrix[ii_pie,] = c(as.numeric(documents[i_pie,station_topics]),rep(NA,(nb_topics)-length(station_topics)))
+          if (length(which(pie.colors.matrix[ii_pie,] == "grey")) > 1)
+          {
+            pie.slices.matrix[ii_pie,which(pie.colors.matrix[ii_pie,] == "grey")[1]] = sum(pie.slices.matrix[ii_pie,which(pie.colors.matrix[ii_pie,] == "grey")])
+            pie.slices.matrix[ii_pie,which(pie.colors.matrix[ii_pie,] == "grey")[-1]] = NA
+            pie.colors.matrix[ii_pie,which(pie.colors.matrix[ii_pie,] == "grey")[-1]] = NA
+          }
+        }
+        #####
+        # space.pies(spatial_topicmix_kriged_all_topics$x[stations_depths[rownames(coord) %in% row.names,2] == "SUR"],
+        #            spatial_topicmix_kriged_all_topics$y[stations_depths[rownames(coord) %in% row.names,2] == "SUR"],
+        space.pies(spatial_topicmix_kriged_all_topics$x[rownames(documents) %in% rownames(pie_positions.SUR)],
+                   spatial_topicmix_kriged_all_topics$y[rownames(documents) %in% rownames(pie_positions.SUR)],
+                   pie.slices = pie.slices.matrix, pie.colors = pie.colors.matrix,
+                   # pie.radius=3, pie.space=0.01,
+                   pie.radius=6, pie.space=0.4,
+                   link=TRUE, seg.lwd=1, seg.col=1, seg.lty=1, 
+                   coord= pie_positions.SUR[rownames(pie_positions.SUR) %in% rownames(documents),])
+        
+        # space.pies(spatial_topicmix_kriged_all_topics$x[row.names %in% c("TARA_148 SUR","TARA_149 SUR")],
+        #            spatial_topicmix_kriged_all_topics$y[row.names %in% c("TARA_148 SUR","TARA_149 SUR")],
+        #            pie.slices = data.frame(pie.slices.matrix), pie.colors = data.frame(pie.colors.matrix),
+        #            # pie.radius=3, pie.space=0.01,
+        #            pie.radius=6, pie.space=0.4,
+        #            link=TRUE, seg.lwd=1, seg.col=1, seg.lty=1, 
+        #            coord= pie_positions.SUR[rownames(pie_positions.SUR) %in% c("TARA_148 SUR","TARA_149 SUR"),])
+      } else if (dominant)
+      {
+        dominant_k = vector(length = length(which(rownames(pie_positions.SUR) %in% rownames(documents))), mode = "numeric")
+        ii = 1
+        for (i in which(rownames(documents) %in% rownames(pie_positions.SUR)))
+        {
+          dominant_k[ii] = sort.int(documents[i,],decreasing=T,index.return = T)$ix[1]
+          names(dominant_k)[ii] = rownames(documents)[i]
+          ii = ii+1
+        }
+        
+        if (monochrom)
+        {
+          if (fixed_nb_colors && !nb_colors > length(levels(as.factor(dominant_k))))
+          { 
+            col.array = c(col.pal(nb_colors),rep("grey",nb_topics-nb_colors))
+          } else
+          {
+            col.array = col.pal(length(levels(as.factor(dominant_k))))#[sample(length(levels(as.factor(dominant_k))))]
+            cat(length(levels(as.factor(dominant_k))),"colors\n")
+          }
+          
+          col = vector(length = nb_topics, mode = "character")
+          i = 1
+          # Assigning colors in the order of the most common dominant assemblage to the least common
+          for (k in names(table(as.factor(dominant_k))))
+          {
+            k = as.numeric(k)
+            if (k != 0)
+            {
+              col[k] = col.array[i]
+              i = i+1
             }
           }
-        } else
-        {
-          col[sorted_SUR_assemblages$ix[sorted_SUR_assemblages$x > 1]] = col.pal(length(which(sorted_SUR_assemblages$x > 1)))#[sample(length(which(sorted_SUR_assemblages$x > 1)))]
-          col[sorted_SUR_assemblages$ix[sorted_SUR_assemblages$x < 1]] = rep("grey",length(which(sorted_SUR_assemblages$x < 1)))
-          
-          cat(length(which(sorted_SUR_assemblages$x > 1)),"colors\n")
-        }
-      } else if (manual)
-      {
-        # col = c(color.pal1(6),color.pal2(3),color.pal3(3),rev(color.pal4(4)))
-        # col = c("#7e170f","#e30a14","#eb611d","#f4961b",
-        #         "#fdc611","#f3e600","#94c56a","#47ad42",
-        #         "#06652e","#838b8b","#ccbfb0","#f0f8fe",
-        #         "#6cc6d9","#509fd8","#2e58a5","#282e67")
-        
-        if (nb_topics == 16)
-        {
-          col = c("#7e170f","#e30a14","#eb611d","#f4961b",
-                  muted("#fdc611",l=83,c=200),"#f3e600",muted("#94c56a",l=83,c=60),"#47ad42",
-                  "#06652e","#838b8b","#ccbfb0","#f0f8fe",
-                  "#6cc6d9","#509fd8","#2e58a5","#282e67")
-        } else if (nb_topics == 14)
-          col = c("#7e170f","#eb611d","#f4961b",
-                  muted("#fdc611",l=83,c=200),"#f3e600",muted("#94c56a",l=83,c=60),"#47ad42",
-                  "#06652e","#838b8b","#ccbfb0","#f0f8fe",
-                  "#6cc6d9","#509fd8","#2e58a5")
-          
-        
-        # col[sorted_SUR_assemblages$ix] = col
-        if (variable_alpha.delta)
-        {
-          if (alpha == 50/nb_topics && delta == 0.1)
-          {
-            col = col[c(14,7,9,12,
-                        5,3,6,10,
-                        4,11,13,8,
-                        1,2)]
-          } else if (alpha == 0.05/nb_topics && delta == 0.1)
-          {
-            col = col[c(1,12,2,6,
-                        14,4,3,5,
-                        7,13,11,8,
-                        9,10)]
-          } else if (alpha == 1 && delta == 1)
-          {
-            col = col[c(1,12,11,10,
-                        8,3,7,9,
-                        5,2,4,6,
-                        13,14)]
-          }
-        } else if (variable_reals)
-        {
-          if (real.number == 1)
-          {
-            col = col[c(1,13,2,7,
-                        15,8,4,6,
-                        3,5,9,12,
-                        14,16,11,10)]
-          } else if (real.number == 37)
-          {
-            col = col[c(14,7,10,13,
-                        12,11,5,16,
-                        6,8,3,9,
-                        2,15,1,4)]
-          } else if (real.number == 64)
-          {
-            col = col[c(10,8,5,15,
-                        14,11,3,1,
-                        4,12,9,6,
-                        7,13,2,16)]
-          }
-        } else if (variable_Ks)
-        {
-          if (nb_topics == 3)
-            col = col[c(1,13,3)]
-          else if (nb_topics == 5)
-            col = col[c(1,13,8,3,
-                        15)]
-          else if (nb_topics == 8)
-            col = col[c(1,13,15,3,
-                        8,4,7,12)]
-          else if (nb_topics == 12)
-            col = col[c(1,13,3,15,
-                        7,8,4,6,
-                        14,12,11,10)]
-        }
-        # } else
-        #   topic_reordering = 1:9
-      } else
-      {  
-        # spatial_topicmix_kriged_all_topics[,2+(1:nb_topics)] = spatial_topicmix_kriged_all_topics[,2 + sorted_SUR_assemblages$ix[1:nb_topics]]
-        
-        # Computing the latitude of topics' barycentres in surface:
-        mean_abs_latitude = vector(length = ncol(documents), mode = "numeric")
-        for (k in 1:ncol(documents))
-        {
-          # mean_latitude[k] = weighted.mean(coord$y[rownames(coord) %in% rownames(documents) & stations_depths[,2] == "SUR"],
-          #                                  w=documents[stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR",k]/sum(documents[stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR",k]))
-          mean_abs_latitude[k] = weighted.mean(abs(coord$y)[rownames(coord) %in% rownames(documents) & stations_depths[,2] == "SUR"],
-                                               w=documents[stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR",k]/sum(documents[stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR",k]))  
         }
         
-        col = vector(length = nb_topics, mode = "character")
-        # Dark red color for the most abundant topic:
-        col[1] = "#7F0000"
-        # sorted_latitudes = sort.int(mean_latitude[sorted_SUR_assemblages$ix[1:nb_topics1]][-1],decreasing=T,index.return=T)
-        # Sorting the nb_topics1 most abundant topics by the absolute latitude of their barycentre, excluding the most abundant one:
-        sorted_abs_latitudes = sort.int(mean_abs_latitude[sorted_SUR_assemblages$ix[1:nb_topics]][-1],decreasing=T,index.return=T)
-        # Blue palette for the topics above 50°:
-        if (length(which(sorted_abs_latitudes$x>arctic_bound)) == 1)
-        {
-          col[sorted_abs_latitudes$ix[sorted_abs_latitudes$x>arctic_bound]+1] = "cyan"
-        } else if (length(which(sorted_abs_latitudes$x>arctic_bound)) == 2)
-        {
-          col[sorted_abs_latitudes$ix[sorted_abs_latitudes$x>arctic_bound]+1] = c("cyan","#007FFF")
-        } else if (length(which(sorted_abs_latitudes$x>arctic_bound)) > 2)
-          col[sorted_abs_latitudes$ix[sorted_abs_latitudes$x>arctic_bound]+1] = color.pal.blue(length(which(sorted_abs_latitudes$x>arctic_bound)))
-        # Red-yellow palette for topics between 50° and 20°, exclusing the dark red color already used for the most abundant topic:
-        if (length(which(sorted_abs_latitudes$x<arctic_bound & sorted_abs_latitudes$x>tropic_bound)) > 0)
-          col[sorted_abs_latitudes$ix[sorted_abs_latitudes$x<arctic_bound & sorted_abs_latitudes$x>tropic_bound]+1] = color.pal.warm(length(which(sorted_abs_latitudes$x<arctic_bound & sorted_abs_latitudes$x>tropic_bound))+1)[-1]
-        # Green palette for topics between 0° and 20°:
-        if (length(which(sorted_abs_latitudes$x<tropic_bound)) > 0)
-          col[sorted_abs_latitudes$ix[sorted_abs_latitudes$x<tropic_bound]+1] = color.pal.green(length(which(sorted_abs_latitudes$x<tropic_bound)))
-      }
-      
-      pie.colors.matrix = matrix(nrow = length(which(rownames(pie_positions.SUR) %in% rownames(documents))), 
-                                 ncol=nb_topics, 
-                                 data = NA,
-                                 dimnames = list(rownames(pie_positions.SUR)[rownames(pie_positions.SUR) %in% rownames(documents)],
-                                                 NULL))
-      pie.slices.matrix = matrix(nrow = length(which(rownames(pie_positions.SUR) %in% rownames(documents))), 
-                                 ncol=nb_topics, 
-                                 data = NA,
-                                 dimnames = list(rownames(pie_positions.SUR)[rownames(pie_positions.SUR) %in% rownames(documents)],
-                                                 NULL))
-      # pie.colors.matrix = matrix(nrow = 2, 
-      #                            ncol=nb_topics, 
-      #                            data = NA,
-      #                            dimnames = list(c("TARA_148 SUR","TARA_149 SUR"),
-      #                                            NULL))
-      # pie.slices.matrix = matrix(nrow = 2, 
-      #                            ncol=nb_topics, 
-      #                            data = NA,
-      #                            dimnames = list(c("TARA_148 SUR","TARA_149 SUR"),
-      #                                            NULL))
-      
-      ii_pie = 0
-      for (i_pie in which(rownames(documents) %in% rownames(pie_positions.SUR)))
-      # for (i_pie in which(row.names %in% c("TARA_148 SUR","TARA_149 SUR")))
-      # for (i_pie in which(stations_depths[rownames(coord) %in% rownames(documents),2] == "SUR"))
-      {
-        ii_pie = ii_pie+1
-        station_topics = which(documents[i_pie,1:nb_topics] > 0)
-        pie.colors.matrix[ii_pie,] = c(col[station_topics],rep(NA,(nb_topics)-length(station_topics)))
-        pie.slices.matrix[ii_pie,] = c(as.numeric(documents[i_pie,station_topics]),rep(NA,(nb_topics)-length(station_topics)))
-        if (length(which(pie.colors.matrix[ii_pie,] == "grey")) > 1)
-        {
-          pie.slices.matrix[ii_pie,which(pie.colors.matrix[ii_pie,] == "grey")[1]] = sum(pie.slices.matrix[ii_pie,which(pie.colors.matrix[ii_pie,] == "grey")])
-          pie.slices.matrix[ii_pie,which(pie.colors.matrix[ii_pie,] == "grey")[-1]] = NA
-          pie.colors.matrix[ii_pie,which(pie.colors.matrix[ii_pie,] == "grey")[-1]] = NA
-        }
-      }
-      #####
-      # space.pies(spatial_topicmix_kriged_all_topics$x[stations_depths[rownames(coord) %in% row.names,2] == "SUR"],
-      #            spatial_topicmix_kriged_all_topics$y[stations_depths[rownames(coord) %in% row.names,2] == "SUR"],
-      space.pies(spatial_topicmix_kriged_all_topics$x[rownames(documents) %in% rownames(pie_positions.SUR)],
-                 spatial_topicmix_kriged_all_topics$y[rownames(documents) %in% rownames(pie_positions.SUR)],
-                 pie.slices = pie.slices.matrix, pie.colors = pie.colors.matrix,
-                 # pie.radius=3, pie.space=0.01,
-                 pie.radius=6, pie.space=0.4,
-                 link=TRUE, seg.lwd=1, seg.col=1, seg.lty=1, 
-                 coord= pie_positions.SUR[rownames(pie_positions.SUR) %in% rownames(documents),])
-      
-      # space.pies(spatial_topicmix_kriged_all_topics$x[row.names %in% c("TARA_148 SUR","TARA_149 SUR")],
-      #            spatial_topicmix_kriged_all_topics$y[row.names %in% c("TARA_148 SUR","TARA_149 SUR")],
-      #            pie.slices = data.frame(pie.slices.matrix), pie.colors = data.frame(pie.colors.matrix),
-      #            # pie.radius=3, pie.space=0.01,
-      #            pie.radius=6, pie.space=0.4,
-      #            link=TRUE, seg.lwd=1, seg.col=1, seg.lty=1, 
-      #            coord= pie_positions.SUR[rownames(pie_positions.SUR) %in% c("TARA_148 SUR","TARA_149 SUR"),])
-    } else if (dominant)
-    {
-      dominant_k = vector(length = length(which(rownames(pie_positions.SUR) %in% rownames(documents))), mode = "numeric")
-      ii = 1
-      for (i in which(rownames(documents) %in% rownames(pie_positions.SUR)))
-      {
-        dominant_k[ii] = sort.int(documents[i,],decreasing=T,index.return = T)$ix[1]
-        names(dominant_k)[ii] = rownames(documents)[i]
-        ii = ii+1
-      }
-      
-      if (monochrom)
-      {
-        if (fixed_nb_colors && !nb_colors > length(levels(as.factor(dominant_k))))
-        { 
-          col.array = c(col.pal(nb_colors),rep("grey",nb_topics-nb_colors))
-        } else
-        {
-          col.array = col.pal(length(levels(as.factor(dominant_k))))#[sample(length(levels(as.factor(dominant_k))))]
-          cat(length(levels(as.factor(dominant_k))),"colors\n")
-        }
-          
-        col = vector(length = nb_topics, mode = "character")
-        i = 1
-        # Assigning colors in the order of the most common dominant assemblage to the least common
-        for (k in names(table(as.factor(dominant_k))))
+        # pvpick_Hellinger = pvpick(pvclust_Hellinger,alpha = 0.96)
+        # nb_clust = length(pvpick_Hellinger$clusters)
+        # 
+        # grp_Hellinger = rep(1,nrow(documents))
+        # names(grp_Hellinger) = rownames(documents)
+        # for (i_clust in 1:nb_clust)
+        # {
+        #   grp_Hellinger[names(grp_Hellinger) %in% pvpick_Hellinger$clusters[[i_clust]]] = i_clust+1
+        # }
+        
+        # Plotting stations associated with each dominant assemblage  
+        for (k in levels(as.factor(dominant_k)))
         {
           k = as.numeric(k)
-          if (k != 0)
+          if (k !=0)
           {
-            col[k] = col.array[i]
-            i = i+1
+            pies.coord = pie_positions.SUR[rownames(pie_positions.SUR) %in% rownames(documents),][dominant_k == k,]
+            stations.coord = coord[rownames(coord) %in% names(dominant_k),][dominant_k == k,]
+            segments(x0=stations.coord[,2],y0=stations.coord[,1],x1=pies.coord[,1],y1=pies.coord[,2])
+            points(pie_positions.SUR[rownames(pie_positions.SUR) %in% rownames(documents),][dominant_k == k,],
+                   pch = 21, cex=7, bg = col[k])
           }
         }
-      }
-      
-      # pvpick_Hellinger = pvpick(pvclust_Hellinger,alpha = 0.96)
-      # nb_clust = length(pvpick_Hellinger$clusters)
-      # 
-      # grp_Hellinger = rep(1,nrow(documents))
-      # names(grp_Hellinger) = rownames(documents)
-      # for (i_clust in 1:nb_clust)
-      # {
-      #   grp_Hellinger[names(grp_Hellinger) %in% pvpick_Hellinger$clusters[[i_clust]]] = i_clust+1
-      # }
-      
-      # Plotting stations associated with each dominant assemblage  
-      for (k in levels(as.factor(dominant_k)))
-      {
-        k = as.numeric(k)
-        if (k !=0)
-        {
-          pies.coord = pie_positions.SUR[rownames(pie_positions.SUR) %in% rownames(documents),][dominant_k == k,]
-          stations.coord = coord[rownames(coord) %in% names(dominant_k),][dominant_k == k,]
-          segments(x0=stations.coord[,2],y0=stations.coord[,1],x1=pies.coord[,1],y1=pies.coord[,2])
-          points(pie_positions.SUR[rownames(pie_positions.SUR) %in% rownames(documents),][dominant_k == k,],
-                 pch = 21, cex=7, bg = col[k])
-        }
-      }
+      } 
     } else if (k_by_k)
     {
-      # col = vector(length = length(which(rownames(pie_positions.SUR) %in% rownames(documents))), mode = "numeric")
-      # for (i_station in 1:length(which(rownames(pie_positions.SUR) %in% rownames(documents))))
-      
-      # plot = ggplot(data = data.frame(x=pies.coord$x,y=pies.coord$y,z.pred=documents_SUR[,k])) +
-      #                 geom_point(aes(x,y,colour=z.pred)) +
-      #                 scale_colour_gradientn(colours = c("darkblue","firebrick2"), space = "Lab")
-      
-      nColor = 20
-      colors = paletteer_c(palette = "viridis::viridis", n = nColor)
-      # colors = colorRampPalette(c("darkblue","white","red"),space = "Lab")(nColor)
-      # colors = topo.colors(nColor)
-      
-      assemblage_order = c(1,3,9,7,
-                           10,8,4,6,
-                           11,16,15,12,
-                           2,13,5,14)
-      
-      # Cut the continuous range into bins, including dummy 0 and 1 at the beginning to scale the min and max of the color range: 
-      # cut.doc.0.1 = as.numeric(cut(c(0,1,documents_SUR[,assemblage_order[k]]),nColor))[-c(1,2)]
-      cut.doc.0.1 = as.numeric(cut(documents_SUR[,assemblage_order[k]],nColor))
-         
-      pies.coord = pie_positions.SUR[rownames(pie_positions.SUR) %in% rownames(documents),]
-      stations.coord = coord[rownames(coord) %in% rownames(documents) & rownames(coord) %in% rownames(pie_positions.SUR) & stations_depths[,2] == "SUR",]
-      segments(x0=stations.coord[,2],y0=stations.coord[,1],x1=pies.coord[,1],y1=pies.coord[,2])
-      points(pie_positions.SUR[rownames(pie_positions.SUR) %in% rownames(documents),],
-             pch = 21, cex=7, 
-             # bg = col.pal(nrow(documents_SUR))[findInterval(documents_SUR[,k], sort(documents_SUR[,k]))])
-             bg = colors[cut.doc.0.1])
+      par(mar = c(1,1,1,1), oma=c(1,1,10,1))
+      for (k in 1:nb_topics)
+      {
+        cat(k,"\n")
+        
+        # plot(bat, image = T, land = T, lty = 0, bty = "n", xaxt = "n", yaxt = "n", ann = F, bpal = list(c(0, max(bat), greys[1]), c(min(bat), 0, blues))) #plot map without isobaths
+        plot(bat, image = T, land = T, lty = 0, bty = "n", xaxt = "n", yaxt = "n", ann = F, bpal = list(c(0, max(bat), greys[1]), c(min(bat), 0, blues[3])))
+        plot(bat, lwd = 0.2, deep = 0, shallow = 0, step = 0, add = TRUE)
+        
+        # col = vector(length = length(which(rownames(pie_positions.SUR) %in% rownames(documents))), mode = "numeric")
+        # for (i_station in 1:length(which(rownames(pie_positions.SUR) %in% rownames(documents))))
+        
+        # plot = ggplot(data = data.frame(x=pies.coord$x,y=pies.coord$y,z.pred=documents_SUR[,k])) +
+        #                 geom_point(aes(x,y,colour=z.pred)) +
+        #                 scale_colour_gradientn(colours = c("darkblue","firebrick2"), space = "Lab")
+        
+        nColor = 20
+        colors = paletteer_c(palette = "viridis::viridis", n = nColor)
+        # colors = colorRampPalette(c("darkblue","white","red"),space = "Lab")(nColor)
+        # colors = topo.colors(nColor)
+        
+        if (group == "AllTaxa")
+        {
+          assemblage_order = c(1,3,9,7,
+                               10,8,4,6,
+                               11,16,15,12,
+                               2,13,5,14)
+        } else
+          assemblage_order = 1:nb_topics
+        
+        # Cut the continuous range into bins, including dummy 0 and 1 at the beginning to scale the min and max of the color range: 
+        # cut.doc.0.1 = as.numeric(cut(c(0,1,documents_SUR[,assemblage_order[k]]),nColor))[-c(1,2)]
+        cut.doc.0.1 = as.numeric(cut(documents_SUR[,assemblage_order[k]],nColor))
+        
+        pies.coord = pie_positions.SUR[rownames(pie_positions.SUR) %in% rownames(documents),]
+        stations.coord = coord[rownames(coord) %in% rownames(documents) & rownames(coord) %in% rownames(pie_positions.SUR) & stations_depths[,2] == "SUR",]
+        segments(x0=stations.coord[,2],y0=stations.coord[,1],x1=pies.coord[,1],y1=pies.coord[,2])
+        points(pie_positions.SUR[rownames(pie_positions.SUR) %in% rownames(documents),],
+               pch = 21, cex=7, 
+               # bg = col.pal(nrow(documents_SUR))[findInterval(documents_SUR[,k], sort(documents_SUR[,k]))])
+               bg = colors[cut.doc.0.1])
+      }
+      mtext(group, outer=TRUE,  cex=9, line=-0.5, adj = 0)
+      grid.newpage()
     }
   }
   # plot.new()
