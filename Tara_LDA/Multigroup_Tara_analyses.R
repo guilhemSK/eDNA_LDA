@@ -25451,6 +25451,145 @@ if (marker_comparison)
   saveRDS(list(Normalized_VI_V4,Normalized_VI_psbO),paste0(results_folder,"/Normalized.VI_group.comparison.SUR_V4.psbO_Gibbs.prevalence.min.crossValid10sampleFolds.rds"))
 }
 
+if (random_groups_comparison)
+{
+  library(ape)
+  
+  taxo_groups = readRDS(paste0(results_folder,"/taxo_groups_modif_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  diversity = readRDS(paste0(results_folder,"/diversity_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  selected_groups = !(taxo_groups %in% groups_to_remove) & diversity > 100 
+  
+  optimalK_prevalence.min.crossValid_random.groups = readRDS("/Users/guilhemsommeria-klein/Desktop/Code/Projects/eDNA_LDA/Tara_LDA/Saved_results/random.group.div_optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-25t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds")
+  
+  # optimalK = readRDS(paste0(results_folder,"/OptimalK_2plusOTUs",noArcticNoBiomark_insert,noLagoon_insert,".rds"))
+  # Gibbs_VEM_insert = "_Gibbs.prevalence.min.crossValid10sampleFolds"
+  # optimalK_prevalence.min.crossValid.complete = readRDS(paste0(results_folder,"/optimalK_prevalence.min.crossValid_Gibbs10sampleFolds2-35t_iter1000thin25burnin500_2plusOTUs_noLagoon.rds"))
+  # optimalK_prevalence.min.crossValid.allTaxa = optimalK_prevalence.min.crossValid.complete[[1]]  
+  # optimalK_prevalence.min.crossValid = optimalK_prevalence.min.crossValid.complete[[2]]   
+  
+  nb_iter = 1000
+  nb_real = 100
+  thin = 25
+  burnin = 2000
+  
+  documents_random.groups = list()
+  div = 0
+  for (ii_taxon in 1:length(which(selected_groups)))
+  {
+    taxon = paste0("random.group.div.",ii_taxon)
+    
+    # Assigning unique i_taxon to each random group:
+    i_taxon = which(as.vector(diversity) == as.vector(diversity)[selected_groups][ii_taxon])
+    if (length(i_taxon)>1)
+    {
+      if (div != as.vector(diversity)[selected_groups][ii_taxon])
+      {
+        div = as.vector(diversity)[selected_groups][ii_taxon]
+        ii_div = 1
+      } else
+      {
+        ii_div = ii_div + 1
+      }
+      i_taxon = i_taxon[ii_div]
+    }
+    
+    data.folder_name = paste0(data_folder,"/18S_V9_TARA_CompleteSizeRange_byStationByDepth_",taxon,"_noLagoon")
+    
+    if (!is.na(optimalK_prevalence.min.crossValid_random.groups[i_taxon]))
+    {
+      data.folder_name = paste0(data_folder_workspace2,"/18S_V9_TARA_CompleteSizeRange_byStationByDepth_",taxon,noArcticNoBiomark_insert,noLagoon_insert)
+      nb_topics = optimalK_prevalence.min.crossValid_random.groups[i_taxon]
+      spatial_topicmix_kriged = readRDS(paste0(data.folder_name,"/Rtopicmodels_LDA_Gibbs_alpha0.1_delta0.1_nb_topics",nb_topics,"_nb_iter",nb_iter,"_nb_real",nb_real,"_meanPosteriorDistributedLlh_thin",thin,"_burnin",burnin,"_occurrence/1st_closestToMean_realization/Spatial_topicmix_kriged.rds"))
+      
+      # selecting the z.pred columns in all topics:
+      documents = unlist(lapply(spatial_topicmix_kriged,function(g) g$z.pred))
+      # setting one topic per column
+      documents = matrix(documents,ncol=nb_topics,dimnames=list(rownames(spatial_topicmix_kriged[[1]]),paste0("topic",1:nb_topics)))
+      documents_random.groups[[i_taxon]] = documents
+    }
+  }
+  
+  # VI = vector(length = 3, mode = "list")
+  # names(VI) = c("SUR","DCM","All")
+  # VI_over_K = vector(length = 3, mode = "list")
+  # names(VI_over_K) = c("SUR","DCM","All")
+  # VI_over_logK = vector(length = 3, mode = "list")
+  # names(VI_over_logK) = c("SUR","DCM","All")
+  Normalized_VI_random.groups = vector(length = 3, mode = "list")
+  names(Normalized_VI_random.groups) = c("SUR","DCM","All")
+  for (case in c("SUR","DCM","All"))
+  {
+    i_case = which(c("SUR","DCM","All") == case)
+    # VI[[i_case]] = matrix(nrow = length(taxo_groups), ncol = length(taxo_groups), dimnames = list(taxo_groups,taxo_groups), data = NA)
+    # VI_over_K[[i_case]] = matrix(nrow = length(taxo_groups), ncol = length(taxo_groups), dimnames = list(taxo_groups,taxo_groups), data = NA)
+    # VI_over_logK[[i_case]] = matrix(nrow = length(taxo_groups), ncol = length(taxo_groups), dimnames = list(taxo_groups,taxo_groups), data = NA)
+    Normalized_VI_random.groups[[i_case]] = matrix(nrow = length(taxo_groups), ncol = length(taxo_groups), dimnames = list(taxo_groups,taxo_groups), data = NA)
+    for (i in 2:length(taxo_groups))
+    {
+      for (j in 1:(i-1))
+      {
+        if (selected_groups[i] & selected_groups[j] & !is.na(optimalK_prevalence.min.crossValid_random.groups[i]) & !is.na(optimalK_prevalence.min.crossValid_random.groups[j]))
+        {
+          Pk_i = colMeans(documents_random.groups[[i]])
+          Pk1_j = colMeans(documents_random.groups[[j]])
+          if (i_case %in% c(1,2))
+          {
+            selected_stations_ij = rownames(coord)[rownames(coord) %in% rownames(documents_random.groups[[i]]) &
+                                                     rownames(coord) %in% rownames(documents_random.groups[[j]]) &
+                                                     stations_depths[,2] == case]
+          } else
+          {
+            selected_stations_ij = rownames(coord)[rownames(coord) %in% rownames(documents_random.groups[[i]]) & 
+                                                     rownames(coord) %in% rownames(documents_random.groups[[j]])]
+          } 
+          if (length(selected_stations_ij)>1)
+          {
+            sum_Pkk1_times_log_Pkk1_over_PkPk1 = 0
+            for (k in 1:ncol(documents_random.groups[[i]]))
+            {
+              for (k1 in 1:ncol(documents_random.groups[[j]]))
+              {
+                Pkk1 = mean(documents_random.groups[[i]][selected_stations_ij,k]*documents_random.groups[[j]][selected_stations_ij,k1])
+                if (Pkk1>0)
+                  sum_Pkk1_times_log_Pkk1_over_PkPk1 = sum_Pkk1_times_log_Pkk1_over_PkPk1 + Pkk1*(log(Pkk1) - log(Pk_i[k]) - log(Pk1_j[k1]))
+              }
+            }
+            # Computing the Variation of Information using probability values 
+            H_i = -sum(Pk_i*log(Pk_i))
+            H_j = -sum(Pk1_j*log(Pk1_j))
+            I = sum_Pkk1_times_log_Pkk1_over_PkPk1
+            Normalized_VI_random.groups[[i_case]][i,j] = (H_i + H_j - 2*I)/(H_i + H_j - I)
+            # VI_over_K[[i_case]][i,j] = VI[[i_case]][i,j]/(ncol(documents_allgroups[[j]]) + ncol(documents_allgroups[[i]]))*2
+            # VI_over_logK[[i_case]][i,j] = VI[[i_case]][i,j]/log((ncol(documents_allgroups[[j]]) + ncol(documents_allgroups[[i]]))/2)
+          } 
+        }
+      }
+    }
+  }
+  
+  NormalizedVI_random.groups_pcoa = vector(length = 3, mode = "list")
+  names(NormalizedVI_random.groups_pcoa) = c("SUR","DCM","All")
+  i_case = 3
+  for (i_case in 1:3)
+  {
+    VI.pcoa = pcoa(as.dist(Normalized_VI_random.groups[[i_case]][selected_groups,selected_groups][-(1:2),-(1:2)]))
+    NormalizedVI_random.groups_pcoa[[i_case]] = VI.pcoa$vectors
+  }
+  
+  plot(NormalizedVI_random.groups_pcoa[[3]][,1],NormalizedVI_random.groups_pcoa[[3]][,2])
+  #
+  plot(log10(as.vector(diversity))[selected_groups][-(1:2)],NormalizedVI_random.groups_pcoa[[3]][,2])
+  plot(log(as.vector(size_relativeAbund))[selected_groups][-(1:2)],NormalizedVI_random.groups_pcoa[[3]][,2])
+  plot(log(size_relativeAbund)[selected_groups][as.vector(log10(diversity))[selected_groups] > 2.5][-(1:2)],
+       NormalizedVI_random.groups_pcoa[[3]][,2][as.vector(log10(diversity))[selected_groups][-(1:2)] > 2.5])
+  #
+  plot(I_square.observed_w.mean.random.groups[selected_groups,1][-(1:2)],NormalizedVI_random.groups_pcoa[[3]][,1])
+  plot((lat_I_random.groups[selected_groups,1]/I_square.observed_w.mean.random.groups[selected_groups,1])[-(1:2)],
+       NormalizedVI_random.groups_pcoa[[3]][,2])
+  plot((basin_I_random.groups[selected_groups,1]/I_square.observed_w.mean.random.groups[selected_groups,1])[-(1:2)],
+       NormalizedVI_random.groups_pcoa[[3]][,2])
+}
+
 if (Arctic_analyses)
 {
   ######################################################
