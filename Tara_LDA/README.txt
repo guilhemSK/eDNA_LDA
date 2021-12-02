@@ -1,7 +1,7 @@
 
 R code and input and output data associated with the article 'Global drivers of eukaryotic plankton biogeography in the sunlit ocean', Sommeria-Klein et al. Science 2021.
 
-Formatted.input.data_and_output.biogeographies contains, bundled together in a zip file, the input data (properly formatted for the 'LDA_main' R code used to generate the results) and the output biogeographies (as data frames). The file tree structure is as outputted by the code: there is one folder per DNA marker and major plankton group, which contains:
+Formatted.input.data_and_output.biogeographies contains the input data (properly formatted for the 'LDA_main' R code used to generate the results) and the output biogeographies (as data frames), bundled together in a zip file. The file tree structure is as outputted by the code: there is one folder per DNA marker and major plankton group, which contains:
 - the input community matrix ('data2m.Rdata'),
 - the coordinates of the corresponding Tara stations ('coord.Rdata'), 
 - taxonomic information for the corresponding OTUs ('taxo_ref.Rdata'), 
@@ -17,3 +17,4 @@ In addition, the file "Biogeographies18SV9_assemblageByAssemblage_10majorGroups.
 
 Suitable absolute paths to data, code and figure folders need to be defined at the beginning of 'Multigroup_Tara_analyses.R' (lines 2-14) and 'Tara_figures.R' (lines 69-77). In particular, 'code_folder' should point to the folder to which the eDNA_LDA repository has been cloned, and 'data_folder' (as well as all 'data_folder_workspacex' variables) should point to the folder where the content of 'Formatted.input.data_and_output.biogeographies' has been downloaded and expanded.
 
+Note that the body size provided for each plankton group corresponds the mean body size estimated from the sampling size fractions where the group was recovered. This may significantly overestimate actual body size for some groups for a variety of reasons (e.g., parasitism, cell aggregates, particle feeding), therefore caution should be exercised before using our body size estimate for any particular group.
